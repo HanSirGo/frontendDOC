@@ -16,58 +16,41 @@ ECMAScript 也是一门脚本语言，缩写为ES，通常看做JavaScript的标
 在node环境中，JavaScript = ECMAScript + Node APIs
 ```
 
-##### (1) **变量声明**
+#### 变量声明
 
-**let** 声明变量 
-
-**const** 声明常量 
+```
+let 声明变量 
+const 声明常量 
 
 const 常量的实质：是变量指向的那个内存地址不变，基本数据类型的值就是内存地址所以不能改变，而引用数据类型保存的是一个指针（地址），而值则在堆内存中，只要地址不变，值可以改变 
 
 基础数据类型：按值访问；复制的是值 
-
 引用数据类型：按引用地址访问；复制的是地址
+```
 
-**let、const与var的区别：** 
+##### let、const与var的区别： 
 
-\1. 只在块级作用域有效 
+```
+1. 只在块级作用域有效 
+2. 不能重复声明 
+3. 不存在变量提升 
+4. const声明常量必须初始化。并且值不可改 
+5. let const 声明的变量不是window对象的属性 
+6. 变量提升：var声明的变量，由于浏览器机制将变量的声明都提升到当期作用域的最顶层 
+7. 暂时性死区：在当前作用域内，使用let声明变量之前，该变量都是不可用的
+```
 
-\2. 不能重复声明 
+####  解构赋值
 
-\3. 不存在变量提升 
-
-\4. const声明常量必须初始化。并且值不可改 
-
-\5. let const 声明的变量不是window对象的属性 
-
-\6. 变量提升：var声明的变量，由于浏览器机制将变量的声明都提升到当期作用域的最顶层 
-
-\7. 暂时性死区：在当前作用域内，使用let声明变量之前，该变量都是不可用的
-
-**let、const与var的区别：** 
-
-\1. 只在块级作用域有效 
-
-\2. 不能重复声明 
-
-\3. 不存在变量提升 
-
-\4. const声明常量必须初始化。并且值不可改 
-
-\5. let const 声明的变量不是window对象的属性 
-
-\6. 变量提升：var声明的变量，由于浏览器机制将变量的声明都提升到当期作用域的最顶层 
-
-\7. 暂时性死区：在当前作用域内，使用let声明变量之前，该变量都是不可用的
-
-##### (2) **解构赋值**
-
+```
 解构赋值：本质就是赋值，左边一种结构，右边一种结构，左右一一对立
+```
 
-**数组的解构赋值：由变量的位置决定 根据索引匹配**
+> **数组的解构赋值：由变量的位置决定 根据索引匹配**
+>
+> **对象的解构赋值：由属性决定  根据属性相同匹配**
 
-**对象的解构赋值：由属性决定  根据属性相同匹配**
-
+```
 其他数据的解构赋值：能当数组的用数组解构赋值，能看做对象的用对象的解构赋值
 
 string 可以作为 对象和数组的 解构赋值
@@ -77,9 +60,11 @@ null indefined 不可以
 number boolean有tostring方法可以作为对象来精选解构赋值
 
 使用默认值：一个位置未赋值或者赋的值严格等于 undefined 情况下，默认值生效
+```
 
-##### (3) **字符串的扩展**
+#### 字符串的扩展
 
+```
 编码：
 
 es5： let b = '\u4e00' 4e00是16进制，必须够4位，不够用0填充或{}包裹 ，\u 书unicode编码
@@ -89,55 +74,56 @@ es5： let b = '\u4e00' 4e00是16进制，必须够4位，不够用0填充或{}�
 let str = '\u0061' 或者 '\u{61}'
 
 es6:   \u 后必须是5位
+```
 
-**num.toString(16) 转 16进制字符转编码：**
+##### 字符串的方法：
 
-es5 ： str.charCodeAt(索引).toString(16)
+```
+num.toString(16) 转 16进制字符转编码：
+	es5 ： str.charCodeAt(索引).toString(16)
+	es6 :  str.codePointAt(索引).toString(16)
 
-es6 :  **str.codePointAt(索引).toString(16)编码转字符：**
+编码转字符：
+    es5 ： String.fromCharCode() 转为 4位编码
+    es6 ： String.CodePoint()  转为 5位编码
 
-es5 ： String.fromCharCode() 转为 4位编码
+判断字符串的开头结尾是否有指定值：
+    str.startsWith()
+    str.endsWith()
 
-es6 ： **String.CodePoint()  转为 5位编码**
+字符串的重复：
+	str.repeat()  参数为数字，表示重复几次
 
-**判断字符串的开头结尾是否有指定值：**
+字符串的自动补全：
+	str.padStart(length,value) 开头补全 length长度;用value补全
+	str.padEnd(length,value)  结尾补全
 
-**str.startsWith()**
+字符串去空格：
+    str.trimStart() 开头
+    str.trimEnd()  结尾
 
-**str.endsWith()**
+用指定字符串替换所有的匹配字符：
+	str.replaceAll(匹配字符,value)
 
-**字符串的重复：**
+查询字符：返回布尔值  
+	str.includes()
+```
 
-**str.repeat()  参数为数字，表示重复几次**
+#### 模板字符串
 
-**字符串的自动补全：**
-
-**str.padStart(length,value) 开头补全 length 长度  用value补全**
-
-**str.padEnd(length,value)  结尾补全：**
-
-**字符串去空格****：** **str.trimStart() 开头**  **str.trimEnd()  结尾**
-
-**用指定字符串替换所有的匹配字符：** **str.replaceAll(匹配字符,value)** 
-
-**查询字符：返回布尔值**  **str.includes()**
-
-##### (4) **模板字符串**
-
+```js
 用反引号 ``
 
-变量用 **${}**  包裹
+变量用 ${}  包裹
 
 例子:
+    let age = 18;
+    let text = `your age ${age}`
+```
 
-let age = 18;
+#### 扩展运算符...
 
-let text = `your age ${age}`
-
- 
-
-##### (5) **扩展运算符****...**
-
+```
 把数组，类数组展开成一系列用逗号隔开的值
 
 复制数组  [...arr]
@@ -145,51 +131,58 @@ let text = `your age ${age}`
 合并数组  [...arr1,...arr2]
 
 与解构赋值结合  [a,b,...c] = [1,2,3,4,5,]  // a=1,b=2,c=[3,4,5]
+```
 
-##### (6) **数组的扩展**
+#### 数组的扩展
 
-数组的方法：
+##### 数组的方法：
 
-es3 ：	pop shift push unshift slice splice sort reverse join indexOf lastIndexOf concat
+```
+es3:
+	pop shift push unshift slice splice sort reverse join indexOf lastIndexOf concat
 
-es5:		map filter forEach every some reduce reduceRight
+es5:
+	map filter forEach every some reduce reduceRight
+```
 
-es6:静态 方法：
+##### 静态方法：
 
+```
 Array.from() 将伪数组转为 数组  Array.from([1,2,3],item=>item+1)  [].slice.call() 
 
-​        [...argments]
+[...argments]
 
 Array.isArray()  判断是不是数组  
 
 Array.of()  将散列 装进 数组
+```
 
- 
+##### **数组实例 方法**：
 
-**数组实例 方法**：
+```js
+1. fill() 填充 fill(填充的值，起始下标，结束下标(不包括))  填充的元素是对象时，填充的是引用地址，一项改变，每项都变
 
-\1. fill() 填充 fill(填充的值，起始下标，结束下标(不包括))  填充的元素是对象时，填充的是引用地址，一项改变，每项都变
+2. copywithin()  将指定位置的成员复制到其他位置
+ copyWithin( 替换起始下标 ，指定起始下标 ， 结束下标 )
 
-\2. copywithin()  将指定位置的成员复制到其他位置
+3. keys()  values()  entires() 遍历数组
 
-​    copyWithin( 替换起始下标 ，指定起始下标 ， 结束下标 )
+4. find()  找到符合条件的第一个数组成员  arr.find(item => 条件)
 
-\3. keys()  values()  entires() 遍历数组
+5. findIndex() 找到符合条件的第一个元素 下标
 
-\4. find()  找到符合条件的第一个数组成员  arr.find(item => 条件)
+6. includes()  数组是否包含 指定的值 includes(检测的值 ，从下边开始)
 
-\5. findIndex() 找到符合条件的第一个元素 下标
+7. flat()  拉平 flat(Infinity)
 
-\6. includes()  数组是否包含 指定的值 includes(检测的值 ，从下边开始)
-
-\7. flat()  拉平 flat(Infinity)
-
-\8. flatMap()  只能拉平一层
+8. flatMap()  只能拉平一层
 
 [1,2,3].flatMap( (item,index) => [item,item*2] ) //[1,2,2,4,3,6]
+```
 
-###### ①　**判断一个数组是数组**
+##### 判断一个数组是数组
 
+```js
 Array.isArray()
 
 arr instanceof Array
@@ -203,9 +196,11 @@ Object.getPrototypeOf(arr) === Array.prototype
 Object.prototype.toString.call(arr) === '[Object Array]'
 
 Array.prototype.constructor.toString.call(arr) === '[Object Array]'
+```
 
-###### ②　**数组去重**
+##### 数组去重
 
+```js
 1.**filter** 
 
 arr.filter( (item,index,arr) => arr.indexOf(item) === index )
@@ -217,107 +212,90 @@ arr.filter( (item,index,arr) => arr.indexOf(item) === index )
 3.**reduce**
 
 arr.reduce( (pre,item,index) => 
-
-​    if(!pre.includes(item)){ pre.push(item) } return pre
-
+    if(!pre.includes(item)){ pre.push(item) } return pre
  , [] )
 
  4.**对象**
 
  let obj = {};
-
  arr.forEach( item => {
-
-​     if(obj[item]){
-
-​         obj[item]++;
-
-​     }else{
-
-​         obj[item]=1;
-
-​     }
+     if(obj[item]){
+         obj[item]++;
+     }else{
+         obj[item]=1;
+     }
 
  } )
 
-###### ③　**数组扁平化**
+```
 
-**数组的扁平化： 将多维数组 展成一维数组**
+##### 数组扁平化
 
+```js
+// **数组的扁平化： 将多维数组 展成一维数组**
 1.arr.flat(Infinity)
 
 2.let str = JSON.stringify(arr)
-
 arr = str.replace(/(\[\])/g,'').split(',')
 
-\3. let str = JSON.stringify(arr)
-
+3. let str = JSON.stringify(arr)
 str = str.replace(/(\[\])/g,'').split(',')
-
 str = '['+str+']'
-
 arr = JSON.parse(str)
 
- \4. function flatten(arr){
-
-​     return arr.reduce(pre,cur) => {
-
-​         return pre.concat(Array.isArray(cur)? flatten(cur):cur )
-
-​     }
-
+4. function flatten(arr){
+     return arr.reduce(pre,cur) => {
+         return pre.concat(Array.isArray(cur)? flatten(cur):cur )
+     }
  }
 
- 5.while(arr.some(item => Array.isArray(item) )){
-
-​     arr = [].concat(...arr)
-
+5.while(arr.some(item => Array.isArray(item) )){
+     arr = [].concat(...arr)
  }
 
-\6. 递归
+6. 递归
 
 let result = [];
 
 let fn = function (arr) { 
-
-​    for()let i=0;i<arr.length;i++){
-
-​        let item = arr[i];
-
-​        if(Array.isArray(arr[i])){
-
-​            fn(item)
-
-​        }else{
-
-​            result.push(item)
-
-​        }
-
-​    }
-
+    for()let i=0;i<arr.length;i++){
+        let item = arr[i];
+        if(Array.isArray(arr[i])){
+            fn(item)
+        }else{
+            result.push(item)
+        }
+    }
  }
+```
 
-##### (7) **数值的扩展** 
+#### 数值的扩展
 
+```
 二进制数值 ： 0b 或 0B 前缀  例如：0b101
 
 八进制数值 ： 0o  0O
 
 十六进制数值：0x 0X
+```
 
-**数值分隔符（下划线_）:**
+##### 数值分隔符（下划线_）
 
-1.没有指定间隔的位数，可以隔随意位添加 _      2.不能在数值开头/结尾
-
-3.不能连续写多个 _     4.小数点前后不能加 _    5.所有进制数值使用 _
+```
+1.没有指定间隔的位数，可以隔随意位添加 _      
+2.不能在数值开头/结尾
+3.不能连续写多个 _     
+4.小数点前后不能加 _    
+5.所有进制数值使用 _
 
 let num = 1_00;  num === 100 ;// true
+```
 
-将全局的方法放在Number上，es6对Number的优化：
+##### es6对Number的优化
 
+```js
+// 将全局的方法放在Number上
 1.Number.isNaN() 判断是不是NaN ；参数必须是数值，否者返回 false
-
 与 原来 的 isNaN相比，isNaN 会先把参数转为 数值
 
 2.Number.isFinite() 检测一个数是不是 有限的 参数必须是数值
@@ -325,9 +303,11 @@ let num = 1_00;  num === 100 ;// true
 3.Number.parseInt() 转 整数   '123.45px' --> 123
 
 4.Number.parseFloat() 转小数  '123.45px' --> 123.45
+```
 
-**新增方法：**
+##### 新增方法
 
+```js
 1.Number.isInteger() 是不是整数
 
 2.Number.EPSILON() 极小数，常量做误差处理 小于成功
@@ -339,9 +319,11 @@ Number.MAX_SAFE_INTEGER 最大安全数
 Number.MIN_SAFE_INTEGER 最小安全数
 
 安全整数 ： -2^53 ~ 2^53 之间的都是安全整数 不包括 2个断点
+```
 
-##### (8) **大整数 BigInt**
+#### 大整数 BigInt
 
+```js
 定义： 数值 + 后缀 n  例子:25n
 
 typeof 100n  ==>  BinInt
@@ -350,22 +332,21 @@ typeof 100n  ==>  BinInt
 
 1.解决数据精准度问题（安全整数）
 
- 2n**53n ==>  2**53
-
- 2n**53n+1n ==> 2**53+1
+     2n**53n ==>  2**53
+     2n**53n+1n ==> 2**53+1
 
 2.解决数据大时，无法表示的问题：
 
    2**1024 是计算机最大值 显示为 infinity 
+   2n**1024n 可以正常显示
+```
 
-   2n**1024n 可以正常显
+####  数学对象的扩展
 
-##### (9) **数学对象的扩展**
+##### es5
 
-**es5:**
-
+```
 Math.max()
-
 Math.min()
 
 **放大镜边界问题**：偏移量：L 最大偏移量：W 取值 Math.max(0,Math.min(L,W)) 取代if判断
@@ -383,9 +364,11 @@ Math.pow(a,b) a的b次方
 Math.abs() 绝对值
 
 Math.sqrt() 开平方
+```
 
-**es6 扩展**
+##### es6 扩展
 
+```
 Math.cbrt() 开立方
 
 Math.trunc() 取整
@@ -393,9 +376,11 @@ Math.trunc() 取整
 Math.hypot() 所有参数平方和 的开平方
 
 Math.sign() 判断正负数 负数 --> -1 整数 --> +1 0 --> 0  其他值 --> NaN
+```
 
-##### (10) **函数的扩展**
+#### 函数的扩展
 
+```
 函数的默认值：es6允许函数的参数设置默认值
 
 参数变量是默认值声明的，所以不能用let const再次声明
@@ -407,123 +392,129 @@ Math.sign() 判断正负数 负数 --> -1 整数 --> +1 0 --> 0  其他值 --> N
  
 
 函数带默认值会形成 独立作用域 初始化后消失
+```
 
- 
+##### rest参数
 
-rest参数：
-
+```js
 获取函数的多余参数，并放入数组中
 
 function fn(a,...arg){}  //arg 之后不能有其他参数，会报错
 
 fn(1,2,3,4)  arg//[2,3,4]
+```
 
-##### (11) **箭头函数**
+#### 箭头函数
 
-**let fn = () => {}**
+```js
+let fn = () => {}
+```
 
+```js
 特点：
 
 1.this指向问题，箭头函数中的this指向定义时的对象，而不是指向使用时的对象
 
-​    document.ondblclick = () => console.log(this)  //window
+    document.ondblclick = () => console.log(this)  //window
 
 2.箭头函数不能作为构造函数，所以不能用new 命令调用
 
-​    function Fn(){}  new Fn() //{}
+    function Fn(){}  new Fn() //{}
 
-​    let Fn = () => {} new Fn() //error
+    let Fn = () => {} new Fn() //error
 
 3.箭头函数内部没有arguments对象，可以用rest参数代替
 
-​    function fn(){ console.log(arguments) }  fn(1,2,3,40) //类数组
+    function fn(){ console.log(arguments) }  			fn(1,2,3,40) //类数组
 
-​    let fn = () => console.log(arguments)  fn(1,2,3,4)  //error
+    let fn = () => console.log(arguments)  				fn(1,2,3,4)  //error
 
-​    let fn = (...arg) => console.log(arg)  fn(1,2,3,4)  // [1,2,3,4]
+    let fn = (...arg) => console.log(arg)  
+    fn(1,2,3,4)  // [1,2,3,4]
 
 4.箭头函数不能做generator函数 内部不能使用yield命令
+    function * gen(){
+        yield 1+1
+        yield 'abc'
+        return 123
+    }
+    let g = gen()
+    g.next() //{value:2,done:false}
+    
+    let gen1 = () => { yield 'a' }
+    gen1()  //error
+```
 
-​    function * gen(){
+#### 对象的扩展
 
-​        yield 1+1
+##### 对象的简洁表达式
 
-​        yield 'abc'
-
-​        return 123
-
-​    }
-
-​    let g = gen()
-
-​    g.next() //{value:2,done:false}
-
-​    
-
-​    let gen1 = () => { yield 'a' }
-
-​    gen1()  //error
-
-##### (12) **对象的扩展**
-
-**对象的简洁表达式：** 
-
+```js
 let a = 100; const obj = { a:a,  getA:function(){ alert(this.a) } } 
 
-简洁：const obj = {  a,  getA(){alert(this.a)} }
+// 简洁
+const obj = {  a,  getA(){alert(this.a)} }
+```
 
- 
+##### 对象的属性表达式
 
-对象的**属性表达式**： const obj = { name:'zs',**['age'+1]**:18 }
+```js
+const obj = { name:'zs',['age'+1]:18 }
+```
 
- 
+##### 对象属性的添加方式
 
-**对象属性的添加方式：** 
-
-单个属性： 
+```js
+// 单个属性： 
 
 Object.defineProperty(obj,key,{ 
-
-value: , writable:false, //修改 默认否 可省略 
-
-enumerable:false, // 遍历 默认否 可省略 
-
-comfigurable:false //删除 默认否 可省略 
-
+	value: xx, 
+    writable:false, //修改 默认否 可省略 
+	enumerable:false, // 遍历 默认否 可省略 
+	comfigurable:false //删除 默认否 可省略 
 }) 
 
-所有属性： Object.defineProperties(obj,{ 属性:{ value... } })
+// 所有属性： 
+Object.defineProperties(obj,{ 属性:{ value... } })
+```
 
-**获取对象属性的描述对象** 
+##### 获取对象属性的描述对象
 
+```js
 单个属性： Object.getOwnPropertyDescriptor(obj,key) 
 
 所有属性： Object.getOwnPropertyDescriptors(obj) 
+```
 
-**对象的新增方法：** 
+##### 对象的新增方法
 
-Object.is() 判断 2值是否严格相等（长一样就是true，不一样false） 
+```js
+Object.is() 
+判断 2值是否严格相等（长一样就是true，不一样false） 
 
-注意：**NaN === NaN //false Object****.is****(NaN,NaN) true +0 === -0 //true** 
+注意：
+NaN === NaN // false
+Object.is(NaN,NaN) // true 
++0 === -0 // true 
 
-Object.assign() 拷贝 
+Object.assign() // 拷贝 
 
 Object.keys() Object.Values() Object.entries() 
 
-Object.fromEntires() 将键值对 数组 转为对象；例子：[['a',1],['b',2]] ==> {a:1,b:2}
+Object.fromEntires() // 将键值对 数组 转为对象；
+// 例子：[['a',1],['b',2]] ==> {a:1,b:2}
+```
 
-###### **赋值函数与取值函数：**
+##### 赋值函数与取值函数
 
-\1. 在 Object.defineProperty 与 Object.defineProperties 
+```js
+//1. 在 Object.defineProperty 与Object.defineProperties 
 
 let person = {} let value = '';
 
 Object.defineProperty(person,'sex',{// 
-
-set(v) { value = v } //赋值 
-
-get(v) { return value } //取值 
-
+	set(v) { value = v } //赋值 
+	get(v) { return value } //取值 
 })
 
 person.sex // '' 
@@ -532,41 +523,39 @@ person.sex = '男'
 
 person.sex //‘男’
 
-\2. 字面量法定义对象 
+// 2. 字面量法定义对象 
 
 const person = { 
-
-_sex:'',
-
-get sex(){ return this._sex },
-
-set sex(value){ this._sex = value } 
-
+    _sex:'',
+    get sex(){ return this._sex },
+    set sex(value){ this._sex = value } 
 } 
 
 person.sex // ''
-
 person.sex = '男' 
-
 person.sex //‘男’
+```
 
-**对象的 循环：** 
+##### 对象的循环
 
-for in 对象自身 和 继承的可枚举属性 不包括symbol 
+```js
+for in // 对象自身 和 继承的可枚举属性 不包括symbol 
 
-Object.keys() 对象自身可枚举属性 不包括symbol 
+Object.keys() // 对象自身可枚举属性 不包括symbol 
 
-Object.getOwnPropertyNames() 自身所有属性的键名 不包括symbol 
+Object.getOwnPropertyNames() // 自身所有属性的键名 不包括symbol 
 
-Object.getOwnPropertySymbols() 自身所有symbol 属性 键名 
+Object.getOwnPropertySymbols() // 自身所有symbol 属性 键名 
 
-Reflect.ownkeys() 自身所有属性的键名
+Reflect.ownkeys() // 自身所有属性的键名
+```
 
-##### (13) **运算符的扩展**
+#### 运算符的扩展
 
-###### ①　**?.** **链式判断运算符**
+##### ?. 链式判断运算符
 
-使用场景：
+```js
+// 使用场景：
 
 对象的属性 a?.b a?.[b]；函数或对象方法的调用 
 
@@ -575,58 +564,69 @@ fn?.(...args) const obj = { x:{a:1} }
 obj.c.a //报错 undefined 没有 a 属性 
 
 obj.c?.a //undefined
+```
 
-###### ②　***\*** **指数运算符** 
+##### ** 指数运算符
 
+```
 2**3**4 从右 到 左 运算
+```
 
-###### ③　**??** **null判断运算符** 
+##### ?? null判断运算符
 
-设置默认值，函数的参数默认值 
+```json
+// 设置默认值，函数的参数默认值 
 
-let x = a??1; 若 a 是 null 或 undefined 时，x = 1
+let x = a??1 // 若 a 是 null 或 undefined 时，x = 1
+```
 
-###### ④　**&&= ||= ??=** **逻辑赋值运算符** 
+##### &&= ||= ??= 逻辑赋值运算符
 
-var a = a??1 ==> a??=1 和 a = a+1 简写 a+=1
+```js
+var a = a??1 //  ==> a??=1 和 a = a+1 简写 a+=1
+```
 
-##### (14) **Symbol**
+#### Symbol
 
+```
 Symbol 基础数据类型  表示独一无二的值，是一个普通函数
 
 Symbol  做对象的属性时，用对象的的属性表达式 [Symbol()] 不会担心同名属性覆盖
+```
 
-声明方式：
+##### 声明方式
 
-1.Symbol() / Symbol('a')  便于描述好区分，无实际意义
+```js
+1.Symbol() / Symbol('a')  // 便于描述好区分，无实际意义
 
-2.Symbol.for('a') 全局注册字符串做参数；搜索有没有以该参数命名的Symbol值，有返回Symbol值，没有就声明
+2.Symbol.for('a') // 全局注册字符串做参数；搜索有没有以该参数命名的Symbol值，有返回Symbol值，没有就声明
 
-**2种声明方式的区别：Symbol.for('a') 被登记在全局供搜索，第一种不会**
+// 2种声明方式的区别：Symbol.for('a') 被登记在全局供搜索，第一种不会
 
-Symbol.keyFor() 返回一个已登记的Symbol类型值的key，没有返回undefined
+Symbol.keyFor() //返回一个已登记的Symbol类型值的key，没有返回undefined
 
-​    const s = Symbol.for('abc')
+    const s = Symbol.for('abc')
+    Symbol.keyFor(s)  // abc
+```
 
-​    Symbol.keyFor(s)  // abc
+##### Symbol 转为其他数据类型
 
-Symbol 转为其他数据类型：
+```
+    转string ：只能强制转换
+      number ：不能转
+      boolean:隐式转换，强制转换
+```
 
-​    转string ：只能强制转换
+#### Set
 
-​      number ：不能转
-
-​      boolean:隐式转换，强制转换
-
-##### (15) **Set**
-
-创建：
+```js
+// 创建
 
 \1. let s = new Set()  s.add()
 
 \2. let s = new Set([1,2,3,4,2])属性：
 
-size 成员个数方法：
+size 成员个数属性
 
 add() 添加；返回 Set本身
 
@@ -635,44 +635,54 @@ has() 查询；返回布尔值
 delete() 删除；返回布尔值
 
 clear() 清空；放回undefined
+```
 
-注意：
+```js
+// 注意：
+//    查询引用数据类型 易错点
 
-​    查询引用数据类型 易错点
+    s.add({a:1})  s.has({a:1}) //false  地址不一样
 
-​    s.add({a:1})  s.has({a:1}) //false  地址不一样
+    let obj = {a:1}  s.add(obj)  s.has(obj) // true
+//遍历：s.keys() values() entries() forEach()
+```
 
-​    let obj = {a:1}  s.add(obj)  s.has(obj) // true遍历：s.keys() values() entries() forEach()
-
- 
-
+```js
 Set 转数组 ===>  [...new Set()]   /  Array.from( new Set() )
 
 数组转 Set ===>  new Set(arr)
+```
 
-##### (16) **WeakSet**
+#### WeakSet
 
+```
 成员只能是数组 对对象的引用是弱引用弱引用：垃圾回收机制不考虑 weakSet对 该对象有引用，如果其他对象都不在引用该对象，那么垃圾回收机制会自动回收该对象所占用的内存，不考虑该对象还存在于weakSet中。
+```
 
-**创建：**
+```js
+// 创建：
 
 let ws = new WeakSet()
 
 方法：添加  ws.add({a:1}).add([1,2])
 
-因为是弱引用 所以没有size属性，没有clear方法，不能遍历
+// 因为是弱引用 所以没有size属性，没有clear方法，不能遍历
+```
 
-##### (17) **Map**
+#### Map
 
-**创建：**
+```js
+// 创建：
 
 \1. let m = new Map()  m.set('a',1).set({name:'zs'},true) //key 可以是任意数据类型
 
 \2. let m = new Map([ ['a',1] , ['b',2,true] ]) //参数是键值对数组 ['b',2,true] 多的元素会被省略，不放到map结构中
 
-**属性：**size 成员总数
+// 属性：
 
-**方法：**
+size 成员总数
+
+// 方法：
 
 set(key,value) 添加，设置键值对，返回 map结构本身可以链式；key可以是任意数据类型
 
@@ -685,53 +695,51 @@ delete(key) 删除；返回布尔值 成功true
 clear() 清空；返回undefined
 
 遍历 m.keys() values() entries() forEach()
+```
 
  
 
-**Map 与 对象 的转换：**
+```js
+// Map 与 对象 的转换
 
-对象 > Map  ==> 1. 循环 Object.keys() 把 键值对 用 set 添加
+	// 对象 > Map  ==> 
+	1. 循环 Object.keys() 把 键值对 用 set 添加
+    2. new Map(Object.entries(obj)) 
 
-​                \2. new Map(Object.entries(obj)) 
+	// Map > 对象  ==> 
+	Object.fromEntries(map)
 
-Map > 对象  ==> Object.fromEntries(map)
+// Map 与 string 转换：
 
- 
+   Map --> string
+   string --> map
 
-**Map 与 string 转换：**
+// Map 与数组 转换:
 
-​    Map --> string
+    Map --> array ...
+    array --> Map  new Map()
 
-​    string --> map
+// Map 与 对象 的区别：
 
-**Map 与数组 转换**
+    1.键值 用 => 链接
+    2.任何数据都可以当键
+```
 
-​    Map --> array ...
+#### WeakMap
 
-​    array --> Map  new Map()
-
- 
-
-**Map 与 对象 的区别：**
-
-1.键值 用 => 链接
-
-2.任何数据都可以当键
-
-##### (18) **WeakMap**
-
-键 只能是对象类型 是弱引用 不能遍历
+```js
+// 键 只能是对象类型 是弱引用 不能遍历
 
 const wm = new WeakMap()
 
 wm.set({name:'zs'},true)
 
- 
+//方法： get()  set()  has()  delete()
+```
 
-方法： get()  set()  has()  delete()
+#### Set 、Map、数组、对象 对数据的操作对比
 
-##### (19) **Set** **、****Map****、****数组****、****对象** **对数据的操作对比**
-
+```js
 const arr = [ {name:'苹果',id:'1001'},{name:'橙子',id:'1002'} ] 
 
 检测以上数据是否有 1002 对应的商品，先得到，在删除； 
@@ -746,7 +754,8 @@ let id = '1002'
 
 //删除 arr.splice(index,1)
 
-//2.对象 let obj = { 1001:{name:'苹果',id:'1001'},1002:{name:'橙子',id:'1002'} }
+//2.对象 
+let obj = { 1001:{name:'苹果',id:'1001'},1002:{name:'橙子',id:'1002'} }
 
 //查询 id in obj
 
@@ -783,72 +792,77 @@ map.set('1001',{name:'苹果',id:'1001'}).set('1002',{name:'橙子',id:'1002'})
 //取值 map.get(id) 
 
 //删除 map.delete(id)
+```
 
-##### (20) **Reflect**
+#### Reflect
 
-**Reflect:反射 用来代替object 处理对象的相关操作**
+> **Reflect:反射 用来代替object 处理对象的相关操作**
 
-**1.设置属性**
+##### 设置属性
 
+```js
 Reflect.set(obj,key,value)
 
 Reflect.set(obj,key,value,receiver) 
 
-receiver 可选参数，如果设置的属性是赋值函数，那么this 指向这个参数
+// receiver 可选参数，如果设置的属性是赋值函数，那么this 指向这个参数
+```
 
-**2.获取属性值**
+##### 获取属性值
 
+```js
 Reflect.get(obj,key,receiver)
 
-receiver 可选参数，如果获取的属性是取值函数，那么this 指向这个参数
+// receiver 可选参数，如果获取的属性是取值函数，那么this 指向这个参数
 
 let obj = {x:1,y:2}
 
 const obj2 = {
-
-​    x:100,
-
-​    y:100,
-
-​    get z(){
-
-​        return this.x+this.y
-
-​    }
-
+    x:100,
+    y:100,
+    get z(){
+        return this.x+this.y
+    }
 }
 
 Reflect.get(obj2,z,obj1) //3
+```
 
-**3.查询是否有某个属性**
+##### 查询是否有某个属性
 
+```
 Reflect.has(obj,key)
+```
 
-**4.删除 某个属性**
+##### 删除 某个属性
 
+```
 Reflect.deleteProperty(obj,key)
+```
 
-**5.定义属性**
+##### 定义属性
 
+```js
 Reflect.defineProperty(obj,key,{value:....})
 
-es5: Object.defineProperty()  Object.difineProperties()
+// 相当于 es5: 
+Object.defineProperty()  Object.difineProperties()
+```
 
-**6.获取所有的属性名**
+##### 获取所有的属性名
 
+```js
 Reflect.ownkeys(obj)
 
-**es5**: Object.getOwnPropertyNames() //普通属性
+// 相当于 es5: 
+	Object.getOwnPropertyNames() //普通属性
+	Object.getOwnPropertySymbols()// symbol 属性
+```
 
-​    Object.getOwnPropertySymbols()// symbol 属性
+##### Reflect反射函数操作
 
- 
-
-**Reflect反射函数操作：**
-
- 
-
-**1.调用函数，更改this指向**
+```js
+// 1. 调用函数，更改this指向
 
 es5: call/apply/bind
 
@@ -857,115 +871,111 @@ call \ apply 更改this指向并调用函数，bind只更改指向，不调用�
 call 参数传散列，apply传参数数组，bind参数最好放在函数调用里
 
 Reflect.apply(func,thisArg,args)
+// func 调用函数 thisArg this指向 args 参数[]
 
-func 调用函数 thisArg this指向 args 参数[]
-
-**2.代替new 关键字用来调用构造函数 创建实例**
+// 2. 代替new 关键字用来调用构造函数 创建实例
 
 Reflect.construct( 构造函数，参数[] )
 
 es5: let arr = new Array(10)
 
 let arr1 = Reflect.construct(Array,[10])
+```
 
-##### (21) **Proxy 代理**
+#### Proxy 代理
 
-**proxy 代理 在目标对象之前架设一层拦截，对外界的访问进行过滤和改写**
+> **proxy 代理 在目标对象之前架设一层拦截，对外界的访问进行过滤和改写**
 
-用法：**let proxy = new Proxy(target目标对象,handler拦截对象)**
+```js
+// 用法：
+let proxy = new Proxy(target目标对象,handler拦截对象)
+```
 
-**1.拦截对象属性的操作**
+##### 1. 拦截对象属性的操作
 
+```js
 let proxy = new Proxy(obj,{
 
-​    get(target,key,proxy){}  // 拦截属性的读取
+    get(target,key,proxy){}  // 拦截属性的读取
 
-​    set(target,key,value,proxy){}  // 拦截属性的设置
+    set(target,key,value,proxy){}  // 拦截属性的设置
 
-​    has(target,key){}  //拦截属性的查询
+    has(target,key){}  //拦截属性的查询
 
-​    deleteProperty(target,key){}  //拦截属性的删除
+    deleteProperty(target,key){}  //拦截属性的删除
 
-​    defineProperty(target,key){}
+    defineProperty(target,key){}
 
-​    ownKeys(target){} //拦截属性的遍历
+    ownKeys(target){} //拦截属性的遍历
 
 }) 
+```
 
-**2.拦截函数调用的操作**
+##### 2. 拦截函数调用的操作
 
+```js
 let proxy = new Proxy(fn,{
-
-​    apply(target,context,args){ target.apply(context,args) }
-
+    apply(target,context,args){ 
+    	target.apply(context,args)
+    }
 })
 
-例子： Reflect.apply(proxy,null,[1,2])
+// 例子： Reflect.apply(proxy,null,[1,2])
+```
 
-**3.拦截new关键字**
+##### 3. 拦截new关键字
 
+```js
 let ProxyFn = new Proxy(Fn,{
-
-​    construct(target,args,proxy)
-
+    construct(target,args,proxy)
 })
 
-例子： Reflect.construct(构造函数，参数[])
+// 例子： Reflect.construct(构造函数，参数[])
+```
 
-##### (22) **面向对象 es5**
+#### 面向对象 es5
 
-**面向对象：面向对象是一种编程思想，是用对象时只关注对象，提供的功能，不关注其内部细节**
+> **面向对象：面向对象是一种编程思想，是用对象时只关注对象，提供的功能，不关注其内部细节**
+>
+> **面向对象的特性：封装、多态、继承**
+>
+> **es5 实现面向对象的方式：构造函数内部写属性，原型上写方法**
+>
 
-**面向对象的特性：****封装、多态、继承**
+##### 工厂模式创建对象
 
-**es5 实现面向对象的方式：构造函数内部写属性，原型上写方法**
-
-**工厂模式创建对象：**
-
+```js
 function createObj(name,age){
-
-​    const obj = new Object()
-
-​    obj.name = name;
-
-​    obj.age = age;
-
-​    obj.like = function(){}
-
-​    return obj
-
+    const obj = new Object()
+    obj.name = name;
+    obj.age = age;
+    obj.like = function(){}
+    return obj
 }
 
 const obj1 = createObj('zs',18)
+```
 
- 
+##### 系统创建对象
 
-**系统创建对象：**
-
+```js
 const arr = new Array()
 
 const date = new Date()
 
- 
-
 function CreateObj(name,age){
-
-​    this.name = name;
-
-​    this.age = age;
-
+    this.name = name;
+    this.age = age;
 }
 
 CreateObj.prototype.like = function(){}
 
- 
-
 const obj = new CreateObj('zs',18)
+```
 
- 
+##### new的作用
 
-###### ①　**new的作用：**
-
+```js
 1.在构造函数内部创建this对象
 
 2.构造函数最好隐式返回this对象
@@ -973,119 +983,109 @@ const obj = new CreateObj('zs',18)
 3.this指向new构造函数创建出来的实例
 
 4.让实例的__proto__ ([[prototype]]) 属性指向构造函数的原型prototype
+```
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps49.jpg) 
 
-##### (23) **面向对象 es6**
+##### 继承
 
-class 定义一个 类
+```js
+//通过继承创建的新类 称： 子类 、派生类
+//被继承的类 称： 基类、父类、超类
 
-类的本质 还是构造函数
+// 子类继承父类：
 
-class 是构造函数的语法糖
+// 属性继承： 
+	Reflect.apply(父类，this,[])
 
-class F {
+//方法继承：
 
-​    constructor(){}
-
-​    skill(){}
-
-}
-
-##### (24) **继承 es5**
-
-通过继承创建的新类 称： 子类 、派生类
-
-被继承的类 称： 基类、父类、超类
-
-**子类继承父类**：
-
-**属性继承：** Reflect.apply(父类，this,[])
-
-**方法继承**：
-
-function Fn(){}
-
-Fn.prototype = 父类.prototype
-
-const f = new Fn()
-
-子类.prototype = f //缺了constructor属性
-
-子类.prototype.constructor = 子类
-
- 
+    function Fn(){}
+    Fn.prototype = 父类.prototype
+    const f = new Fn()
+    子类.prototype = f //缺了constructor属性
+    子类.prototype.constructor = 子类
 
 **Object.create()**
 
 const obj = Object.create(A,{})
 
-将A对象设置为obj的隐式原型，第二参数：可以扩展自己的属性和方法，类似于Object.defineProperties(obj,{})的第二参数
+// 将A对象设置为obj的隐式原型，第二参数：可以扩展自己的属性和方法，类似于Object.defineProperties(obj,{})的第二参数
+```
 
-##### (25) **继承 es6**
 
-父类：
+
+#### 面向对象 es6
+
+```js
+class 定义一个 类
+
+// 类的本质 还是构造函数
+
+class 是构造函数的语法糖
+
+class F {
+    constructor(){}
+    skill(){}
+}
+```
+
+##### 继承
+
+```js
+// 父类：
 
 class Parent {
-
-​    constructor(x){ this.x = x }
-
-​    getX(){ console.log(this.x) } //实例方法，创建实例在实例调用
-
-​    static sayHello(){ console.log('hello') } // 静态方法，构造函数调用
-
+    constructor(x){ this.x = x }
+    getX(){ console.log(this.x) } 
+    //实例方法，创建实例在实例调用
+    static sayHello(){ console.log('hello') } 
+    // 静态方法，构造函数调用
 }
 
-子类：
+// 子类：
 
 class Child extends Parent{
-
-​    constructor(x,y){
-
-​        super(x)
-
-​        this.y = y
-
-​    }
-
-​    a(){
-
-​        super.getX()
-
-​        super.sayHello() //报错
-
-​    }
-
-​    static b(){
-
-​        super.getX() //报错
-
-​        super.sayHello()
-
-​    }
+    constructor(x,y){
+        super(x)
+        this.y = y
+    }
+    a(){
+        super.getX()
+        super.sayHello() //报错
+    }
+    static b(){
+        super.getX() //报错
+        super.sayHello()
+    }
 
 }
+```
 
+##### super
+
+```js
 super 只能在子类中使用：
 
 1.super 作为函数调用：
 
-代表的是父类构造函数，在子类的constructor内部使用，用来塑造this对象
+	代表的是父类构造函数，在子类的constructor内部使用，用来塑造this对象
 
 2.super作为对象使用：
 
-a. 在普通函数：代表父类原型
-
-b. 在静态方法： 代表父类 父类构造函数
+    a. 在普通函数：代表父类原型
+    b. 在静态方法：代表父类 父类构造函数
+```
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps50.jpg) 
 
-##### (26) **模块化** 
+#### 模块化 
 
-###### ①　**es6**
+> **模块化**：将软件分解成若干个独立的，可替换的，具备预定功能的模块，每个模块实现一个功能，个模块通过接口，组合在一起，形成最终程序
 
-**模块化**：将软件分解成若干个独立的，可替换的，具备预定功能的模块，每个模块实现一个功能，个模块通过接口，组合在一起，形成最终程序
+##### ESModule/ESM
 
+```js
 1.引入到 html中时： <script src=""  type="module"></script>
 
 一般把模块引到 入口文件中，dom中引入入口文件
@@ -1093,47 +1093,45 @@ b. 在静态方法： 代表父类 父类构造函数
 2.下图
 
 3.as 重命名 抛出或引入都可以重命名
+```
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps51.jpg) 
 
-###### ②　**模****块化 commonJs**
+##### commonJs
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps52.jpg) 
 
-###### ③　**区别**
+##### ESM与CJS区别
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps53.jpg) 
 
-###### ④　**其他模块化**
+##### 其他模块化
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps54.jpg) 
 
-##### (27) **异步编程****--------****解决异步问题方法**
+#### 异步编程--------解决异步问题方法
 
-###### ①　**回调函数**
+##### 1. 回调函数
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps55.jpg) 
 
- 
-
-###### ②　**Promise**
+##### 2. Promise
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps56.jpg) 
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps57.jpg) 
 
- 
-
-###### ③　**Generator函数**
+##### 3. Generator函数
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps58.jpg) 
 
  
 
-###### ④　**async/await 函数**
+##### 4. async/await 函数
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps59.jpg) 
 
  
 
  
+

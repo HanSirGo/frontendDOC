@@ -319,6 +319,8 @@ Promise.resolve().then(函数)
 	4. 受事件循环的影响，计时器的回调函数只能在主线程空闲时运⾏，因此⼜带来了偏差
 ```
 
+------
+
 ## 浏览器渲染原理
 
 #### 渲染流⽔线
@@ -581,6 +583,210 @@ repaint 的本质就是重新根据分层信息计算了绘制指令。
 
 ![1709370350303](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709370350303.png)
 
+------
+
+
+
+## 数据类型
+
+### 基本数据类型
+
+```
+Number
+Boolean
+String
+Null
+Undefined
+Symbol(es6,独一无二的值)
+BigInt(es10)
+```
+
+#### 存储方式
+
+```
+直接存储在栈(stack)中，占据空间小、大小固定、频繁使用,所以放在栈中存储
+```
+
+
+
+### 引用数据类型
+
+```
+Object,Object本质上是由一组无序的键值对组成,里面包含 Function、Array、Date...
+```
+
+#### 存储方式
+
+```
+同时存储在栈(stack)和堆(heap)中,占据空间大、大小不固定.
+	引用数据类型在栈中存储了【指针】,该【指针】指向 【堆】中该实体的【起始地址】;
+	当解释器寻找引用值时,会首先检索其在栈中的地址,取得地址后从堆中获取实体.
+```
+
+#### Array
+
+##### 声明(创建)
+
+```js
+1. new Array()
+	a. 无参数: 返回空数组[]
+	b. 一个参数:
+    数字 代表长度: new Array(3)// [empty × 3] length:3
+	其他类型 代表数组的元素: 
+		new Array(undefined) // [undefined] 		
+		new Array('abc') //['abc']
+	c. 多个参数:
+    都是数组的元素:
+		new Array(3,2,null) // [3, 2, null] 
+```
+
+##### 判断一个数组
+
+##### 构造函数静态方法
+
+###### Array.from()
+
+```
+Array.from()方法就是将一个类数组对象或者可遍历对象转换成一个真正的数组。
+参数：
+	第一个参数：类数组等
+	第二参数：映射(类似map方法)
+	第三参数：作用域
+```
+
+```js
+1. 将类数组(元素集合、参数集合)对象转换为真正数组
+
+要将一个类数组对象转换成一个真正的数组,必须具备以下条件:
+	a. 该类数组对象必须具备length属性,用于指定数组的长度.如果没有length属性,那么转换后的数组是一个空数组
+	ps: 转换后的数组的元素的个数=length属性的值
+	let obj = { 
+		1:'a',
+		'2':'b',
+        'abc':'c',
+		[Symbol('w')]:2,
+		length:1
+	}
+    Array.from(obj) //[undefined]
+	b. 该类型数组对象的属性名必须为数值型或者字符串类型的数字;
+	let obj = { 
+		1:'a',
+		'2':'b',
+        'abc':'c',
+		[Symbol('w')]:2,
+		length:4
+	}
+    Array.from(obj) //[undefined, "a", "b", undefined]
+```
+
+```js
+2. 将 Set结构的数据转换为真正的数组
+let arr = [1,2,3,4]
+Array.from(new Set(arr)) // [1,2,3,4]
+// 等同于
+[... new Set(arr)]
+```
+
+```js
+3. 将字符串转换为数组:
+let str = 'abc';
+Array.from(str) // ['a','b','c']
+```
+
+```js
+4. Array.from参数是一个真正的数组: 返回一个一模一样的数组
+let arr = [1,2,3,4]
+Array.from(arr) // [1,2,3,4]
+```
+
+```js
+Array.from还可以接收第二个参数,作用类似于数组的map方法,用来对每个元素进行处理,将处理后的值放入返回的数组
+let arr = [1,2,3,4]
+Array.from(arr,item => item*2) // [2, 4, 6, 8]
+```
+
+```js
+Array.from还可以接收第三个参数:作用域
+const obj = {
+    class: 'A',
+    show(el){
+        return `我是${this.class}班的${el}`
+    }
+}
+Array.from(['张三','李四'],obj.show,obj) // ["我是A班的张三", "我是A班的李四"]
+```
+
+###### Array.of()
+
+```js
+Array.of() 方法创建一个具有可变数量参数的新数组实例，而不考虑参数的数量或类型。
+Array.of() // []
+Array.of(1,null,undefined) // [1, null, undefined]
+Array.of([1,2,3]) // [ [1,2,3] ]
+Array.of({'a':1}) // [ {'a':1} ]
+Array.of({1:'a',2:'b',length:2}) // [ {1:'a',2:'b',length:2} ]
+```
+
+> **不论参数是什么都会 返回一个 [] 包裹着参数的数组**
+
+##### 原型方法
+
+#### Object
+
+##### 声明(创建)
+
+```
+
+```
+
+#### function
+
+##### 声明(创建)
+
+```js
+函数定义的三种方式:
+	1. 函数声明:
+		function fn() { }
+	2. 函数表达式 / 函数字面量
+		var fn = function() {}
+    3. Function 构造函数
+    	new Function() {}
+```
+
+[^字面量]: 用于表达一个固定值的表示法,又叫常量
+
+##### arguments对象
+
+```js
+arguments对象是函数中传递的参数值的集合.
+	它是一个类似数组的对象(类数组),因为它有一个length属性;
+	我们可以使用数组索引表示法arguments[1]来访问单个值,但它没有数组中的内置方法,如:forEach、filter...
+
+将arguments对象转换成一个数组:
+	1. 我们可以使用 Array.prototype.slice将arguments对象转换成一个数组;
+	function fn() {
+		return Array.prototype.slice.call(arguments)
+	}
+	2. 使用es6的扩展运算符: [... arguments]
+	3. 也可以使用es6的函数的剩余参数rest语法 fn(...args)
+```
+
+> 箭头函数中没有arguments对象
+>
+> <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709520579205.png" alt="1709520579205" style="zoom: 67%;" />
+>
+> 可以使用rest语法:
+>
+> <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709520629183.png" alt="1709520629183" style="zoom: 67%;" />
+
+##### 作用域
+
+##### 作用域链
+
+##### 高阶函数
+
+##### 函数柯里化
+
 #### 逻辑赋值运算符
 
 ```
@@ -591,6 +797,14 @@ x ||= true;
 
 console.log(x); // Output: true
 ```
+
+### 数据类型转换
+
+#### 隐式转换
+
+
+
+------
 
 
 

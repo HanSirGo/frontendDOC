@@ -12,7 +12,7 @@ git rm --cached 文件名（可多个） 取消追踪
 git checkout -- 文件名 还原成修改前的状态
 ```
 
-##### Git合并分支
+##### Git 合并分支
 
 ```
 git add . 暂存缓存区
@@ -111,6 +111,30 @@ git checkout branchname
 使用命令：
 git reflog --date=local --all | grep 后面加上要查询的分支名称
 ```
+// TODO git stash 补存
+##### Git 暂存
+
+```js
+git add
+git add . // 提交到暂存区
+git commit -m '注释' // 提交到本地仓库
+
+git stash 
+git stash pop
+git stash pop x
+git stash clear
+git stash save '注释'
+git stash list
+git stash apply x
+```
+
+##### tag
+
+```
+gitLab...网站上,点击[标签],[新建标签],填写[标签名],[创建标签]
+```
+
+
 
 #### Git 分支规范
 
