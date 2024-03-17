@@ -1,3 +1,197 @@
+## 事件循环
+
+##### 浏览器的进程模型 
+
+###### 何为进程？ 
+
+```
+程序运⾏需要有它⾃⼰专属的内存空间，可以把这块内存空间简单的理解为进程
+```
+
+![1709363890154](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709363890154.png)
+
+```
+每个应⽤⾄少有⼀个进程，进程之间相互独⽴，即使要通信，也需要双⽅同意。
+```
+
+###### 何为线程？
+
+```
+有了进程后，就可以运⾏程序的代码了。
+运⾏代码的「⼈」称之为「线程」。
+⼀个进程⾄少有⼀个线程，所以在进程开启后会⾃动创建⼀个线程来运⾏代码，该线程称之为主线程。
+如果程序需要同时执⾏多块代码，主线程就会启动更多的线程来执⾏代码，所以⼀个进程中可以包含多个线程。
+```
+
+![1709364003533](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709364003533.png)
+
+###### 浏览器有哪些进程和线程？
+
+```
+浏览器是⼀个多进程多线程的应⽤程序
+浏览器内部⼯作极其复杂。
+为了避免相互影响，为了减少连环崩溃的⼏率，当启动浏览器后，它会⾃动启动多个进程。
+```
+
+![1709364087871](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709364087871.png)
+
+> 可以在浏览器的任务管理器中查看当前的所有进程
+
+```
+其中，最主要的进程有：
+1. 浏览器进程
+主要负责界⾯显示、⽤户交互、⼦进程管理等。浏览器进程内部会启动多个线程处理不同的任务。
+2. ⽹络进程
+负责加载⽹络资源。⽹络进程内部会启动多个线程来处理不同的⽹络任务。
+3. 渲染进程
+渲染进程启动后，会开启⼀个渲染主线程，主线程负责执⾏ HTML、CSS、JS 代码。
+默认情况下，浏览器会为每个标签⻚开启⼀个新的渲染进程，以保证不同的标签⻚之间不相互影响。
+```
+
+> 将来该默认模式可能会有所改变，可参⻅ chrome官⽅说明⽂档
+
+###### 渲染主线程是如何⼯作的？
+
+```
+渲染主线程是浏览器中最繁忙的线程，需要它处理的任务包括但不限于：
+	解析 HTML
+	解析 CSS
+	计算样式
+	布局
+	处理图层
+	每秒把⻚⾯画 60 次
+	执⾏全局 JS 代码
+	执⾏事件处理函数
+	执⾏计时器的回调函数
+	......
+```
+
+> 为什么渲染进程不适⽤多个线程来处理这些事情？
+
+```
+要处理这么多的任务，主线程遇到了⼀个前所未有的难题：如何调度任务？
+⽐如：
+	我正在执⾏⼀个 JS 函数，执⾏到⼀半的时候⽤户点击了按钮，我该⽴即去执⾏点击事件的处理函数吗？
+	我正在执⾏⼀个 JS 函数，执⾏到⼀半的时候某个计时器到达了时间，我该⽴即去执⾏它的回调吗？
+	浏览器进程通知我“⽤户点击了按钮”，与此同时，某个计时器也到达了时间，我应该处理哪⼀个呢？
+	......
+渲染主线程想出了⼀个绝妙的主意来处理这个问题：排队
+```
+
+![1709364520684](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709364520684.png)
+
+```
+1. 在最开始的时候，渲染主线程会进⼊⼀个⽆限循环
+2. 每⼀次循环会检查消息队列中是否有任务存在。如果有，就取出第⼀个任务执⾏，执⾏完⼀个后进⼊下⼀次循环；如果没有，则进⼊休眠状态。
+3. 其他所有线程（包括其他进程的线程）可以随时向消息队列添加任务。新任务会加到消息队列的末尾。在添加新任务时，如果主线程是休眠状态，则会将其唤醒以继续循环拿取任务
+
+这样⼀来，就可以让每个任务有条不紊的、持续的进⾏下去了。
+整个过程，被称之为事件循环（消息循环）
+```
+
+##### 何为异步？
+
+```
+代码在执⾏过程中，会遇到⼀些⽆法⽴即处理的任务，⽐如：
+	计时完成后需要执⾏的任务 —— setTimeout 、 setInterval
+	⽹络通信完成后需要执⾏的任务 -- XHR 、 Fetch
+	⽤户操作后需要执⾏的任务 -- addEventListener
+	
+如果让渲染主线程等待这些任务的时机达到，就会导致主线程⻓期处于「阻塞」的状态，从⽽导致浏览器「卡死」
+```
+
+![1709365613427](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709365613427.png)
+
+```
+渲染主线程承担着极其重要的⼯作，⽆论如何都不能阻塞！
+因此，浏览器选择异步来解决这个问题
+```
+
+![1709365677839](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709365677839.png)
+
+```
+使⽤异步的⽅式，渲染主线程永不阻塞
+```
+
+###### JS 的异步
+
+```
+JS是⼀⻔单线程的语⾔，这是因为它运⾏在浏览器的渲染主线程中，⽽渲染主线程只有⼀个。
+⽽渲染主线程承担着诸多的⼯作，渲染⻚⾯、执⾏ JS 都在其中运⾏。
+如果使⽤同步的⽅式，就极有可能导致主线程产⽣阻塞，从⽽导致消息队列中的很多其他任务⽆法得到执⾏。这样⼀来，⼀⽅⾯会导致繁忙的主线程⽩⽩的消耗时间，另⼀⽅⾯导致⻚⾯⽆法及时更新，给⽤户造成卡死现象。
+所以浏览器采⽤异步的⽅式来避免。具体做法是当某些任务发⽣时，⽐如计时器、⽹络、事件监听，主线程将任务交给其他线程去处理，⾃身⽴即结束任务的执⾏，转⽽执⾏后续代码。当其他线程完成时，将事先传递的回调函数包装成任务，加⼊到消息队列的末尾排队，等待主线程调度执⾏。
+在这种异步模式下，浏览器永不阻塞，从⽽最⼤限度的保证了单线程的流畅运⾏。
+
+```
+
+###### JS为何会阻碍渲染？
+
+```js
+// 先看代码
+
+<h1>awesome!</h1>
+<button>change</button>
+<script>
+var h1 = document.querySelector('h1');
+var btn = document.querySelector('button');
+// 死循环指定的时间
+function delay(duration) {
+    var start = Date.now();
+    while (Date.now() - start < duration) {}
+}
+btn.onclick = function () {
+    h1.textContent = '很帅！';
+    delay(3000);
+};
+</script>
+// 点击按钮后，会发⽣什么呢？
+```
+
+##### 任务有优先级吗？
+
+```js
+任务没有优先级，在消息队列中先进先出
+但消息队列是有优先级的
+
+根据 W3C 的最新解释:
+	每个任务都有⼀个任务类型，同⼀个类型的任务必须在⼀个队列，不同类型的任务可以分属于不同的队列。在⼀次事件循环中，浏览器可以根据实际情况从不同的队列中取出任务执⾏。
+	浏览器必须准备好⼀个微队列，微队列中的任务优先所有其他任务执⾏https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint
+
+随着浏览器的复杂度急剧提升，W3C 不再使⽤宏队列的说法
+
+在⽬前 chrome 的实现中，⾄少包含了下⾯的队列：
+	延时队列：⽤于存放计时器到达后的回调任务，优先级「中」
+	交互队列：⽤于存放⽤户操作后产⽣的事件处理任务，优先级「⾼」
+	微队列：⽤户存放需要最快执⾏的任务，优先级「最⾼」
+
+添加任务到微队列的主要⽅式主要是使⽤ Promise、MutationObserver
+// 例如：
+// ⽴即把⼀个函数添加到微队列
+Promise.resolve().then(函数)
+```
+
+##### ⾯试题：阐述⼀下 JS 的事件循环
+
+```
+事件循环⼜叫做消息循环，是浏览器渲染主线程的⼯作⽅式。
+在 Chrome 的源码中，它开启⼀个不会结束的 for 循环，每次循环从消息队列中取出第⼀个任务执⾏，⽽其他线程只需要在合适的时候将任务加⼊到队列末尾即可。
+过去把消息队列简单分为宏队列和微队列，这种说法⽬前已⽆法满⾜复杂的浏览器环境，取⽽代之的是⼀种更加灵活多变的处理⽅式。
+根据 W3C 官⽅的解释，每个任务有不同的类型，同类型的任务必须在同⼀个队列，不同的任务可以属于不同的队列。不同任务队列有不同的优先级，在⼀次事件循环中，由浏览器⾃⾏决定取哪⼀个队列的任务。但浏览器必须有⼀个微队列，微队列的任务⼀定具有最⾼的优先级，必须优先调度执⾏。
+```
+
+##### ⾯试题：JS 中的计时器能做到精确计时吗?为什么?
+
+```
+不⾏.
+因为:
+	1. 计算机硬件没有原⼦钟，⽆法做到精确计时
+	2. 操作系统的计时函数本身就有少量偏差，由于 JS 的计时器最终调⽤的是操作系统的函数，也就携带了这些偏差
+	3. 按照 W3C 的标准，浏览器实现计时器时，如果嵌套层级超过 5 层，则会带有 4 毫秒的最少时间，这样在计时时间少于 4 毫秒时⼜带来了偏差
+	4. 受事件循环的影响，计时器的回调函数只能在主线程空闲时运⾏，因此⼜带来了偏差
+```
+
+------
+
 # Event - Loop
 
 ## 什么是 Event Loop？
@@ -90,27 +284,27 @@ console.log('start');setTimeout(()=>{    console.log('setTimeout');    setTimeou
 
 首先我们对各任务进行划分：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)image.png
+![图片](data:image/svg+xml,<%3Fxml version='1.0' encoding='UTF-8'%3F><svg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title></title><g stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'><g transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'><rect x='249' y='126' width='1' height='1'></rect></g></g></svg>)image.png
 
 进入第一次事件循环，开始执行同步任务，这时候start和Promise的打印分别进栈并打印，随后出栈，宏任务进入宏任务队列，微任务进入微任务队列。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)image.png
+![图片](data:image/svg+xml,<%3Fxml version='1.0' encoding='UTF-8'%3F><svg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title></title><g stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'><g transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'><rect x='249' y='126' width='1' height='1'></rect></g></g></svg>)image.png
 
 同步任务执行完后，栈为空，将微任务队列的任务依次推入执行栈执行，分别打印then1，then2。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)image.png
+![图片](data:image/svg+xml,<%3Fxml version='1.0' encoding='UTF-8'%3F><svg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title></title><g stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'><g transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'><rect x='249' y='126' width='1' height='1'></rect></g></g></svg>)image.png
 
 微任务执行完毕，将宏任务推入执行栈执行，也算第二次事件循环的开始。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)image.png
+![图片](data:image/svg+xml,<%3Fxml version='1.0' encoding='UTF-8'%3F><svg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title></title><g stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'><g transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'><rect x='249' y='126' width='1' height='1'></rect></g></g></svg>)image.png
 
 第二次事件循环开始，重复上述步骤，同步任务先执行，分别打印setTimeout和end。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)image.png
+![图片](data:image/svg+xml,<%3Fxml version='1.0' encoding='UTF-8'%3F><svg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title></title><g stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'><g transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'><rect x='249' y='126' width='1' height='1'></rect></g></g></svg>)image.png
 
 微任务队列为空，直接执行宏任务，开始第三次事件循环，打印同步任务console.log('inner')。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)image.png
+![图片](data:image/svg+xml,<%3Fxml version='1.0' encoding='UTF-8'%3F><svg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title></title><g stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'><g transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'><rect x='249' y='126' width='1' height='1'></rect></g></g></svg>)image.png
 
 所以最终打印结果为：
 
@@ -303,3 +497,116 @@ el.click()
 这样就很容易让我们产生一种误解：一次dom渲染就是一次事件循环
 
 然而真实情况是，一次dom渲染中，`准确来说，是两次dom渲染之间`，事件循环的次数是不确定的，不能被事件循环中存在dom渲染这个任务而被其误导
+
+
+
+```
+题1：
+ console.log(1);
+ setTimeout(() => {
+   console.log(2);
+   Promise.resolve().then(() => {
+     console.log(3);
+   });
+ }, 0);
+ new Promise((resolve, reject) => {
+   console.log(4);
+   resolve(5);
+ }).then((data) => {
+   console.log(data);
+ });
+ setTimeout(() => {
+   console.log(6);
+ }, 0);
+
+答案是：1 4 5 2 3 6
+题2：
+ setTimeout(function(){
+   console.log('1')
+ });
+ new Promise(function(resolve){
+   console.log('2');
+   resolve();
+ }).then(function(){
+   console.log('3')
+ });
+ console.log('4');
+
+答案：2 4 3 1
+Promise对象的resolve部分的代码是当前主线程/宏任务的一部分，并不是微任务，Promise对象的then和catch代码段才是微任务。因此最先输出的是2和4，然后才是微任务队列中的3，最后是宏任务中的1。
+
+题3：
+ async function async1() {
+   console.log(1); 
+   const result = await async2(); 
+   console.log(3); 
+ } 
+ async function async2() { 
+   console.log(2); 
+ } 
+ Promise.resolve().then(() => { 
+   console.log(4); 
+ }); 
+ setTimeout(() => { 
+   console.log(5); 
+ }); 
+ async1(); 
+ console.log(6);
+
+答案：1 2 6 4 3 5
+该题需要注意的是，由于await方法返回的是一个Promise对象，因此await方法执行完毕后续的代码都应该归入微任务队列，因此**console.log(3)**应该被加入微任务队列等待执行。
+题4：
+ function sleep(time) {
+   let startTime = new Date()
+   while (new Date() - startTime < time) {}
+   console.log('1s over')
+ }
+ setTimeout(() => {
+   console.log('setTimeout - 1')
+   setTimeout(() => {
+     console.log('setTimeout - 1 - 1')
+     sleep(1000)
+   })
+   new Promise(resolve => {
+    console.log('setTimeout - 1 - resolve')
+     resolve() 
+   }).then(() => {
+     console.log('setTimeout - 1 - then')
+     new Promise(resolve => resolve()).then(() => {
+         console.log('setTimeout - 1 - then - then')
+     })
+   })
+   sleep(1000)
+})
+setTimeout(() => {
+   console.log('setTimeout - 2')
+   setTimeout(() => {
+     console.log('setTimeout - 2 - 1')
+     sleep(1000)
+   })
+   new Promise(resolve => resolve()).then(() => {
+     console.log('setTimeout - 2 - then')
+     new Promise(resolve => resolve()).then(() => {
+         console.log('setTimeout - 2 - then - then')
+    })
+   })
+   sleep(1000)
+})
+
+浏览器输出为：
+setTimeout - 1
+setTimeout - 1 - resolve
+1s over
+setTimeout - 1 - then
+setTimeout - 1 - then - then 
+setTimeout - 2
+1s over
+setTimeout - 2 - then
+setTimeout - 2 - then - then
+setTimeout - 1 - 1
+1s over
+setTimeout - 2 - 1
+1s over
+该题需要注意的是微任务执行过程中产生的新的微任务也是追加在当前微任务队列末尾等待执行。
+```
+

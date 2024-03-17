@@ -167,18 +167,3 @@ fs.readdir(sourceDirectory, (err, files) => {
 ![1710058806465](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1710058806465.png)
 
 水印也被加上去了。
-
-# 总结
-
-通过巧妙地利用这两者，我们可以做到平时很多我们平时想做的事情，发挥你的想象，去做一些有意义有想法的事情吧。
-
-最后分享两个我的两个开源项目,它们分别是:
-
-- **前端脚手架 create-neat**[1]
-- **在线代码协同编辑器**[2]
-
-这两个项目都会一直维护的,如果你也喜欢,欢迎 star 🚗🚗🚗
-
-
-
-原文链接：https://juejin.cn/post/7293115036536930356

@@ -1121,17 +1121,170 @@ super 只能在子类中使用：
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps57.jpg) 
 
-##### 3. Generator函数
+##### 3. Generator函数 
 
-![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps58.jpg) 
+##### 4. async/await 函数  
 
- 
+###  `Iterator`
 
-##### 4. async/await 函数
+> Iterator（迭代器）是一种接口，也可以说是一种规范。为各种不同的数据结构提供统一的访问机制。任何数据结构只要部署Iterator接口，就可以完成遍历操作（即依次处理该数据结构的所有成员）。
 
-![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps59.jpg) 
+#### Iterator语法
 
- 
+```js
+const obj = {
+    [Symbol.iterator]:function(){}
+}
+```
 
- 
+> `[Symbol.iterator]` 属性名是固定的写法，只要拥有了该属性的对象，就能够用迭代器的方式进行遍历。
 
+> 迭代器的遍历方法是首先获得一个迭代器的指针，初始时该指针指向第一条数据之前，接着通过调用 next 方法，改变指针的指向，让其指向下一条数据 每一次的 next 都会返回一个对象，该对象有两个属性
+>
+> - value 代表想要获取的数据
+> - done 布尔值，false表示当前指针指向的数据有值，true表示遍历已经结束
+
+> **Iterator 的作用有三个：**
+>
+> 1. 为各种数据结构，提供一个统一的、简便的访问接口；
+> 2. 使得数据结构的成员能够按某种次序排列；
+> 3. ES6 创造了一种新的遍历命令for…of循环，Iterator 接口主要供for…of消费。
+
+> **遍历过程：**
+>
+> 1. 创建一个指针对象，指向当前数据结构的起始位置。也就是说，遍历器对象本质上，就是一个指针对象。
+>
+> 2. 第一次调用指针对象的next方法，可以将指针指向数据结构的第一个成员。
+>
+> 3. 第二次调用指针对象的next方法，指针就指向数据结构的第二个成员。
+>
+> 4. 不断调用指针对象的next方法，直到它指向数据结构的结束位置。
+>
+>    每一次调用next方法，都会返回数据结构的当前成员的信息。具体来说，就是返回一个包含value和done两个属性的对象。其中，value属性是当前成员的值，done属性是一个布尔值，表示遍历是否结束。
+
+```js
+let arr = [{num:1},2,3]
+let it = arr[Symbol.iterator]() // 获取数组中的迭代器
+console.log(it.next())  // { value: Object { num: 1 }, done: false }
+console.log(it.next())  // { value: 2, done: false }
+console.log(it.next())  // { value: 3, done: false }
+console.log(it.next())  // { value: undefined, done: true }
+```
+
+### `Generator`函数
+
+> Generator函数可以说是Iterator接口的具体实现方式。Generator 最大的特点就是可以控制函数的执行。
+
+```js
+function *foo(x) {
+  let y = 2 * (yield (x + 1))
+  let z = yield (y / 3)
+  return (x + y + z)
+}
+let it = foo(5)
+console.log(it.next())   // => {value: 6, done: false}
+console.log(it.next(12)) // => {value: 8, done: false}
+console.log(it.next(13)) // => {value: 42, done: true}
+```
+
+> 上面这个示例就是一个Generator函数，我们来分析其执行过程：
+>
+> - `首先 Generator 函数调用时它会返回一个迭代器`
+> - `当执行第一次 next 时，传参会被忽略，并且函数暂停在 yield (x + 1) 处，所以返回 5 + 1 = 6`
+> - `当执行第二次 next 时，传入的参数等于上一个 yield 的返回值，如果你不传参，yield 永远返回 undefined。此时 let y = 2 * 12，所以第二个 yield 等于 2 * 12 / 3 = 8`
+> - `当执行第三次 next 时，传入的参数会传递给 z，所以 z = 13, x = 5, y = 24，相加等于 42`
+>
+> `Generator` 函数一般见到的不多，其实也于他有点绕有关系，并且一般会配合 co 库去使用。当然，我们可以通过 `Generator` 函数解决回调地狱的问题。
+
+### `async/await`
+
+> `async/await`是一种建立在Promise之上的编写异步或非阻塞代码的新方法，被普遍认为是 JS异步操作的最终且最优雅的解决方案。相对于 Promise 和回调，它的可读性和简洁度都更高。毕竟一直then()也很烦。
+>
+> `async` 是异步的意思，而 `await` 是 `async wait`的简写，即异步等待。
+>
+> 所以从语义上就很好理解 async 用于声明一个 function 是异步的，而await 用于等待一个异步方法执行完成。
+>
+> 一个函数如果加上 async ，那么该函数就会返回一个 Promise
+
+```js
+async function test() {
+  return "1"
+}
+console.log(test()) // -> Promise {<resolved>: "1"}
+
+// 可以看到输出的是一个Promise对象。所以，async 函数返回的是一个 Promise 对象，如果在 async 函数中直接 return 一个直接量，async 会把这个直接量通过 PromIse.resolve() 封装成Promise对象返回。
+```
+
+```js
+// 相比于 Promise，async/await能更好地处理 then 链
+
+function takeLongTime(n) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(n + 200), n);
+    });
+}
+
+function step1(n) {
+    console.log(`step1 with ${n}`);
+    return takeLongTime(n);
+}
+
+function step2(n) {
+    console.log(`step2 with ${n}`);
+    return takeLongTime(n);
+}
+
+function step3(n) {
+    console.log(`step3 with ${n}`);
+    return takeLongTime(n);
+}
+
+
+//现在分别用 Promise 和async/await来实现这三个步骤的处理。
+```
+
+```js
+// 使用Promise
+
+function doIt() {
+    console.time("doIt");
+    const time1 = 300;
+    step1(time1)
+        .then(time2 => step2(time2))
+        .then(time3 => step3(time3))
+        .then(result => {
+            console.log(`result is ${result}`);
+        });
+}
+doIt();
+// step1 with 300
+// step2 with 500
+// step3 with 700
+// result is 900
+```
+
+```js
+// 使用async/await
+
+async function doIt() {
+    console.time("doIt");
+    const time1 = 300;
+    const time2 = await step1(time1);
+    const time3 = await step2(time2);
+    const result = await step3(time3);
+    console.log(`result is ${result}`);
+}
+doIt();
+
+// 结果和之前的 Promise 实现是一样的，但是这个代码看起来是不是清晰得多，优雅整洁，几乎跟同步代码一样。
+```
+
+> await关键字只能在async function中使用。在任何非async function的函数中使用await关键字都会抛出错误。await关键字在执行下一行代码之前等待右侧表达式(可能是一个Promise)返回。
+
+#### 优缺点
+
+```
+`async/await`的优势在于处理 then 的调用链，能够更清晰准确的写出代码，并且也能优雅地解决回调地狱问题。当然也存在一些缺点，因为 await 将异步代码改造成了同步代码，如果多个异步代码没有依赖性却使用了 await 会导致性能上的降低。
+```
+
+> 「硬核JS」深入了解异步解决方案

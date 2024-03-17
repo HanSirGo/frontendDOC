@@ -1,23 +1,5 @@
 # electron入门（16.0版本亲测可用）
 
-原创 幻城cc [量子前端](javascript:void(0);) *2023-11-01 11:04* *上海*
-
-**您好，** **如果喜欢我的文章或者想上岸大厂，可以关注公众号「量子前端」，将不定期关注推送前端好文、分享就业资料秘籍，也希望有机会一对一帮助你实现梦想**
-
-
-
-![img](http://mmbiz.qpic.cn/sz_mmbiz_png/IlE1Y2rl1ubgBxicT7baXNXeyjicWqrm7dfiboTGunkaM2keh7J3FZQ0WPTfsf48y7yZJ47iar1t1rbCvJKELN9RFw/300?wx_fmt=png&wxfrom=19)
-
-**量子前端**
-
-作者就职于阿里，大厂收割机，关注我们，每日学习行业最前沿内容包含但不限于前端知识、面试分享相关内容，同时我们提供大厂一对一内推服务，希望能对你有所帮助。
-
-138篇原创内容
-
-
-
-公众号
-
 ## 根据业务需求，开始学习electron跨桌面应用框架。
 
 ## 创建一个electron项目

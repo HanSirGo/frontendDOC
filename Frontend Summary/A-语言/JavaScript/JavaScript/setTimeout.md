@@ -218,3 +218,18 @@ while、Web Worker、requestAnimationFrame、setTimeout 系统时间补偿
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709459031924.png" alt="1709459031924" style="zoom:50%;" />
 
+#### `setTimeout`实现`setInterval`
+
+```js
+function myInterval(fn,interval,...args) {
+ let context=this
+ setTimeout(()=>{
+  fn.apply(context,args)
+  myInterval(fn,interval,...args)//别忘了为它传入参数
+ },interval)
+}
+
+
+myInterval((num)=>console.log(num),500,10)
+```
+

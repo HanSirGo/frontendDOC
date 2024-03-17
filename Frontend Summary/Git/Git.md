@@ -1,6 +1,6 @@
 ## Git
 
-#### Git命令
+### Git命令
 
 ![1709187444673](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709187444673.png)
 
@@ -10,6 +10,16 @@ git status 查看状态 红色没追踪 绿色追踪
 git add . 所有的文件
 git rm --cached 文件名（可多个） 取消追踪
 git checkout -- 文件名 还原成修改前的状态
+```
+
+#### 分支
+
+##### Git 创建分支
+
+```js
+git branch <branchname>
+git checkout -b <local branchname> // 创建本地分支,并切换到本地分支
+git checkout -b <local branchname> <origin/branchname> // 创建本地分支,并切换到本地分支,并且这这种方法创建的本地分支会和远程分支建立映射关系
 ```
 
 ##### Git 合并分支
@@ -30,13 +40,6 @@ Git commit -m ‘’
 Git push  （推送到远程仓库后，在远程仓库中提交自己的分支合并到需要的分支上）
 ```
 
-##### Git 克隆
-
-```
-Git clone url(http地址)
-Git clone -b branchname remoteaddr 克隆指定分支 remoteaddr （http地址）
-```
-
 ##### Git 删除分支
 
 ```
@@ -44,17 +47,26 @@ Git branch -d branchname 删除本地分支
 						删除远程分支
 ```
 
-##### Git **版本回退**
+##### Git 查看分支
 
 ```
-1. Git log 查看commit 提交；复制 版本号
+当通过命令：
+$ git branch -a  查看所有分支:本地&远程
+$ git branch -r  查看所有分支:远程
 
-2. 使用 git reset -- hard 版本号 
-
-3. Git push -f origin 分支
+查看不到远程dev分支时，可以通过命令：
+$ git fetch  进行刷新，然后再通过 
+$ git branch -a   ，就可以看到远程分支了。
 ```
 
-![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps58.jpg)
+##### Git 查看当前分支是基于哪个分支创建的
+
+```
+切换到要查询的分支下
+git checkout branchname
+使用命令：
+git reflog --date=local --all | grep 后面加上要查询的分支名称
+```
 
 ##### Git 将本地与远程分支关联
 
@@ -66,15 +78,18 @@ Git branch -d branchname 删除本地分支
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps53.jpg) 
 
-```
+```js
 2. feature/performance-md 只是一个本地分支；
 
-想要关联就 git branch -u origin/feature/performance
-
-或者 git branch --set-upstream-to=origin/feature/performance
+// 想要关联就 
+git branch -u origin/feature/performance
+#或者
+git branch --set-upstream-to=origin/feature/performance
+// 撤销本地分支与远程分支的映射关系
+git branch --unset-upstream
 ```
 
-​    ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps54.jpg)
+![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps54.jpg)
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps55.jpg) 
 
@@ -92,51 +107,7 @@ Git push 时会有提示
 
  ![1709187760764](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709187760764.png)
 
-##### Git 查看所有分支
-
-```
-当通过命令：
-$ git branch -a  查看所有分支:本地&远程
-
-查看不到远程dev分支时，可以通过命令：
-$ git fetch  进行刷新，然后再通过 
-$ git branch -a   ，就可以看到远程分支了。
-```
-
-##### Git 查看当前分支是基于哪个分支创建的
-
-```
-切换到要查询的分支下
-git checkout branchname
-使用命令：
-git reflog --date=local --all | grep 后面加上要查询的分支名称
-```
-// TODO git stash 补存
-##### Git 暂存
-
-```js
-git add
-git add . // 提交到暂存区
-git commit -m '注释' // 提交到本地仓库
-
-git stash 
-git stash pop
-git stash pop x
-git stash clear
-git stash save '注释'
-git stash list
-git stash apply x
-```
-
-##### tag
-
-```
-gitLab...网站上,点击[标签],[新建标签],填写[标签名],[创建标签]
-```
-
-
-
-#### Git 分支规范
+##### Git 分支规范
 
 ```
 feat: 新功能feature的缩写
@@ -178,6 +149,142 @@ hotfix 分支--修复分支
 分支命名: hotfix/ 开头的为修复分支，它的命名规则与feature分支类似。
 线上出现紧急问题时，需要及时修复，以master分支为基线，创建hotfix分支，
 修复完成后，需要合并到master分支和develop分支
+```
+
+##### Git 克隆
+
+```
+Git clone url(http地址)
+Git clone -b branchname remoteaddr 克隆指定分支 remoteaddr （http地址）
+```
+
+#### 版本回退
+
+##### HEAD指针
+
+```
+HEAD : HEAD指向当前分支的最后一次commit
+HEAD^ : 当前版本的前一个版本
+HEAD^^ : 当前版本的前两个版本
+HEAD~100 : 当前版本的前100个版本
+```
+
+##### Git **版本回退**
+
+```
+git reset HEAD^ : 回退到当前版本的前一个版本
+git reset HEAD^^ : 回退到当前版本的前两个版本
+git reset HEAD~100 : 回退到当前版本的前100个版本
+如果增加 --hard 参数会重置工作区和暂存区,未提交的变更将不可逆的丢弃
+```
+
+```
+1. Git log 查看commit 提交；复制 版本号
+
+2. 使用 git reset --hard 版本号 
+
+3. Git push -f origin 分支
+```
+
+![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps58.jpg)
+
+// TODO git stash 补存
+#### 提交
+
+##### Git 提交暂存区
+
+```js
+git add <file>
+git add . // 提交到暂存区
+```
+
+##### 缓存
+
+```js
+## stash 是一种暂存工作区更改的方法,它允许你暂存保存未提交的更改,并将当前的工作目录恢复到上次提交的状态.这对于需要切换分支处理其他问题、或者当前的工作尚未完成但需要清理工作区以拉取或合并其他分支时非常有用.
+git stash // 此命令会将当前工作目录中的所有未提交更改(包括已添加至暂存区的)保存到一个新的stash项目中,并重置工作目录为上一次提交的状态.
+git stash clear // 删除所有的stash
+git stash save "message" // 可以自定义stash的描述信息,并执行stash操作
+git stash branch <branchname> [<stash@{n}>] // 基于某个stash创建新的分支,并自动应用该stash中更改
+git stash list // 显示所有已缓存的stash列表及其简短描述
+git stash apply [stash@{n}] // 从stash列表中取出并应用指定编号(n)的stash,如果没有指定,则默认使用最近的一个stash.注意,这并不会删除stash,它仍然存在于列表中.
+git stash pop // 与apply类似,但它会在应用stash后立即将其从stash列表中移除.
+git stash pop [<stash@{n}>] // 删除指定的stash,不指定则删除最近的stash
+git stash apply --index 或者 git stash pop --index // 如果stash包含索引修改(即暂存区的更改),这个选项会使Git尝试将这些更改精确地应用回暂存区,而不仅仅是工作目录
+git stash show [-p | --patch] [<stash@{n}>] //显示指定stash包含的更改详情,如果不指定stash编号,则默认显示最近的stash.加上-p或者--patch参数可以看到差异补丁格式的详细内容
+```
+
+##### Git提交本地仓库
+
+```
+git commit -m '注释' // 提交到本地仓库
+```
+
+##### Git修改提交的commit
+
+```js
+# 提交到本地仓库
+git commit --amend // 弹出一个操作框(需要会点基本的vim知识: 我们输入i 进行对commit的修改,当我们改完后输入 esc 表示改完了,在输入 :wq 就可以保存了)
+```
+
+##### Git合并多个commit
+
+```js
+# 提交到本地仓库
+git commit --amend --no-edit // 将修改的代码合并到上一个commit中
+
+# 或
+git rebase -i [commit Id] //commit Id 是你要合并的几个commit中最老的commit Id
+
+```
+
+##### Git提交远程仓库
+
+```
+git push
+```
+
+#### 标签tag
+
+```js
+gitLab...网站上,点击[标签],[新建标签],填写[标签名],[创建标签]
+
+git tag // 列出当前仓库的所有标签
+git tag -n // 列出当前仓库的所有标签及说明
+git tag -l "1.0.*" // 搜索符合条件的标签
+git show v1.0.1 //查看标签信息
+
+// 创建标签
+git tag [tagName] // 创建标签
+git tag -a [tagName] -m "指定说明文字" // 创建带有说明的标签
+
+// 给指定的commit打标签
+# 找历史提交的 commit id
+git log --pretty=oneline --abbrev-commit
+# 给指定的commit id打标签
+git tag -a [tagName] commitID // git tag -a "v1.0.2" 9fbc3d0
+
+// 删除本地标签
+git tag -d [tagName] // git tag -d v1.0.2
+// 删除远程标签
+git tag -d v1.0.2
+git push origin :refs/tags/v1.0.2
+// git push origin --delete tag Git1.7版本后的 删除远程标签
+
+// 本地标签推送到远程
+git push [remote] [tagName] // git push origin v1.0.2 // 推送指定标签
+git push [remote] --tags// git push origin --tags // 一次性推送全部未推送到远程的本地标签
+
+// 重命名tag
+// 1. 删除原有tag,重新添加
+git tag -d 
+git tag -a -m "xxx"
+// 2. 强制替换,在删除原有tag
+git tag -f
+git tag -d
+
+// 新建一个分支,指向某个tag
+git checkout -b [branchName] [tagName]
 ```
 
 #### Git遇到的问题
