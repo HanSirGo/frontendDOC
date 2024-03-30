@@ -16,3 +16,21 @@ window.navigator.onLine // 判断是否有网
 >
 > 《JavaScript 学习总结（三）BOM 和 DOM 详解》
 
+##### 获取 loaction 中参数值
+
+```js
+# 在 JavaScript 中，你可以使用 window.location.search 属性来获取 URL 中的查询参数。
+
+// 获取 URL 中的查询参数
+var queryString = window.location.search;
+
+// 去除问号，并将查询参数转换为对象形式
+var params = new URLSearchParams(queryString);
+
+// 获取特定参数的值
+var paramValue = params.get('paramName');
+
+console.log(paramValue);
+```
+
+> **请注意**，这只适用于现代浏览器环境。在某些旧版本的浏览器中，可能需要使用其他方法来解析查询参数。

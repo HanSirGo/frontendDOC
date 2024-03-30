@@ -12,6 +12,53 @@ git rm --cached 文件名（可多个） 取消追踪
 git checkout -- 文件名 还原成修改前的状态
 ```
 
+##### Git init
+
+```js
+git init // 命令用于初始化项目文件夹中的新存储库。
+// 本地初始化(初始化git环境), 这个会生成一个.git目录
+```
+
+##### Git status
+
+```js
+git status // 命令用于检查存储库的状态（例如未跟踪的文件和准备提交的更改）
+```
+
+##### Git log
+
+```js
+git log // 命令用于显示所有提交的历史记录。它包括提交哈希、作者、日期和提交消息。
+```
+
+##### Git diff
+
+```js
+git diff // 命令用于检查当前工作目录和上次提交之间的差异。
+```
+
+##### Git pull
+
+```js
+git pull // 命令用于从远程存储库获取更改并将其集成到本地分支中。
+
+git pull origin 分支 // 更新本地仓库的某一个分支的代码 (相当于 pull = fetch + merge)
+# 它本质上是两个独立的 Git 命令的组合：git fetch 和 git merge。
+```
+
+##### Git fetch
+
+```js
+git fetch origin 分支 // 同步远程仓库的分支信息
+```
+
+##### Git merge
+
+```js
+git merge // 命令将所有分支更改合并到一个分支中。
+git merge <branch_name> // 将 <branch_name> 替换为要将其更改合并到当前分支的分支名称。
+```
+
 #### 分支
 
 ##### Git 创建分支
@@ -20,6 +67,18 @@ git checkout -- 文件名 还原成修改前的状态
 git branch <branchname>
 git checkout -b <local branchname> // 创建本地分支,并切换到本地分支
 git checkout -b <local branchname> <origin/branchname> // 创建本地分支,并切换到本地分支,并且这这种方法创建的本地分支会和远程分支建立映射关系
+```
+
+##### Git 切换分支
+
+```js
+git checkout <local branchname> // 切换到本地分支
+git checkout -b <local branchname> // 创建本地分支,并切换到本地分支
+git checkout -b <local branchname> <origin/branchname> // 创建本地分支,并切换到本地分支,并且这这种方法创建的本地分支会和远程分支建立映射关系
+
+git switch 分支; git checkout 分支; // 切换分支
+
+git switch -c 分支; git checkout -b 分支 // 创建分支
 ```
 
 ##### Git 合并分支
@@ -49,14 +108,15 @@ Git branch -d branchname 删除本地分支
 
 ##### Git 查看分支
 
-```
+```js
 当通过命令：
-$ git branch -a  查看所有分支:本地&远程
-$ git branch -r  查看所有分支:远程
+$ git branch -a  // 查看所有分支:本地&远程
+$ git branch -r  // 查看所有分支:远程
+$ git branch // 罗列分支
 
 查看不到远程dev分支时，可以通过命令：
-$ git fetch  进行刷新，然后再通过 
-$ git branch -a   ，就可以看到远程分支了。
+$ git fetch  // 进行刷新，然后再通过 
+$ git branch -a   // 就可以看到远程分支了。
 ```
 
 ##### Git 查看当前分支是基于哪个分支创建的
@@ -153,9 +213,9 @@ hotfix 分支--修复分支
 
 ##### Git 克隆
 
-```
+```js
 Git clone url(http地址)
-Git clone -b branchname remoteaddr 克隆指定分支 remoteaddr （http地址）
+Git clone -b branchname remoteaddr // 克隆指定分支 remoteaddr （http地址）
 ```
 
 #### 版本回退
@@ -194,11 +254,19 @@ git reset HEAD~100 : 回退到当前版本的前100个版本
 ##### Git 提交暂存区
 
 ```js
-git add <file>
-git add . // 提交到暂存区
+git add <file_name> // 将 <file_name> 替换为你的文件名
+git add . // 提交所有的更改到暂存区
+```
+
+##### Git 取消暂存
+
+```
+git reset <file_name>
 ```
 
 ##### 缓存
+
+git stash 命令用于临时保存尚未准备好提交的更改。
 
 ```js
 ## stash 是一种暂存工作区更改的方法,它允许你暂存保存未提交的更改,并将当前的工作目录恢复到上次提交的状态.这对于需要切换分支处理其他问题、或者当前的工作尚未完成但需要清理工作区以拉取或合并其他分支时非常有用.
@@ -240,8 +308,10 @@ git rebase -i [commit Id] //commit Id 是你要合并的几个commit中最老的
 
 ##### Git提交远程仓库
 
-```
-git push
+```js
+git push //用于将提交发送到远程存储库。这只会推送已提交的更改
+git push origin <branch_name>
+git push -u origin <branch_name> // 如果分支是新创建的，那么需要使用以下命令上传分支
 ```
 
 #### 标签tag

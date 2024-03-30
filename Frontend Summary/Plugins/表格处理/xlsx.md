@@ -1,3 +1,50 @@
+## XLSX
+
+```js
+# 安装依赖：首先，在你的项目中安装xlsx库。可以使用npm或者yarn进行安装。
+
+npm install xlsx
+
+# 导入依赖：在你的代码中导入xlsx库。
+
+import XLSX from 'xlsx';
+```
+
+```js
+# 封装Excel的读取函数：创建一个函数用于读取Excel文件，并返回读取到的数据。以下是一个简单的示例：
+function readExcel(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      resolve(jsonData);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsArrayBuffer(file);
+  });
+}
+```
+
+```js
+# 封装Excel的写入函数：创建一个函数用于将数据写入Excel文件，并返回生成的Excel文件。以下是一个简单的示例：
+function writeExcel(data, sheetName, fileName) {
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  window.URL.revokeObjectURL(url);
+}
+```
+
 #### 1、引入依赖
 
 ```javascript
