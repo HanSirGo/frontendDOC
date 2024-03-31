@@ -9,6 +9,161 @@
 2.JSON.stringify()
 ```
 
+##### JSON.parse()
+
+```js
+// JSON.parse() 的语法如下：
+
+JSON.parse(text, reviver)
+```
+
+> - **text：** 必需， 一个有效的 JSON 字符串。
+> - **reviver**：可选，一个转换结果的函数， 将为对象的每个成员调用此函数。
+
+```js
+const json = '{"name": "zhangsan", "age": 18, "city": "beijing"}';
+
+const myJSON = JSON.parse(json);
+ 
+console.log(myJSON.name, myJSON.age);  // zhangsan 18
+
+// 我们可以启用 JSON.parse 的第二个参数 reviver，一个转换结果的函数，对象的每个成员都会调用此函数：
+
+const json = '{"name": "zhangsan", "age": 18, "city": "beijing"}';
+
+const myJSON = JSON.parse(json, (key, value) => {
+  if(typeof value === "number") {
+     return String(value).padStart(3, "0");
+  }
+  return value;
+});
+ 
+console.log(myJSON.name, myJSON.age);  // zhangsan 018
+```
+
+##### JSON.stringify()
+
+```js
+// JSON.stringify() 的语法如下：
+JSON.stringify(value, replacer, space)
+```
+
+> - **value：** 必需， 要转换的 JavaScript 值（通常为对象或数组）。
+> - **replacer：** 可选。用于转换结果的函数或数组。如果 replacer 为函数，则 JSON.stringify 将调用该函数，并传入每个成员的键和值。使用返回值而不是原始值。如果此函数返回 undefined，则排除成员。根对象的键是一个空字符串：""。如果 replacer 是一个数组，则仅转换该数组中具有键值的成员。成员的转换顺序与键在数组中的顺序一样。当 value 参数也为数组时，将忽略 replacer 数组。
+> - **space：** 可选，文本添加缩进、空格和换行符，如果 space 是一个数字，则返回值文本在每个级别缩进指定数目的空格，如果 space 大于 10，则文本缩进 10 个空格。space 也可以使用非数字，如：`\t`。
+
+```js
+const json = {"name": "zhangsan", "age": 18, "city": "beijing"};
+
+const myJSON = JSON.stringify(json);
+ 
+console.log(myJSON);  // {"name":"zhangsan","age":18,"city":"beijing"}
+```
+
+######  格式化
+
+```js
+// 上面提到，可以使用JSON.stringify()来将 JSON 对象转换为字符串。它支持第二、三个参数。我们可以借助第二三个参数来格式化 JSON 字符串。正常情况下，格式化后的字符串长这样：
+
+const json = {"name": "zhangsan", "age": 18, "city": "beijing"};
+
+const myJSON = JSON.stringify(json);
+ 
+console.log(myJSON);  // {"name":"zhangsan","age":18,"city":"beijing"}
+
+// 添加第二三个参数：
+
+const json = {"name": "zhangsan", "age": 18, "city": "beijing"};
+
+const myJSON = JSON.stringify(json, null, 2);
+ 
+console.log(myJSON);  
+
+// 生成的字符串格式如下：
+
+{
+  "name": "zhangsan",
+  "age": 18,
+  "city": "beijing"
+}
+
+// 这里的 2 其实就是为返回值文本在每个级别缩进 2 个空格。
+
+// 如果缩进是一个字符串而不是空格，就可以传入需要缩进的填充字符串：
+
+const json = {"name": "zhangsan", "age": 18, "city": "beijing"};
+
+const myJSON = JSON.stringify(json, null, "--");
+ 
+console.log(myJSON);  
+
+// 输出结果如下：
+
+{
+--"name": "zhangsan",
+--"age": 18,
+--"city": "beijing"
+}
+```
+
+###### 隐藏属性
+
+```js
+// 我们知道JSON.stringify()支持第二个参数，用来处理 JSON 中的数据：
+const user = {
+  "name": "John",
+  "password": "12345",
+  "age": 30
+};
+
+console.log(JSON.stringify(user, (key, value) => {
+    if (key === "password") {
+       return;
+    }
+    return value;
+}));
+
+// 输出结果：{"name":"John","age":30}
+
+// 可以将第二个参数抽离出一个函数：
+
+function stripKeys(...keys) {
+    return (key, value) => {
+        if (keys.includes(key)) {
+           return;
+        }
+        return value;
+    };
+}
+
+const user = {
+  "name": "John",
+  "password": "12345",
+  "age": 30,
+  "gender": "male"
+};
+
+console.log(JSON.stringify(user, stripKeys('password', 'gender')))
+
+// 输出结果：{"name":"John","age":30}
+```
+
+###### 过滤结果
+
+```js
+// 当 JSON 中的内容很多时，想要查看指定字段是比较困难的。可以借助JSON.stringify()的第二个属性来获取指定值，只需传入指定一个包含要查看的属性 key 的数组即可：
+
+const user = {
+    "name": "John",
+    "password": "12345",
+    "age": 30
+}
+
+console.log(JSON.stringify(user, ['name', 'age']))
+
+// 输出结果：{"name":"John","age":30}
+```
+
 #### JSON的常用操作
 
 ##### 从JSON字符串转化为JavaScript对象

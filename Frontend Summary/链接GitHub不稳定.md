@@ -16,7 +16,7 @@
 下载SwitchHosts -> 安装 -> 添加hosts -> 选择'远程' -> '标题'随便填 -> 'URL' 'https://raw.hellogithub.com/hosts' -> '一小时'自动更新
 ```
 
-[^视屏]: 000001
+
 
 
 

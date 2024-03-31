@@ -28,6 +28,7 @@ $  nrm use taobao
 
 #  添加自定义源：如果你需要添加或移除自定义的 NPM 源，可以使用相应的 add 和 del 命令。
 $  nrm del <registry>
+$  nrm add <源名称> <源地址> // nrm add myregistry http://myregistry.com/
 
 #  测试源的速度：可以通过以下命令测试各个源的下载速度：
 $  nrm test

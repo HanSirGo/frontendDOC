@@ -1,4 +1,6 @@
-### nvm
+## nvm
+
+### 下载包
 
 ```
 nvm管理node，npm管理包，yarn也一样；
@@ -50,5 +52,156 @@ nvm命令行操作命令
 16,nvm version 查看当前的版本
 ```
 
+### 终端下载
 
+```js
+// 首先在终端中通过以下命令来安装 nvm：
 
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
+# 当我输入该命令后，终端就报错了，报错信息：curl: (7) Failed to connect to raw.githubusercontent.com port 443 after 5 ms: Couldn't connect to server，这个报错是因为github 有些域名访问不到，可以通过配置hosts里面的ip域名对应关系解决。
+```
+
+```js
+// 在终端中输入以下命令来打开hosts文件以进行编辑：
+sudo vim /etc/hosts
+
+// 在文件中追加以下对应关系：
+199.232.68.133 raw.githubusercontent.com
+199.232.68.133 user-images.githubusercontent.com
+199.232.68.133 avatars2.githubusercontent.com
+199.232.68.133 avatars1.githubusercontent.com
+```
+
+![1711791691745](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711791691745.png)
+
+```
+然后按下ESC键，输入:w来保存即可。这个配置不仅可以解决 nvm 的安装问题，还能使加载不了图片的 GitHub页面恢复正常，homebrew 也能装了。然后再输入上面的命令就可以安装nvm了。
+
+安装完成之后，重新打开终端，输入 nvm，如果出现以下内容就是安装成功了：
+```
+
+![1711791733217](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711791733217.png)
+
+```js
+// 如果报错：zsh: command not found: nvm，那就是安装失败了。原因就是电脑缺少 bash_profile 文件。该文件位于/Users/MacUserName/.bash_profile路径，如果没有就创建一个，通过以下命令来创建：
+
+touch .bash_profile
+
+// 然后通过以下命令来打开该文件：
+
+open .bash_profile
+
+// 在文件中添加以下内容：
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" 
+
+// 保存之后，在终端中输入以下命令来刷新配置：
+
+source ~/.bash_profile
+
+// 重新打开终端，输入nvm 来查看：
+```
+
+![1711791792781](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711791792781.png)
+
+> 安装成功就可以愉快的玩耍啦，nvm 提供了很多命令管理 Node.js 版本。当输入 nvm 时，也会列出来所有可用的命令，下面来看看常用的 nvm 命令。
+>
+> 1. **安装 Node.js 版本：**
+>
+> 2. - 安装最新稳定版的 Node.js：`nvm install stable`
+>    - 安装指定版本的 Node.js：`nvm install <version>` （例如：`nvm install 14.17.0`）
+>
+> 3. **切换 Node.js 版本：**
+>
+> 4. - 切换到已安装的其中一个版本：`nvm use <version>` （例如：`nvm use 14.17.0`）
+>    - 可以通过简写版本号进行切换（例如 `nvm use 14`），nvm 将自动选择符合的已安装版本。
+>    - 如果在项目目录中创建了 `.nvmrc` 文件，nvm 在进入该目录时会自动切换到文件中指定的 Node.js 版本。
+>
+> 5. **查看已安装的 Node.js 版本：**
+>
+> 6. - 列出已安装的所有版本：`nvm ls`
+>    - 列出远程可用的所有版本：`nvm ls-remote`
+>
+> 7. **卸载 Node.js 版本：**
+>
+> 8. - 卸载指定的 Node.js 版本：`nvm uninstall <version>` （例如：`nvm uninstall 14.17.0`）
+>
+> 9. **设置默认的 Node.js 版本：**
+>
+> 10. - 设置默认版本：`nvm alias default <version>` （例如：`nvm alias default 14.17.0`）
+>     - 这样，在新打开的终端中将自动使用默认版本。
+>
+> 11. **运行 Node.js 命令和 npm：**
+>
+> 12. - 在已安装的 Node.js 版本下运行命令：`nvm exec <version> <command>` （例如：`nvm exec 14.17.0 node -v`）
+>     - 在当前使用的 Node.js 版本下运行命令：`nvm run <command>` （例如：`nvm run node -v`）
+
+## nvm-desktop
+
+> nvm-desktop 是一个以可视化界面操作方式管理多个 Node 版本的桌面应用，使用 Electron 构建（支持 Macos 和 Windows 系统）。通过该应用，可以快速安装和使用不同版本的 Node。它完美支持为不同的项目单独设置和切换 Node 版本，不依赖操作系统的任何特定功能和 shell。
+>
+> nvm-desktop 的功能包括：
+>
+> - 支持为系统全局和项目单独设置Node引擎版本
+> - 管理Node的命令行工具
+> - 支持英文和简体中文
+> - 支持自定义下载镜像地址 (默认是 https://nodejs.org/dist)
+> - Windows 平台支持自动检查更新
+> - 完整的自动化测试
+
+![1711793329424](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793329424.png)
+
+![1711793341965](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793341965.png)
+
+### 下载
+
+> 首先，在 nvm-desktop 的 Release 页面**[2]**下载系统对应的版本：
+>
+> ![1711793380678](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793380678.png)
+
+### 环境配置
+
+```js
+// 安装完成之后，如果使用的是 Mac 电脑，需要在~/.bashrc、 ~/.profile 或 ~/.zshrc 文件添加以下内容，以便在登录时自动获取它：
+
+ 
+export NVMD_DIR="$HOME/.nvmd" 
+export PATH="$NVMD_DIR/bin:$PATH"
+```
+
+> 如果电脑系统默认的是 zsh, 可以复制这个命令添加到 `~/.zshrc` 文件中即可。如果电脑使用的是 bash，则复制粘贴到 `~/.bashrc` 文件中去即可。如果有其他安装问题，可以查看官方文档：https://github.com/1111mp/nvm-desktop/blob/main/README-zh_CN.md
+
+> Windows 下则不需要额外的操作，安装好运行之后直接搜索指定的 Node.js 版本点击下载安装即可。
+
+![1711793493909](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793493909.png)
+
+![1711793511407](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793511407.png)
+
+> 可以在终端中查看是否切换成功：
+
+![1711793557770](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793557770.png)
+
+> nvm-desktop 还支持为每个项目设置不同的 Node.js 版本，只需从本地添加项目，并设置需要的版本即可：
+
+![1711793588559](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793588559.png)
+
+> 这样设置之后，全局的 Node.js 版本和项目的 Node.js 版本互不干扰。
+>
+> 除此之外，点击版本名称可以查看该版本的更新日志，点击右上角的“远程刷新”按钮可以获取最新的 Node.js 版本：
+
+![1711793629915](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793629915.png)
+
+> 支持搜索 Node.js 版本、 V8 版本、NPM 版本，支持按发布时间排序，对不同版本进行筛选：
+
+![1711793652450](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793652450.png)
+
+> 在 Mac 上，支持在顶部菜单栏便捷修改 Node.js 版本：
+
+![1711793692236](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793692236.png)
+
+> 在 Windows 上，支持在右下角菜单便捷修改 Node.js 版本：
+
+![1711793712857](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793712857.png)

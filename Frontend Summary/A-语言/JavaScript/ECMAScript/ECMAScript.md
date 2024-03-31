@@ -12,6 +12,8 @@ ECMAScript说什么JavaScript就得做什么！
 JavaScript（狭义的JavaScript）做什么都要问问ECMAScript我能不能这样干！如果不能我就错了！能我就是对的！
 ```
 
+![1711785676374](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711785676374.png)
+
 ### ECMAScript 2015（ES6）新特性
 
 > - 块作用域
