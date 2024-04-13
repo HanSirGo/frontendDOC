@@ -34,3 +34,31 @@ console.log(paramValue);
 ```
 
 > **请注意**，这只适用于现代浏览器环境。在某些旧版本的浏览器中，可能需要使用其他方法来解析查询参数。
+
+##### 启用虚拟键盘 API
+
+默认情况下，虚拟键盘 API 是不可用的，需要使用 Javascript 来启用它。
+
+```js
+if ("virtualKeyboard" in navigator) {
+  navigator.virtualKeyboard.overlaysContent = true
+}
+```
+
+这有点奇怪，还需使用 Javascript 来启用。当然，我们也可以使用这样的 `meta` 标签来启用：
+
+```html
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, virtual-keyboard=overlays-content"
+/>
+```
+
+或者使用 CSS 属性：
+
+```css
+html {
+  virtual-keyboard: overlays-content;
+}
+```
+
