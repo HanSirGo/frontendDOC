@@ -133,6 +133,20 @@ console.info()可以用来打印资讯类说明信息，它和console.log()的�
 
 ### 1. console.time() & console.timeEnd()
 
+> 使用 console.time && console.timeEnd 来记录代码的执行耗时
+>
+> ```js
+> console.time('js 耗时')
+> const vNodes = []
+> for (let i = 0; i < 10000; i++) {
+>   const vNode = {
+>     type: 'div'
+>   }
+>   vNodes.push(vNode)
+> }
+> console.timeEnd('js 耗时')
+> ```
+
 如果我们想要获取一段代码的执行时间，就可以使用console对象的console.time() 和console.timeEnd()方法，来看下面的例子：
 
 ```js

@@ -201,7 +201,7 @@ import qs from 'qs'   // 或者使用commonjs引入   const qs = require('qs')
 axios.post(url,qs.stringify({"name":"zs"}))  
 ```
 
-## 
+
 
 ## 引言
 
@@ -452,4 +452,64 @@ const server = (()=> {
 最终效果如下图：
 
 ![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709986385828.png)
+
+## 遇到的问题
+
+##### 请求地址变成了localhost:8080 + 配置的本地地址 
+
+![1713089221797](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713089221797.png)
+
+```js
+# 原因：baseURL配置的ip不完整
+
+axios.defaults.baseURL = '192.168.1.107'
+
+# 处理方法：配置完善的ip地址，加上http或https
+
+axios.defaults.baseURL = 'http://192.168.1.107'
+
+#再次调用后发现已经可以了
+```
+
+![1713089263383](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713089263383.png)
+
+##### get请求传参
+
+```js
+# { name:'xiaoli',age:18 }
+
+axios.get('url',{
+	params:{ name:'xiaoli',age:18 }
+})
+// url?name=xiaoli&age=18
+
+# {ids:[1,2,3]}
+
+axios.get('url',{
+    params:{ids:[1,2,3]}
+})
+// url?ids[]=1&ids[]=2&ids[]=3
+
+axios.get('url',{
+    params,
+    paramsSerializer: params => {
+            return qs.stringify(params,{arrayFormat:'repear'})
+        }
+    }
+})
+// // url?ids=1&ids=2&ids=3
+
+# 1、qs.stringify({ ids:[1,2,3] }, { arrayFormat: 'indices' })
+// 输出结果：'ids[0]=1&ids[1]=2&ids[2]=3'
+# 2、qs.stringify({ ids:[1,2,3] }, { arrayFormat: 'brackets' })
+// 输出结果：'ids[]=1&ids[]=2&ids[]=3'
+# 3、qs.stringify({ ids:[1,2,3] }, { arrayFormat: 'repeat' })
+// 输出结果：'ids=1&ids=2&ids=3'
+# 4、qs.stringify({ ids:[1,2,3] }, { arrayFormat: 'comma' })
+// 输出结果：'ids[0]=1&ids[1]=2&ids[2]=3'
+# 5、qs.stringify({ ids:[1,2,3] }, { indices: false })
+// 输出结果：'ids=1&ids=2&ids=3'
+# 6、qs.stringify({ ids:[1,2,3] }, { indices: true })
+// 输出结果：'ids[0]=1&ids[1]=2&ids[2]=3'
+```
 

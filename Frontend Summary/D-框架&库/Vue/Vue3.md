@@ -626,3 +626,42 @@ function useMine(idname){
 export default useMine
 ```
 
+###### defineProps
+
+```js
+# 1
+defineProps(['aa','bb'])
+
+# 2
+defineProps({
+	aa: {
+		type:Array,
+		default:()=>{ return [] }
+	},
+	bb: {
+		type:String,
+		default:'xx'
+	}
+})
+
+# 3 withDefault
+## a （箭头函数写 {花括号} 记得加 return）
+withDefaults(
+  defineProps<{
+      list?:Persons
+  }>(),
+  {
+      list: () => { return [{id: 3333, name: '毛利小五郎', age: 90}] }
+   }
+)
+## b
+withDefaults(
+   defineProps<{
+       list?:Persons
+   }>(),
+   {
+   		list: () => [{id: 3333, name: '毛利小五郎', age: 90}]
+ 	}
+)
+```
+

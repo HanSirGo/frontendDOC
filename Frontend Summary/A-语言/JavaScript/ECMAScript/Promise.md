@@ -1099,3 +1099,27 @@ Promise.allSettled([p1, p2, p4]).then(values => {
 - `Promise.allSettled`将永远不会失败，一旦数组中的所有 Promises 被完成或失败，它就会完成。
 - `Promise.allSettled`是对 Promise.all 的一种补充，解决了当多个 promise 并行时 reject 的出现会伴随着其他 promise 数据丢失的问题。
 
+## Promise.then vs Promise.catch
+
+promise 有两种处理错误的方式，分别是：
+
+1. .then 的第二个参数回调函数
+2. .catch 回调
+
+当请求出现错误时，第二个回调函数和 Promise 的 .catch 都会被触发。
+
+乍一看，它们好像没什么区别，但是——前者（第二个参数回调函数）无法捕获“then”当前第一个回调函数中抛出的错误，而“catch”可以：
+
+```js
+Promise.resolve().then(
+ () => {
+ throw new Error('成功的回调出现错误');
+ },
+ () => {
+ // 这里不会执行
+ }
+).catch(reason => {
+ console.log(reason.message); // 成功的回调出现错误
+});
+```
+

@@ -306,6 +306,62 @@ git branch -M <oldname> <newname>
 
 ##### Git 合并分支
 
+实际开发工作的时候，我们都是在自己的分支开发，然后将自己的分合并到主分支，那合并分支用2种操作，这2种操作有什么区别呢？
+
+git上新建一个项目，默认是有master分支的，将项目克隆到本地，我们的准备工作就完成了
+
+![1712998862505](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998862505.png)
+
+> ### 同学A：
+>
+> 执行git log ，可以看到有一个提交记录，是初始化提交
+>
+> ![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998896792.png)新增一个文件a.txt, 再次查看我们的提交记录，有2条提交记录了
+>
+> ![1712998907388](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998907388.png)
+>
+> 这个时候将本地新commit的记录push到远程仓库，就可以看到我们的2次提交了
+>
+> ![1712998922560](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998922560.png)
+
+> ### 同学B：
+>
+> 同学B在已经有提交记录的master分支上，检出分支dev，并将分支推送到远程分支，并进行自己的开发
+>
+> ![1712998967582](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998967582.png)
+>
+> 查看远程仓库，多了一个dev分支
+>
+> ![1712998981529](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998981529.png)
+>
+> 此时的git分支类图是这样的
+>
+> ![1712998997589](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712998997589.png)
+>
+> 此时B同学开始进行开发，完成了自己的3次提交工作，使用git log 看一下
+>
+> ![1712999010074](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712999010074.png)此时git的分支类图是这样子的
+>
+> ![1712999021361](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712999021361.png)
+
+现在有这样一个现实的请况，就是B同学准备进行第4次提交的时候，同学A在master主分支上进行了一次提交，master的提交已经向前走了
+
+此时的git分支类图是这样的
+
+![1712999054746](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712999054746.png)
+
+此时我们知道B同学开发的dev分支是基于C2提交点切出来的，而这个时候master分支已经被更新了
+
+如果B同学开发完毕，需要将其所作的功能合并到master分支 ，他可以有两种选择：
+
+###### git merge
+
+- （1）找到master和dev的共同祖先，即C2
+- （2）将dev的最新提交C5和master的最新提交即C6合并成一个新的提交C7，有冲突的话，解决冲突
+- （3）将C2之后的dev和master所有提交点，按照提交时间合并到master
+
+![1712999110757](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712999110757.png)
+
 ```js
 # 如果想将A分支合并到B分支，就要先切换到B分支，然后执行命令：git merge A。
 git merge <branch>
@@ -319,13 +375,29 @@ Git checkout 远程分支
 Git status
 Git pull
 Git log
-Git checkout 本地分支
-Git merge 远程分支 （将远程分支合并到本地）
+Git checkout 本地分支a
+Git merge 本地分支b （将本地分支b合并到本地分支a）
 有冲突解决冲突（在分支上有一个表示 MING 有冲突）
 Git status
 Git commit -m ‘’
 Git push  （推送到远程仓库后，在远程仓库中提交自己的分支合并到需要的分支上）
 ```
+
+###### git rebase
+
+切换分支到需要rebase的分支，这里是dev分支
+
+执行git rebase master，有冲突就解决冲突，解决后直接git add . 再git rebase --continue即可
+
+发现采用rebase的方式进行分支合并，整个master分支并没有多出一个新的commit，原来dev分支上的那几次（C3，C4，C5）commit记录在rebase之后其hash值发生了变化，不在是当初在dev分支上提交的时候的hash值了，但是提交的内容被全部复制保留了，并且整个master分支的commit记录呈线性记录
+
+此时git的分支类图
+
+![1712999157887](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712999157887.png)
+
+git merge 会让2个分支的提交按照提交时间进行排序，并且会把最新的2个commit合并成一个commit。最后的分支树呈现非线性的结构
+
+git reabse 将dev的当前提交复制到master的最新提交之后，会形成一个线性的分支树
 
 ##### Git 删除分支
 
