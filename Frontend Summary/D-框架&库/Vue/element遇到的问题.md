@@ -1,3 +1,5 @@
+## Form
+
 ##### form表单输入框回车刷新页面
 
 ```js
@@ -10,6 +12,44 @@
 ```
 
 ##### 时间组件date-picker 去掉“此刻”(now)二字
+
+**第一种: 组件添加样式**
+
+```js
+<el-date-picker popper-class="no-atTheMoment" >
+</el-date-picker>
+// 在<el-date-picker>这个标签内加入popper-class="no-atTheMoment"，这个是官方提供的日期弹出层添加样式的方法，用这个classname做限制，不想显示“此刻”的，就加上这个，想显示的，就去掉它即可.
+// el-date-picker 组件键 下拉列表插入到了body元素中,所以 <style scoped></style> 会不起作用因为在组件中找不到,所以把 scoped 去掉样式就会全局起作用了.
+# element-ui
+<style lang="scss">
+    
+.el-picker-panel.no-atTheMoment {
+    .el-button--text.el-picker-panel__link-btn {
+        display: none;
+    }
+}	    
+</style>
+
+# element-plus
+<style lang="scss">
+    
+.no-atTheMoment {
+  // 去掉 此刻
+  .is-text.el-picker-panel__link-btn {
+    display: none;
+  }
+}
+
+.no-atTheMoment {
+  // 去掉 footer
+  .el-picker-panel__footer {
+    display: none;
+  }
+}
+</style>
+```
+
+**第二种: 全局引入样式**
 
 ```js
 # element-ui
@@ -85,5 +125,85 @@ const rules = reactive({
   ]
 
 })
+```
+
+## Table
+
+##### 修改表头样式
+
+```js
+# plus
+<el-table 
+	:header-cell-style="
+		{
+            background:'#fff',
+            color:'black'
+        }
+	"
+></el-table>
+```
+
+##### 一行展示超出提示
+
+```js
+# plus
+<el-table :tooltip-options="{ placement:'top'}">
+    <el-table-column 
+		v-for="item in columns" 
+		:key="item.label"
+		:label="item.label"
+		:prop="item.prop"
+		:min-width="item.width"
+		show-overflow-tooltip
+	>
+        <template #default="scope:any">
+          <span>{{ scope.row[item.prop] }}</span>
+        </template>
+    </el-table-column>
+	<el-table-column label="Operations" fixed="right">
+         <template #default="scope:any">
+          <el-button>xx</el-button>
+        </template>
+    </el-table-column>
+</el-table>
+
+```
+
+##### 选中单元格
+
+```js
+# plus
+<el-table :cell-class-name="tableCellClassName" @cell-click="handleCellClick">
+    <el-table-column 
+		v-for="item in columns" 
+		:key="item.label"
+		:label="item.label"
+		:prop="item.prop"
+		:min-width="item.width"
+		show-overflow-tooltip
+	>
+        <template #default="scope:any">
+          <template v-if="scope.row.index===tableClickRowIndex&&scope.column.index===tableClickColumnIndex">
+          	<el-input />
+          </template>
+          <span v-else>{{ scope.row[item.prop] }}</span>
+        </template>
+    </el-table-column>
+</el-table>
+
+<script setup lang="ts">
+    ...
+	const tableClickRowIndex = ref()
+	const tableClickColumnIndex = ref()
+	const tableCellClassName= (value) => {// 这个函数有必要写吗？？
+        const {row,column,rowIndex,columnIndex}=value
+        row.index = rowIndex
+        column.index = columnIndex
+    }
+    const handleCellClick = (row,column) => {
+        tableClickRowIndex.value = row.index
+        tableClickColumnIndex = column.index
+    }
+</script>
 ```
 

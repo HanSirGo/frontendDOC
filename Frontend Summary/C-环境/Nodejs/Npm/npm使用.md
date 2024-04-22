@@ -1,3 +1,7 @@
+
+
+
+
 ## npm
 
 ### npm 
@@ -338,6 +342,90 @@ npm audit
 npm audit fix
 ```
 
+### npm hooks
+
+它是npm提供的一种机制，允许我们在特定的生命周期事件发生时触发自定义脚本。这些脚本可以用来自动化执行一些任务，如代码检查、构建应用程序等。
+
+hooks近几年很火。熟悉的react-hooks、vue hooks、git hooks等
+
+使用npm hooks非常简单，只需要在项目的package.json文件中的"scripts"字段下添加相应的脚本即可。例如，如果我们想要在npm install之前执行一个脚本，可以添加以下代码：
+
+```js
+"scripts": {  "preinstall": "node demo-script.js"}
+```
+
+当我执行npm install时候![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687529944.png)会先执行我自定义js文件的日志输出
+
+npm的hooks包括以下几种：
+
+**1.生命周期hooks：**
+
+在npm生命周期的各个阶段运行，包括preinstall、install、postinstall、preuninstall、uninstall、postuninstall、preversion、version、postversion等。
+
+**2.包钩子：**
+
+允许您配置URL端点，只要对任何受支持的实体类型发生更改，都将收到通知。钩子可以监视三种不同类型的实体：包、所有者和作用域。要创建一个包钩子，只需引用包名。要创建所有者挂钩，请在所有者名称前加上~（如~youruser）。要创建作用域挂钩，请在作用域名称前加上@（如@yourscope）。
+
+**3.其他钩子：**
+
+包括prepublishOnly、prepack、prepublish、preuninstall脚本等。
+
+### npm view
+
+npm view是一个命令行工具，用于查看远程npm仓库中的模块信息。它允许用户通过模块名或版本号来获取指定版本的模块信息，并将其打印到标准输出流中。
+
+使用npm view命令时，可以指定要查看的模块名，并可选地指定要查看的版本范围。如果未指定版本范围，则默认将显示最新版本的模块信息
+
+例如：
+
+查看模块所有的版本信息：
+
+```
+npm view <module-name> versions
+```
+
+![1713687564360](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687564360.png)查看模块的依赖关系信息：
+
+```
+npm view <module-name> dependencies
+```
+
+![1713687586479](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687586479.png)查看模块的贡献者信息：
+
+```
+npm view <module-name> contributors
+```
+
+![1713687597049](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687597049.png)查看模块的存储库URL：
+
+```
+npm view <module-name> repository.url
+```
+
+![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687607963.png)
+
+### npm search
+
+用于在npm库中搜索包。通过运行该命令，你可以在npm的官方库中搜索与你输入的关键字相关的包。相比npm view而言，这个属于模糊搜索包，npm view属于针对性看包信息。![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687622976.png)
+
+### npm root
+
+用于查看当前包的安装路径。
+
+例如，如果在很深的路径中，需要使用当前项目依赖的 node_modules/.bin 中的指令，可以使用以下命令找到目录：
+
+```
+npm root
+```
+
+![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687648781.png)
+
+### npm prune
+
+用于删除未使用的npm软件包。当你在项目中安装了大量的npm软件包时，可能会出现一些未使用的软件包，这些包会占用磁盘空间并可能导致项目运行缓慢。使用npm prune可以删除这些未使用的软件包，从而减少项目的大小并提高性能。
+
+假如我之前安装了axios等等大量无用的包![1713687665123](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687665123.png)但是我不想用命令一个一个的删，那就执行它![1713687680216](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687680216.png)这样再去看node_modules里面就没有了。
+
 ##  查看已安装的包
 
 可以通过以下命令来获取整个项目的包信息：
@@ -398,3 +486,35 @@ npm link 模块名
 npm unlink 模块名
 ```
 
+## 遇到的问题
+
+### 执行npm install命令时发生版本冲突问题
+
+```js
+// 执行npm install 命令发现报错：D:\StudySoft\VsCode\code\CODE_Projects\new-cms>npm install
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR!
+npm ERR! While resolving: panda@1.0.0
+npm ERR! Found: react@17.0.2
+npm ERR! node_modules/react
+npm ERR!   react@"^17.0.2" from the root project
+npm ERR!   peer react@">=16.9.0" from antd@4.24.8
+npm ERR!   node_modules/antd
+npm ERR!     antd@"^4.21.2" from the root project
+npm ERR!     peer antd@"4.x" from @ant-design/pro-card@1.0.6
+npm ERR!     node_modules/@ant-design/pro-card
+npm ERR!       @ant-design/pro-card@"1.0.6" from the root project
+npm ERR!   1 more (react-dom)
+```
+
+这个报错是因为依赖树出现了问题，可能是由于部分依赖的版本冲突导致的。
+
+你可以尝试以下几种方法来解决这个问题：
+
+1. 清空 node_modules 和 package-lock.json 文件，重新执行 npm install 命令。
+2. 使用 npm install --legacy-peer-deps 命令替代 npm install 命令，这条命令会忽略 peerDependencies 的版本限制。
+3. 更新 package.json 中的依赖版本号，使其符合 SemVer 规范。
+4. 更换包管理器为 yarn 或 pnpm，并尝试再次执行安装命令。
+
+如果以上方法不能解决问题，建议检查一下项目中 package.json 中的依赖是否正确，并且检查网络连接状态是否正常。

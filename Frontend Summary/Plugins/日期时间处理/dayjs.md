@@ -1,5 +1,7 @@
 ## Day.js
 
+> Day.js 是一个仅 2kb 大小的轻量级 JavaScript 时间日期处理库，下载、解析和执行的JavaScript更少，为代码留下更多的时间。
+
 Day.js是一个极简的JavaScript库，可以为现代浏览器解析、验证、操作和显示日期和时间。其具有以下特点：
 
 - 和 Moment.js 相同的 API 和用法

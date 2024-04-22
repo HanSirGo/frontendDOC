@@ -1,3 +1,7 @@
+
+
+
+
 ## Git
 
 ### Git 基本概念
@@ -109,6 +113,7 @@ config 命令适用于不同的级别：
 
 ```js
 git config --global user.name "name"
+// git config user.name "name"
 ```
 
 可以使用以下命令查看设置的`user.name`：
@@ -123,6 +128,7 @@ git config user.name
 
 ```js
 git config --global user.email "email"
+// git config user.email "email"
 ```
 
 可以使用以下命令查看设置的 email：
@@ -169,9 +175,57 @@ git config --global alias.cm "commit -m"
 git cm <message>
 ```
 
+#### 注意
+
+> 修改文件也可以达到上面使用命令行的效果
+
+```
+在 .git --> config 中可以查看和修改  name email (修改单个的git项目)
+
+在 C盘 --> 用户 --> Administrator .gitconfig 中可以查看和修改  name email (全局)
+```
+
+![1713254365304](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713254365304.png)
+
 ### 常见问题
 
 #### Git对文件名大小写不敏感
+
+> 例如我在这样一个项目中![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688874434.png)某一天，不知道啥情况，需要我把文件夹名称改一下。
+>
+> ![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688889433.png)这个时候，提交列表是没有东西让你提交的，也没有提示报错（当然可能有的伙伴用了某些vscode插件会提示），所以你可能会接着写代码,然后提交代码
+>
+> ![1713688909399](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688909399.png)这个时候，我们去git上面去看
+>
+> ![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688933000.png)发现大小写改了没有效果？
+>
+> ## 分析
+>
+> 刚开始时候，本地和远程都是大写的。![1713688958483](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688958483.png)后面，你把本地改为小写的。![1713688967321](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688967321.png)但是！git它是不知道的，因为git在默认情况下，是忽略掉文件名大小写的，它不会认为有任何更改。
+>
+> 然后接下来你把本地的推送到远程，由于git并不清楚这些文件有任何的更改，所以，远程那边它仍然保持是大写，因为文件都没有动，只是动了我们新建的index.js文件，文件内引用的是小写，远程是大写
+>
+> ![1713688983865](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713688983865.png)
+>
+> 这就会造成一个情况，你本地是好好的，到了远程就报错了，别人拉新代码去运行，却发现报错。都是一套代码！你可能烧到cpu了，搞不清楚为什么报错。后面才发现是路径大小写不一样，这就浪费太多时间啦。
+>
+> ## 解决
+>
+> 所以最好的做法是什么？那就是你一开始就告诉git。你不要忽略大小写，而是要保持大小写敏感，那具体怎么做呢，那做法就非常简单了，只需要输入一个命令
+>
+> ```js
+> git config core.ignorecase false
+> ```
+>
+> 表示忽略大小写这个配置给它禁用，禁用了过后你再来看看。![1713689029028](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713689029028.png)禁用过后，它就能跟踪到了，这个时候提交一下。再看看远程。![1713689043605](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713689043605.png)这个时候发现，小写的文件夹是到远程了，但是之前的那个文件夹保留下来了，那怎么解决呢？
+>
+> 使用下面命令
+>
+> ```
+> git rm --cached Components -r 
+> ```
+>
+> 命令用于把暂存区的指定的文件移除![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713689083019.png)提交之后，我们再到远程看看。![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713689092095.png)
 
 ```js
 # 忽略大小写
@@ -179,6 +233,33 @@ git config core-ignorecase true
 # 区分大小写
 git config core-ignorecase false 
 ```
+
+### Git版本号
+
+```js
+# 每次提交都会生成一个版本号，这个版本号是40位长度的16进制的数字字符串。经过特殊的加密算法计算出来的，不容易重复。
+1. 避免版本合并的时候冲突
+2. 定位仓库中的文件，把40位拆分成两部分：前两位是文件夹，后38位是文件名（.git-->objects）
+// 当依据本次提交的commit版本号在.git的objects文件夹中找到文件，打开后是一堆乱码。如何查看里边的内容：
+// 回到.git文件夹的目录中，右键选择Git Bash Here打开git自带的命令行工具，使用命令查看这个文件。
+// git cat-file -p 版本号
+// -p 友好的查看我的文件
+// 得到的是本次提交的内容
+```
+
+![1713235627811](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713235627811.png)
+
+```js
+# git如何记录那个是最新的版本号
+.git --> HEAD 中记录一个路径：ref: refs/heads/main
+.git --> refs --> heads --> main 在main中记录着一个版本号
+
+// 而main则是 分支的名称
+# 当分支发生变化后 HEAD中也会发生改变
+// 切换 dev 分支 HEAD中 ref: refs/heads/dev
+```
+
+
 
 ### Git命令
 
@@ -231,13 +312,27 @@ doc/**/*.pdf
 ##### Git status
 
 ```js
-git status // 命令用于检查存储库的状态（例如未跟踪的文件和准备提交的更改）
+git status // 命令用于检查存储库的状态（例如未跟踪的文件和准备提交的更改） 暂存区的状态
 ```
 
-##### Git log
+##### Git查看提交
+
+###### Git show
+
+```js
+// 查看具体提交，具体修改等待
+Git show
+// or
+Git log -n1 -p
+```
+
+![1713602804521](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713602804521.png)
+
+###### Git log
 
 ```js
 git log // 命令用于显示所有提交的历史记录。它包括提交哈希、作者、日期和提交消息。
+git log --oneline // 将每次commit提交,简化成一行
 ```
 
 ##### Git diff
@@ -266,6 +361,17 @@ git fetch origin 分支 // 同步远程仓库的分支信息
 ```js
 git merge // 命令将所有分支更改合并到一个分支中。
 git merge <branch_name> // 将 <branch_name> 替换为要将其更改合并到当前分支的分支名称。
+```
+
+##### Git restore
+
+```js
+git restore filename // 将删除的文件恢复
+// 这个删除的文件是已标记过的
+// 当删除文件后已提交
+git reset --hard commitid // commitid之后的提交会消失
+// 想要保留所有提交，切还原
+git revert commitid
 ```
 
 #### 分支
@@ -530,6 +636,7 @@ hotfix 分支--修复分支
 
 ```js
 Git clone url(http地址)
+Git clone url filename // 克隆项目并修改文件夹名称
 Git clone -b branchname remoteaddr // 克隆指定分支 remoteaddr （http地址）
 ```
 
@@ -570,6 +677,7 @@ git reset HEAD~100 : 回退到当前版本的前100个版本
 
 ```js
 git add <file_name> // 将 <file_name> 替换为你的文件名
+git add *.txt // 将所有的.txt文件提交到暂存区
 git add . // 提交所有的更改到暂存区
 ```
 
@@ -577,9 +685,10 @@ git add . // 提交所有的更改到暂存区
 
 ```
 git reset <file_name>
+git rm --cached <file>
 ```
 
-##### 缓存
+##### Git stash 缓存
 
 git stash 命令用于临时保存尚未准备好提交的更改。
 
@@ -610,6 +719,20 @@ git commit --amend -m <message>
 
 git add .
 git commit --amend --no-edit
+```
+
+##### Git提交信息(commit message)写错了
+
+```js
+# 如果你的提交信息(commit message)写错了且这次提交(commit)还没有推(push), 你可以通过下面的方法来修改提交信息(commit message):
+
+$ git commit --amend --only
+
+# 这会打开你的默认编辑器, 在这里你可以编辑信息. 另一方面, 你也可以用一条命令一次完成:
+
+$ git commit --amend --only -m 'xxxxxxx'
+
+# 如果你已经推(push)了这次提交(commit), 你可以修改这次提交(commit)然后强推(force push), 但是不推荐这么做。
 ```
 
 ##### Git修改提交的commit

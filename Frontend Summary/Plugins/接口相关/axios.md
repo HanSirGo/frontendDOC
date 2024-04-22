@@ -493,11 +493,17 @@ axios.get('url',{
 axios.get('url',{
     params,
     paramsSerializer: params => {
-            return qs.stringify(params,{arrayFormat:'repear'})
+            return qs.stringify(params,{arrayFormat:'repeat'})
         }
     }
 })
-// // url?ids=1&ids=2&ids=3
+// 上边的代码报错 可以试试这一段代码
+paramsSerializer: {
+    serialize: params => {
+        return qs.stringify(params,{arrayFormat:'repeat'})
+    }
+}
+// url?ids=1&ids=2&ids=3
 
 # 1、qs.stringify({ ids:[1,2,3] }, { arrayFormat: 'indices' })
 // 输出结果：'ids[0]=1&ids[1]=2&ids[2]=3'
@@ -513,3 +519,415 @@ axios.get('url',{
 // 输出结果：'ids[0]=1&ids[1]=2&ids[2]=3'
 ```
 
+##### get请求日期时间参数
+
+```js
+params = {time:'2024-04-18 00:00:00'}
+# 1. 一般情况
+axios.get('url',{
+    params
+})
+// url?time=2024-04-18+00:00:00
+# 2. 手动拼接
+axios.get(`url?time=${params.time}`)
+// url?time=2024-04-18%2000:00:00
+# 3. qs
+axios.get('url',{
+    params,
+    paramsSerializer: params => {
+            return qs.stringify(params,{arrayFormat:'repeat'})
+        }
+    }
+})
+// url?time=2024-04-18%2000%3000%3000
+```
+
+##### CancelToken、AbortController取消重复请求
+ **场景**
+
+> 在开发中会遇到连续点击按钮同时多次请求相同接口，一般我们会对按钮进行一个loading操作，但是有时候可能是一个tab页签，点击页签就要请求一次数据，当频繁的来回点击页签的时候，会发送多次请求，如果在数据还没有请求到的时候禁用tab页签点击，会给用户一种页签组件点不动的感觉，于是我考虑换个思路，发现本次的请求和之前的请求相同，则取消之前的请求，以本次的请求为准。
+
+###### 1. axios 实例
+
+**V1.0（使用CancelToken，无白名单，基本够用）**
+
+由于项目中使用到的是axios来进行请求，经过一通百度大法，发现axios有一个叫CancelToken的api，用于给请求打上一个标识，并返回一个函数，只要调用这个函数，就可以取消被标识的请求
+
+整体思路如下：
+
+1.定义请求队列，以唯一标识（url+method）为key来缓存取消函数
+
+2.在请求拦截中判断，如果标识相同，说明为重复请求，根据唯一标识删除缓存队列中的取消函数，再将新的取消函数进行缓存
+
+3.响应拦截中判断，如果本次请求成功，根据唯一标识删除缓存队列中的取消函数，如果请求失败，通过axios内置函数isCancel判断，本次失败的原因是接口请求失败，还是通过CancelToken进行的取消
+```javascript
+import axios from 'axios'
+ 
+// CancelToken能为一次请求‘打标识’
+// isCancel用于判断请求是不是被CancelToken取消的
+const { CancelToken, isCancel } = axios
+ 
+// 请求队列，缓存发出的请求
+const cacheRequest = {}
+ 
+// axios实例
+const service = axios.create({
+  timeout: 10*60*1000,
+  // headers: {
+  //  'Content-Type': 'application/json; charset=UTF-8'
+  // },
+})
+ 
+// 请求拦截
+service.interceptors.request.use((config) => {
+    const { url, method } = config
+    // 请求地址和请求方式组成唯一标识，将这个标识作为取消函数的key，保存到请求队列中
+    const reqKey = `${url}&${method}`
+    // 如果存在重复请求，删除之前的请求
+    removeCacheRequest(reqKey)
+    // 将请求加入请求队列
+    config.cancelToken = new CancelToken(c => {
+      cacheRequest[reqKey] = c
+    })
+})
+ 
+// 响应拦截
+service.interceptors.response.use(
+    (response) => {
+        // 请求成功，从队列中移除
+        const { url, method } = response.config
+        removeCacheRequest(`${url}&${method}`)
+    },
+    (error) => {
+    	// 请求失败，从队列中移除(这两行可加可不加)
+        const { url, method } = error.config
+        removeCacheRequest(`${url}&${method}`)
+        
+        // 请求失败，使用isCancel来区分是被CancelToken取消，还是常规的请求失败
+        if (isCancel(error)) {
+          // 通过CancelToken取消的请求不做任何处理
+          return Promise.reject({
+            message: '重复请求，自动拦截并取消'
+          })
+        } else{
+        	// 判断一下是不是断网了
+        	if(!window.navigator.onLine) return console.log('断网')
+        	
+            // 正常请求发生错误,抛出异常等统一提示
+            console.log(error.response, 'errMsg')
+        }
+    }
+)
+ 
+/**
+ * @desc 删除缓存队列中的请求
+ * @param {String} reqKey 本次请求的唯一标识 url&method
+ */
+function removeCacheRequest(reqKey) {
+  if (cacheRequest[reqKey]) {
+    // 这里调用的就是上面的CancelToken生成的c函数，调用就会取消请求
+    cacheRequest[reqKey]()
+    delete cacheRequest[reqKey]
+  }
+}
+
+// 如果不想 二次封装，可以直接导出 service,执行第三步 3
+// export {service, cacheRequest}
+```
+看起来没有问题了，确实也达到了我所想要的效果，之前的请求如果没有完成都被取消，始终只有最新的请求会被发出去
+![1713697556817](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713697556817.png)
+
+**V2.0（使用AbortController，增加白名单）**
+
+回想自己用了这么久axios，都还不知道官方提供了这种api，于是我决定翻一下文档，复习一下axios，结果一翻不得了，官方标识从v0.22.0开始已经弃用CancelToken，建议我们使用AbortController来实现，由于项目中使用的是0.26.1（明明还是可以用），还是紧跟时代步伐，换成官方推荐的吧。
+![1713697572772](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713697572772.png)
+ 将上面的代码进行改造，顺便加了一个白名单，因为项目是vue的后台项目，有可能几个兄弟组件在初始化的时候都请求了同一个接口，这种情况下应该允许这些接口的重复请求
+
+```javascript
+import axios from 'axios'
+ 
+// 注意：AbortController是fetch API提供的，不需要从axios引入
+// isCancel用于判断请求是不是被AbortController取消的
+const { isCancel } = axios
+ 
+// 请求队列，缓存发出的请求
+const cacheRequest = {}
+// 不进行重复请求拦截的白名单
+const cacheWhiteList = ['/foo/bar&get']
+ 
+// axios实例
+const service = axios.create({
+  timeout: 10*60*1000,
+  // headers: {
+  //  'Content-Type': 'application/json; charset=UTF-8'
+  // },
+})
+ 
+// 请求拦截
+service.interceptors.request.use((config) => {
+    const { url, method } = config
+    // 请求地址和请求方式组成唯一标识，将这个标识作为取消函数的key，保存到请求队列中
+    const reqKey = `${url}&${method}`
+    // 如果存在重复请求，删除之前的请求
+    if (cacheWhiteList.indexOf(reqKey) === -1) {
+      removeCacheRequest(reqKey)
+      // 将请求加入请求队列，通过AbortController来进行手动取消
+      const controller = new AbortController()
+      config.signal = controller.signal
+      cacheRequest[reqKey] = controller
+    }
+})
+ 
+// 响应拦截
+service.interceptors.response.use(
+    (response) => {
+        // 请求成功，从队列中移除
+        const { url, method } = response.config
+        removeCacheRequest(`${url}&${method}`)
+    },
+    (error) => {
+    	// 请求失败，从队列中移除(这两行可加可不加)
+        const { url, method } = error.config
+        removeCacheRequest(`${url}&${method}`)
+
+        // 请求失败，使用isCancel来区分是被CancelToken取消，还是常规的请求失败
+        if (isCancel(error)) {
+          // 通过CancelToken取消的请求不做任何处理
+          return Promise.reject({
+            message: '重复请求，自动拦截并取消'
+          })
+        } else{
+        	// 判断一下是不是断网了
+        	if(!window.navigator.onLine) return console.log('断网')
+        	
+            // 正常请求发生错误,抛出异常等统一提示
+            console.log(error.response, 'errMsg')
+        }
+    }
+)
+ 
+/**
+ * @desc 删除缓存队列中的请求
+ * @param {String} reqKey 本次请求的唯一标识 url&method
+ */
+function removeCacheRequest(reqKey) {
+  if (cacheRequest[reqKey]) {
+    // 通过AbortController实例上的abort来进行请求的取消
+    cacheRequest[reqKey].abort()
+    delete cacheRequest[reqKey]
+  }
+}
+// 如果不想 二次封装，可以直接导出 service,执行第三步 3
+// export {service, cacheRequest}
+
+```
+###### 2. axios 请求二次封装
+
+```javascript
+/**
+ * get方法，对应get请求
+ * @param {String} url [请求的url地址]
+ * @param {Object} params [请求时携带的参数]
+ */
+export function get(url, params) {
+  return new Promise((resolve, reject) => {
+    service.get(url, {
+      params
+    })
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject(err.data)
+      })
+  });
+}
+/**
+ * post方法，对应post请求
+ * @param {String} url [请求的url地址]
+ * @param {Object} params [请求时携带的参数]
+ */
+export function post(url, params) {
+  return new Promise((resolve, reject) => {
+    service.post(url, params)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject(err.data)
+      })
+  });
+
+}
+/**
+ * put方法，对应put请求
+ * @param {String} url [请求的url地址]
+ * @param {Object} params [请求时携带的参数]
+ */
+export function put(url, params) {
+  return new Promise((resolve, reject) => {
+    service.put(url, params)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject(err.data)
+      })
+  });
+}
+/**
+ * delete方法，对应delete请求
+ * @param {String} url [请求的url地址]
+ * @param {Object} params [请求时携带的参数]
+ */
+export function $delete(url, params) {
+  return new Promise((resolve, reject) => {
+    service.delete(url, {
+      params: params
+    })
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject(err.data)
+      })
+  });
+}
+```
+###### 3. api接口统一管理文件，后续用到的接口都在这个文件导出
+
+```javascript
+import { get, post, $delete, put } from "./http";
+export const getUserDataList=(data)=>{
+//  /a表示接口
+  return get('/a',data)
+}
+export const getUserData=(data)=>{
+//  /a/b表示接口
+  return post('/a/b',data)
+}
+//编辑用户
+export const putUserData=(data)=> {
+  return put(`/a/b/detail/${data.user_id}`, data);
+};
+//删除用户
+export const delUserData=(data)=> {
+  return $delete(`/a/b/detail/${data.user_id}`, data);
+};
+```
+###### 扩展
+###### axios单个取消请求
+```javascript
+var CancelToken = axios.CancelToken;
+var cancel;
+
+axios.get('/user/12345', {
+  cancelToken: new CancelToken(function executor(c) {
+    // executor 函数接收一个 cancel 函数作为参数
+    cancel = c;
+  })
+});
+
+// 取消请求
+cancel();
+```
+###### 路由切换取消接口
+
+```javascript
+import { cacheRequest } from './api/axios'
+router.beforeEach((to,from,next)=> {
+  // 方法1：
+  for (const item in cacheRequest) {
+    cacheRequest[item].abort()
+    // cacheRequest[item]()
+    delete cacheRequest[item]
+  }
+  next()
+})
+```
+###### ajax 取消请求
+
+```javascript
+document.querySelect('button').addEventListener('clicl',()=>{
+	const xhr = new XMLHttpRequest()
+	const url = 'http://localhost:3000/users'
+	xhr.open('get',url)
+	xhr.onreadystatechange=()=> {
+		console.log(xhr.readyState)
+	}
+	xhr.send()
+	setTimeout( () => {
+		xhr.abort()
+	}, 1000 )
+})
+```
+###### 后端返回数据缺失精度
+
+> js中的数值Number没人是int，4个字节，16位，最大只能存16位，超16位后面的数据可能会被转化为0
+> Number 类型的数据是 64 位双精度，能够安全表示的数据范围为 -253 ~ 253 ， 即最大安全值为 9007199254740992，在我的项目中，后端传递的数据明显超出这个范围，造成了精度丢失，只保证了前 16 位的精度，16 位之后的数据，只用 0 表示。
+>
+
+> 有意思的地方是，postman测试接口时，查看返回值精度并未丢失，是字符串。
+
+```javascript
+var Num = 1234567891011121314
+js会被转化为 1234567891011121000
+```
+
+ - 第一种：后端将此字段类型修改为 String 类型
+ - 第二种：前端在接收到响应数据时，反序列化之前，将此字段类型修改为 String 类型
+
+> 此次我用到的就是这种解决方式，新封装一个 axios 实例，专门用来解决这种精度丢失的问题，在创建实例时，使用正则对 id 属性进行类型的转换
+```javascript
+	// 创建 axios 实例
+	const transformResponse = function (res) {
+	    // id 超过16位， 精度丢失，解决
+	    res = res.replace(/\"id\":(\d+)/g, '"id":"$1"')
+	    return JSON.parse(res)
+	}
+	const serviceTransform = axios.create({
+	    transformResponse
+	});
+
+```
+ - 第三种：下载 json-bigint 插件解决
+
+json-bigint是一个第三方包，它在把json字符串转json对象的过程中，自动识别大整数，把大整数转成一个对象来表示，这样就不会产生精度丢失的问题了。
+
+```javascript
+npm i json-bigint
+```
+导入
+
+```javascript
+import JSONBig from 'json-bigint'
+const JSONBigtoString = JSONBig({ storeAsString: true })
+const service = axios.create({
+	transformResponse: [
+		function (data) {
+			try { 
+				return JSONBigtoString.parse(data)
+			} catch (error) {
+				return data
+			}
+		}
+	]
+})
+```
+###### 拦截器添加 Authorization 权限
+
+```javascript
+service.interceptors.request.use(
+	(config) => {
+		if(本地存在token) {
+			config.headers.Authorization = `Bearer ${ 需要的token }`
+		}
+		if(特殊需要用户名和密码的接口) {
+			config.headers.Authorization = `Basic ${ 将用户名和密码先转为base64格式 }`
+		}
+	},
+	(error) => {
+		return Promise.reject(error)
+	}
+)
+```
