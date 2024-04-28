@@ -32,7 +32,7 @@ iframe 最大的特性就是提供了浏览器原生的硬隔离方案，不论�
 
 #### 4. **特性**
 
-```
+```js
 ·  基于 [single-spa](https://github.com/CanopyTax/single-spa) 封装，提供了更加开箱即用的 API。
 
 ·  技术栈无关，任意技术栈的应用均可 使用/接入，不论是 React/Vue/Angular/JQuery 还是其他等框架。
@@ -48,9 +48,9 @@ iframe 最大的特性就是提供了浏览器原生的硬隔离方案，不论�
 ·  umi 插件，提供了 [@umijs/plugin-qiankun](https://github.com/umijs/plugins/tree/master/packages/plugin-qiankun) 供 umi 应用一键切换成微前端架构系统。
 ```
 
-
-
 #### 5. **搭建qiankun**
+
+> 主应用不限技术栈，只需要提供一个容器 DOM，然后注册微应用并 start 即可。
 
 ##### (1) **主应用(vue)**
 
@@ -82,6 +82,18 @@ registerMicroApps([
       console.log(loading)
     }
   },
+  {
+    name: 'vueApp',
+    entry: '//localhost:8080',
+    container: '#container',
+    activeRule: '/app-vue',
+  },
+  {
+    name: 'angularApp',
+    entry: '//localhost:4200',
+    container: '#container',
+    activeRule: '/app-angular',
+  }
 ],{ //生命周期钩子
   beforeLoad:()=>{
     console.log('加载前');
@@ -126,6 +138,22 @@ registerMicroApps([
 start();
 
 ```
+
+当微应用信息注册完之后，一旦浏览器的 url 发生变化，便会自动触发 qiankun 的匹配逻辑，所有 activeRule 规则匹配上的微应用就会被插入到指定的 container 中，同时依次调用微应用暴露出的生命周期钩子。
+
+如果微应用不是直接跟路由关联的时候，你也可以选择手动加载微应用的方式：
+
+```javascript
+import { loadMicroApp } from 'qiankun';
+
+loadMicroApp({
+  name: 'app',
+  entry: '//localhost:7100',
+  container: '#yourContainer',
+});
+```
+
+--------------------------------------------------------------------------------------------
 
 ```vue
 // APP.vue
@@ -281,3 +309,344 @@ module.exports = {
 在 webpack 4 中，多个 webpack 运行时可能会在同一个 HTML 页面上发生冲突，因为它们使用同一个全局变量进行代码块加载。为了解决这个问题，需要为 output.jsonpFunction 配置提供一个自定义的名称。
 
 Webpack 5 确实会从 package.json name 中自动推断出一个唯一的构建名称，并将其作为 output.uniqueName 的默认值。
+
+-------------------------------------------------------------------------------------------
+
+子应用
+
+###### vue2
+
+1. 在 src 目录新增 public-path.js：
+
+```javascript
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+```
+2. 入口文件 main.js 修改，为了避免根 id #app 与其他的 DOM 冲突，需要限制查找范围。
+
+```javascript
+import './public-path';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import App from './App.vue';
+import routes from './router';
+import store from './store';
+
+Vue.config.productionTip = false;
+
+let router = null;
+let instance = null;
+function render(props = {}) {
+  const { container } = props;
+  router = new VueRouter({
+    base: window.__POWERED_BY_QIANKUN__ ? '/app-vue/' : '/',
+    mode: 'history',
+    routes,
+  });
+
+  instance = new Vue({
+    router,
+    store,
+    render: (h) => h(App),
+  }).$mount(container ? container.querySelector('#app') : '#app');
+}
+
+// 独立运行时
+if (!window.__POWERED_BY_QIANKUN__) {
+  render();
+}
+
+export async function bootstrap() {
+  console.log('[vue] vue app bootstraped');
+}
+export async function mount(props) {
+  console.log('[vue] props from main framework', props);
+  render(props);
+}
+export async function unmount() {
+  instance.$destroy();
+  instance.$el.innerHTML = '';
+  instance = null;
+  router = null;
+}
+```
+3. 打包配置修改（vue.config.js）：
+
+```javascript
+const { name } = require('./package');
+const timeStemp = new Date().getTime()
+module.exports = {
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  },
+  configureWebpack: {
+    output: {
+      filename: `js/[name].${timeStamp}.js`,
+      chunkFilename: `js/chunk.[id].${timeStemp}.js`,
+      library: `${name}-[name]`,
+      libraryTarget: 'umd', // 把微应用打包成 umd 库格式
+      jsonpFunction: `webpackJsonp_${name}`, // webpack 4
+      // chunkLoadingGlobal: `webpackJsonp_${name}`,// webpack 5 需要把 jsonpFunction 替换成 chunkLoadingGlobal
+    },
+  },
+};
+```
+
+###### vue3
+1. 在 src 目录新增 public-path.js：
+
+```javascript
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+```
+2. main.ts文件
+
+```javascript
+import { createApp } from 'vue'
+import App from './App.vue'
+import routes from './router'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import './public-path.js'
+export { mount, unmount, bootstrap } from './qiankun'
+
+if (!(window as any).__POWERED_BY_QIANKUN__) {
+  const router = createRouter({
+    history: createWebHashHistory(),
+    routes
+  })
+  createApp(App).use(router).mount('#app')
+}
+
+```
+3. qiankun.ts
+
+```javascript
+import { RouterHistory, createRouter, createWebHashHistory } from 'vue-router'
+import { App, inject, InjectionKey, createApp } from 'vue'
+import routes from './router'
+import MainApp from './App.vue'
+let history: RouterHistory | null = null
+let app: any = null
+
+interface IGlobalState {
+  setGlobalState: (state: Record<string, any>)=> void
+  onGlobalStateChange: (func: (state: Record<string, any>, prev: Record<string, any>)=> void)=> void
+  offGlobalStateChange: () => boolean
+}
+
+export const GlobalStateKey: InjectionKey<IGlobalState> = Symbol('')
+
+// 全局调用乾坤框架消息方便进行消息传递
+const createGlobalState = (props: any) => {
+  const globalState = {
+    install (app: App) {
+      app.config.globalProperties.$globalState = props
+      app.provide(GlobalStateKey, props)
+    }
+  }
+  return globalState
+}
+
+// vue3 use
+const useGlobalState = () => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return inject(GlobalStateKey)!
+}
+
+/**
+ * 应用每次进入都会调用 mount 方法，通常我们在这里触发应用的渲染方法
+ */
+const mount = async (props: any) => {
+  const { container } = props
+  history = createWebHashHistory('/meeting/')
+  const router = createRouter({
+    history,
+    routes
+  })
+  app = createApp(MainApp)
+  app.use(router).use(createGlobalState(props)).mount(container.querySelector('#app'))
+}
+
+/**
+ * 应用每次 切出/卸载 会调用的方法，通常在这里我们会卸载微应用的应用实例
+ */
+const unmount = async () => {
+  app.unmount()
+  if (history) {
+    history.destroy()
+  }
+}
+
+// bootstrap 只会在微应用初始化的时候调用一次，下次微应用重新进入时会直接调用 mount 钩子，不会再重复触发 bootstrap。
+// 通常我们可以在这里做一些全局变量的初始化，比如不会在 unmount 阶段被销毁的应用级别的缓存等。
+const bootstrap = async () => {
+  console.log('%c%s', 'color: green;', 'vue3.0 app bootstrap')
+}
+
+/**
+ * 可选生命周期钩子，仅使用 loadMicroApp 方式加载微应用时生效
+ */
+const update = async (props: any) => {
+  console.log('update props', props)
+}
+
+export { mount, unmount, bootstrap, update, useGlobalState }
+
+```
+###### vue3（vite）
+
+> 1. vite和webpack不一致没有 webpack_public_path这个东西需要安装插件：vite-plugin-qiankun
+> 2. vite-plugin-qiankun 提供了一些公共方法可以直接使用避免了很多麻烦
+1. 配置vite.config.ts
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import qiankun from 'vite-plugin-qiankun'
+import path from 'path'
+//! useDevMode = true 时不开启热更新
+const useDevMode = true;
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    qiankun('micro-org', {useDevMode})
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')  // 别名
+    }
+  },
+  server: {
+    port: 8081
+  }
+})
+```
+2. 在 src 目录新增 public-path.js：
+
+```javascript
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+```
+3. main.ts文件
+
+```javascript
+import { createApp } from 'vue'
+import App from './App.vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import routes from './router'
+import './public-path.js'
+import {
+  renderWithQiankun,
+  qiankunWindow
+} from 'vite-plugin-qiankun/dist/helper'
+// 通过renderWithQiankun导出
+import { mount, unmount, bootstrap, update } from './qiankun'
+
+const initQianKun = () => {
+  // QiankunLifeCycle
+  renderWithQiankun({
+    mount,
+    bootstrap,
+    unmount,
+    update
+  })
+}
+
+const render = () => {
+  const router = createRouter({
+    history: createWebHashHistory(),
+    routes,
+  })
+  createApp(App).use(router).mount('#app')
+}
+
+qiankunWindow.__POWERED_BY_QIANKUN__ ? initQianKun() : render()
+```
+4. qiankun.ts
+
+```javascript
+import { RouterHistory, createRouter, createWebHashHistory } from 'vue-router'
+import { App, inject, InjectionKey, createApp } from 'vue'
+import { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
+import routes from './router'
+import MainApp from './App.vue'
+let history: RouterHistory | null = null
+let app: any = null
+
+interface IGlobalState {
+  setGlobalState: (state: Record<string, any>) => void
+  onGlobalStateChange: (
+    func: (state: Record<string, any>, prev: Record<string, any>) => void
+  ) => void
+  offGlobalStateChange: () => boolean
+}
+
+export const GlobalStateKey: InjectionKey<IGlobalState> = Symbol('')
+
+// 全局调用乾坤框架消息方便进行消息传递
+const createGlobalState = (props: any) => {
+  const globalState = {
+    install(app: App) {
+      app.config.globalProperties.$globalState = props
+      app.provide(GlobalStateKey, props)
+    },
+  }
+  return globalState
+}
+
+// vue3 use
+const useGlobalState = () => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return inject(GlobalStateKey)!
+}
+
+/**
+ * 应用每次进入都会调用 mount 方法，通常我们在这里触发应用的渲染方法
+ */
+const mount = async (props: QiankunProps) => {
+  const { container } = props
+  history = createWebHashHistory('/org/')
+  const router = createRouter({
+    history,
+    routes,
+  })
+  app = createApp(MainApp)
+  if (container) {
+    app
+      .use(router)
+      .use(createGlobalState(props))
+      .mount(container.querySelector('#app'))
+  }
+}
+
+/**
+ * 应用每次 切出/卸载 会调用的方法，通常在这里我们会卸载微应用的应用实例
+ */
+const unmount = async () => {
+  app.unmount()
+  if (history) {
+    history.destroy()
+  }
+}
+
+// bootstrap 只会在微应用初始化的时候调用一次，下次微应用重新进入时会直接调用 mount 钩子，不会再重复触发 bootstrap。
+// 通常我们可以在这里做一些全局变量的初始化，比如不会在 unmount 阶段被销毁的应用级别的缓存等。
+const bootstrap = async () => {
+  console.log('%c%s', 'color: green;', 'vue3.0 app bootstrap')
+}
+
+/**
+ * 可选生命周期钩子，仅使用 loadMicroApp 方式加载微应用时生效
+ */
+const update = async (props: any) => {
+  console.log('update props', props)
+}
+
+export { mount, unmount, bootstrap, update, useGlobalState }
+```

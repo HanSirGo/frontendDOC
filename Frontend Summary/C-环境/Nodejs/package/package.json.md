@@ -256,6 +256,150 @@ yarn add --dev <PACKAGENAME>
 }
 ```
 
+##### devDependencies 和 dependencies
+
+本文的核心：理清 `devDependencies` 中的 dev ，到底指的是什么，搞清楚这个 dev 的概念。如此一来，`devDependencies` 和 `dependencies` 之间的区别就清晰可见了。
+
+**一、走出 “dev” 的误区**
+
+关于 “`devDependencies` 和 `dependencies` 有什么区别？” 这样的问题，我们随便百度、google一下都能出来很多个答案，其中**最广为流传的说法**大概就是：“ `devDependencies` 是开发环境下需要用到的依赖， `dependencies` 是生产环境下需要用到的依赖” 这样的话术，这也就是很容易让人走进误区的开端。至于为什么这么说，我们接着往下看。
+
+**1. devDependencies 的 dev 理解误区**
+
+存在即合理，即然这是个容易让人产生误区的话术，为什么它是搜索引擎中最容易搜索到的答案呢？其实，从某种角度来看，这个说法并没有什么毛病，只是很容易让人走进误区。如果没有实践中体会过他们的区别，就**很难真正的理解这句话**，这也是让我们掉进误区的原因。
+
+其中最大的误区便是对 “`dev`” 的理解。这么说可能不够清晰，笔者把它转述成一个问题：
+
+- 安装在 `devDependencies` 中的依赖，在项目执行 `build` 的时候会不会被打包进 **dist** 产物中？
+
+上面这个问题其实很简单，大家**不要掉到笔者这个提问的坑里**。我们从正常的项目打包流程分析（不管是 webpack 还是 vite，打包的核心步骤都类似），**这里从最简化的进行分析，只为了针对上述问题。**
+
+1. 初始化配置
+2. **项目入口**
+3. **依赖解析**
+4. loader处理
+5. ... ...
+
+好了，看到这样的打包流程（集中关注**第2、3**点），大家应该也意识到一点：**项目打包跟 devDependencies 这个字段并没什么关系**。这样一来，上述问题的答案也就很清晰了。只要是项目中用到的依赖（且安装到 `node_modules` 中），不管这个依赖是放在 `devDependencies` 还是放在 `dependencies` ，都会被打包工具解析、构建，最后都打进 dist 产物中。
+
+总结：**生产打包 与 devDependencies 字段无关**。`devDependencies` 中的 `dev` **并不是**指我们 dev server 时候的 `dev` ，不能简单的把 dev 理解成当前项目的 “开发环境” 。接着往下，我们通过真实的装包来验证一下这个结论。
+
+**2. 验证 devDependencies**
+
+为了加深大家对上述 “dev误区” 的理解，笔者这里做一个小实验。
+
+1. 随便用vue-cli生成一个 vue2 项目，目录如下。![1714194396465](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194396465.png)
+2. 当前项目的依赖情况如下图：![1714194418543](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194418543.png)可以看到，目前的 vue 是放在 `dependencies` 字段中。
+3. `install` 一下依赖，然后到 `node_modules` 中找到 vue 的依赖包，并且找到对应的入口文件。![1714194438575](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194438575.png)
+4. 在 vue.runtime.esm.js 中，加入一行代码。看看打包后的情况如何。![1714194450766](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194450766.png)
+5. 执行 `build`。并对 dist 文件夹搜索。![1714194467497](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194467497.png)没有意外，vue2 的包给打进了该项目的 dist 包中。
+
+大家对于上述的结果当然不会感觉到有何不妥，那接下来，笔者把 vue 的依赖信息移动到 `devDependencies` 中，然后删除掉之前的 `node_modules` 目录后重新执行 `install` ，结果如图所示。![1714194483005](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194483005.png)![1714194499511](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194499511.png)
+
+这时，再重复上述步骤 3、4、5 ，对 vue2 项目进行打包，再去 dist目录中**搜索**手动添加到 vue2 源码中的 `console.log` ，结果如图所示。![1714194513490](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194513490.png)
+
+结果就是，放在 `devDependencies` 的 vue2 在 build 时候（mode 为 production）依然会被打包进单页应用的项目中。所以，通过这个实践，就为了搞清楚一个点，`devDependencies` 的 dev 并不是指我们在业务项目开发中的 dev 和 prod，它甚至跟打包时候的 `mode` 扯不上关系。
+
+那他们到底的区别在哪里，为什么会存在这2个字段？我们接着往下看。
+
+**二、『npm包』的 devDependencies**
+
+这里提到了 **npm包** ，敏感的同学可能就猜到 `devDependencies` 和 `dependencies` 的真正区别了。其实 `devDependencies` 这个字段的 **dev** 的真正含义，更多是指 **npm包** 的开发阶段所需要的依赖。
+
+**1. npm 包的 dev**
+
+怎么理解前面提到的 npm包 开发阶段所需要的依赖？我们大概回忆一下npm包从 开发 - 发包 的流程。
+
+1. npm**初始化**——`package.json`。想要开发一个 npm包，最先一定是要进行初始化，执行命令 `npm init`，然后填写一些信息比如 name 、 version 、 description ...此时便会生成一个 `pakcage.json` 文件。
+2. npm包的**开发**。这个阶段，也就是对 npm包 功能实现的阶段，我们会开始编写代码。然而，我们在编写npm包的时候，可能需要用到其他的库，这个时候我们就需要去**安装其他的库**。
+3. npm包的**打包、发布**。npm包开发完成后，当然就是要对我们的项目进行打包，然后通过 `npm publish` 命令去发布我们的npm包。
+
+整个 npm包的实现 大概就是这么一个流程。其中第二点，笔者提到了：**如果开发过程中需要用到其他的工具库，就要把依赖安装到当前项目里**！这就涉及到本文的重点了，要怎么安装呢？-D、还是-S？不同的命令会带来怎么样不同的后果呢？
+
+现在，我门来通过一个具体案例开探讨这个问题的答案。
+
+场景描述：现在要开发一个基于 element-plus 的二次封装的组件库，所以在开发调试阶段，笔者需要安装 `vue3` 、 `element-plus` ... 等等依赖，以辅助我们开发组件。
+
+对比实验：
+
+1. 将 `vue3` 、 `element-plus` 都放在组件库package.json的 `devDependencies` 中，然后将组件库发包。最后，在业务项目中安装该组件库，看依赖情况。![1714194539967](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194539967.png)
+2. 将 `vue3` 放在组件库package.json的 `devDependencies` 中，`element-plus` 放在组件库package.json的 `dependencies` 中，然后将组件库发包。最后，在业务项目中安装该组件库，看依赖情况。![1714194551868](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194551868.png)
+
+**2. 对比实验1**
+
+1. 首先在业务项目中安装组件库 vc-element-plus。依赖如下图：![1714194567403](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194567403.png)
+
+   执行安装，操作如下：
+
+   ![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194575835.png)
+
+2. 看下安装的 vc-element-plus 内部的依赖安装情况。如图：
+   ![1714194588676](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194588676.png)
+
+回顾实验1条件：
+
+```js
+"dependencies": {
+  "@element-plus/icons-vue": "^2.0.6",
+  "@xxx/vc-shared": "workspace:*",
+  "lodash": "^4.17.21"
+},
+"devDependencies": {
+  "@vitejs/plugin-vue": "^2.3.3",
+  "element-plus": "^2.2.8",
+  "vue": "^3.2.36",
+  "vue-router": "4",
+  "less": "^4.1.3"
+}
+```
+
+根据步骤2中的图可以清晰看出，放在 `dependencies` 字段中的三个依赖包：`@element-plus/icons-vue` 、 `@xxx/vc-shared` 、 `lodash` 都被安装到组件库的 node_modules 中，而组件库位于**当前的业务项目**的 node_modules 中。换句话说，业务项目中拥有了组件库 `dependencies` 中的依赖包。
+
+这里，笔者进行猜想，实验2中，`element-plus` 将被装到组件库的内部依赖中。紧接着，我们进行实验2验证一下猜想。
+
+**3. 对比实验2**
+
+1. 首先在业务项目中安装组件库 vc-element-plus（版本号对比**实验1**已经不同）。依赖如下图：![1714194622531](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194622531.png)
+
+   同样的，删除node_module后进行装包，操作如下：
+
+   ![图片](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194633746.png)
+
+2. 看下安装的 vc-element-plus 内部的依赖安装情况。如图：
+   ![1714194644123](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714194644123.png)
+
+ok，这样一对比，应该就很清晰了。很明显，实验2中安装了4个依赖，其中多出来的就是我们实验二中放进 `dependencies` 中 `element-plus`。（注意，`@element-plus`是图标那些的，跟`element-plus`不是同一个依赖源）。再次回顾 `dependencies` 字段验证一下：
+
+```js
+"dependencies": {
+  "@element-plus/icons-vue": "^2.0.6",
+  "@xxx/vc-shared": "workspace:*",
+  "lodash": "^4.17.21",
+  "element-plus": "^2.2.8",
+},
+"devDependencies": {
+  "@vitejs/plugin-vue": "^2.3.3",
+  "vue": "^3.2.36",
+  "vue-router": "4",
+  "less": "^4.1.3"
+}
+```
+
+到这里，大家应该对 `devDependencies` 和 `dependencies` 之间的区别有一个清晰的认识了。至于项目装包中什么时候使用 `-D`，什么时候使用 `-S` 也有自己的理解了～
+
+**4. 总结 `devDependencies` 和 `dependencies` 的区别**
+
+结论：`devDependencies` 和 `dependencies`的区别核心体现在 **npm包** 中。只要开发的项目是**发npm包**提供给外部、其他业务项目使用的，需要非常注意依赖的安装地方，因为搞不好很容易在业务使用中会出现bug。而如果只是自己项目用，**不需要发npm包**的话，把依赖安装到 `devDependencies` 或者 `dependencies` 中，实质上是没有任何区别的。
+
+为什么在开发 npm包 的时候 不严格区分 `devDependencies` 、 `dependencies` 进行装包可能会导致业务项目的使用中出现bug呢？笔者举一个例子来加深理解：
+
+- 假设npm包开发者不小心把 vue3 的依赖写到了 `dependencies` 中（用于开发调试的），版本是 `3.0.36`。
+- 业务项目自身用了 `vue@3.0.0` 的情况下，安装了这个 npm包 ，由于 npm包 中的 `dependencies` 有 `vue@3.0.36` 这个依赖，此时会在装 npm包 的同时安装36版本的vue。
+- 由于 npm包中会用到vue，代码是这样引入的：`import { onMount } from 'vue'`，此时，npm包会在自己内部的 `node_modules` 中找到 `vue@3.0.36` 的包并使用，此时就会产生 2 个 vue3 实例，就很容易出现一些奇怪的bug。（业务项目的`vue@3.0.0` 和 npm包的`vue@3.0.36`）
+- **这里还要注意一点就是 externals** 。有同学可能会说，npm包打包的时候会 `externals` 掉第三方的库，比如上述中的 vue3 ，`externals` 只是保证 vue3 的代码不打包进 npm包 的代码中而已。
+
+如果开发 npm包 中不严格区分 `devDependencies` 、 `dependencies` 的依赖安装，可能会导致用户处在使用 npm包 的时候出现问题。
+
 #### 3. peerDependencies
 
 有些情况下，我们的项目和所依赖的模块，都会同时依赖另一个模块，但是所依赖的版本不一样。比如，我们的项目依赖A模块和B模块的1.0版，而A模块本身又依赖B模块的2.0版。大多数情况下，这不是问题，B模块的两个版本可以并存，同时运行。但是，有一种情况，会出现问题，就是这种依赖关系将暴露给用户。

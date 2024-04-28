@@ -154,3 +154,236 @@ let p = new Person('x') // 报错 这个和constructor前边加 protected 作用
 // 子类构造函数运行
 ```
 
+#### 条件类型
+
+```ts
+// 条件类型优化函数重载
+interface IName = {
+    name:string
+}
+interface IAge = {
+    age:number
+}
+
+// 优化前
+function reload(name:string):IName
+function reload(age:number):IAge
+function reload(nameorage:string|number):IName|IAge
+function reload(nameorage:string|number):IName|IAge {
+    throw ""
+}
+// 优化后
+type Params<T> = T extends string ? IName : IAge
+function reload<T extends number | string>(nameorage:T):Params<T> {
+    throw ""
+}
+```
+
+#### infer关键字
+
+```ts
+// 推断类型
+type FOO<T> = T extends {a: infer U; b: infer U} ? U:never
+
+type TT = FOO<{a:string;b:number}>
+// TT string|number
+```
+
+#### TS兼容性
+
+##### 自动类型推论
+
+```ts
+// 1.根据初始值进行类型推论
+let a = 123
+a = '123' // 会报错 不能将string类型赋值给number类型
+
+// 初始化时不赋值，ts不会进行类型推论
+let a;
+a = 123
+a = '123'
+
+// 2.上下文类型推论
+// mouseEvent 已经 有了具体类型
+window.onmousedown = function(mouseEvent) {
+    mouseEvent.button
+}
+```
+
+##### 对象类型的兼容性
+
+```ts
+// 1.可多不可少
+
+interface IPerson {
+    name: string
+}
+
+let p1 = { name:'li' }
+let p2 = { name:'wa',age:18 }
+let p3 = { age:19 }
+
+let p0:IPerson;
+p0 = p1
+p0 = p2
+p0 = p3 // 报错，类型{name:string}中缺少 name属性
+
+// 2.会进行递归检查
+
+interface IPerson {
+    name: string
+    children: {
+        age: number
+    }
+}
+
+let p1 = {name:'li',children:{age:18}}
+let p2 = {name:'wa',children:{age:true}}
+
+let p0:IPerson;
+
+let p0 = p1
+let p0 = p2// children.age的类型不兼容，不能将boolena类型赋值给number类型
+```
+
+##### 函数类型的兼容性
+
+```ts
+// 1.参数个数 : 可少不可多，参数多的兼容参数少的  
+
+let fn1 = (a:number,b:number)=>{}
+let fn2 = (a:number)=>{}
+
+fn1 = fn2
+fn2 = fn1 // 报错
+
+// 2.参数类型 : 参数类型必须相同
+
+let fn1 = (a:number)=>{}
+let fn2 = (a:number)=>{}
+let fn3 = (a:number)=>{}
+
+fn1 = fn2
+fn2 = fn1
+fn1 = fn3 // 报错
+
+// 3.参数返回值 : 返回值类型必须相同
+
+let fn1 = ():number=> 1
+let fn2 = ():number=> 2
+let fn3 = ():string=> '3'
+
+fn1 = fn2
+fn2 = fn1
+fn1 = fn3 // 报错
+
+// 4.双向协变
+// a. 参数的双向协变 : 参数多的赋值给参数少的
+
+let fn1 = (a:number)=>{}
+let fn2 = (a:(number|string))=>{}
+
+fn1 = fn2
+fn2 = fn1 // 报错
+
+// b. 返回值的双向协变 : 可以将返回值是具体类型的赋值给联合类型的函数
+
+let fn1 = (x:boolean):(number|string)=> x?1:'1'
+let fn2 = (x:boolean):number => 2
+
+fn1 = fn2
+fn2 = fn1 // 报错
+
+// 5.函数重载 : 重载多的赋值给重载少的
+
+function fn(x:number, y:number):number
+function fn(x:string, y:string):string
+function fn(x:any, y:any) {
+    return x + y
+}
+
+function fn1(x:number, y:number):number
+function fn1(x:any, y:any) {
+    return x - y
+}
+
+let a = fn
+a = fn1 // 报错
+
+let b = fn1
+b = fn
+
+// 6.可选参数及剩余参数 : 当一个函数有剩余参数的时候，它被当做无限个可选参数
+
+function fn(args:any[], callback:(...args:any[])=>void){
+    
+}
+
+fn([1,2], (x,y,z)=> console.log(x+y+z))
+fn([1,2], (x?,y?)=> console.log(x+y))
+fn([1,2], (x,y?,z?)=> console.log(x+y+z))
+```
+
+##### 枚举类型兼容性
+
+```ts
+// 1. 数字枚举与数字兼容
+enum Gender {
+    Male,
+    Female
+}
+let a:Gender;
+a = 100
+
+// 2. 数字枚举与数字枚举不兼容
+enum Gender {
+    Male,
+    Female
+}
+enum Animal {
+    Dog,
+    Cat
+}
+let a:Gender;
+a = Gender.Male
+a = Animal.Dog // 报错
+
+// 3. 字符串枚举与字符串不兼容
+enum Gender {
+    Male='男',
+    Female='女'
+}
+
+let a:Gender;
+a = Gender.Male
+a = Gender.Female
+a = 'xixi' // 报错
+```
+
+##### 类兼容性
+
+```ts
+public 可多不可少
+private / protected 不能相互赋值
+```
+
+##### 泛型的兼容性
+
+```ts
+// TS是一个结构化的类型系统,类型参数只在作为成员类型的一部分被消耗是影响到结果类型
+
+interface IP<T> {}
+let x: IP<number>
+let y: IP<string>
+x = y
+y = x
+
+interface IP<T> {
+    data: T
+}
+let x: IP<number>
+let y: IP<string>
+x = y // 报错
+y = x // 报错
+```
+

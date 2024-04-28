@@ -1,7 +1,5 @@
 # Vue3项目代码规范(Eslint v9.0.0...)
 
-
-
 # Vite初始化项目
 
 1. 使用npm
@@ -467,3 +465,4 @@ pnpm lint:stylelint
 	}
 }
 ```
+

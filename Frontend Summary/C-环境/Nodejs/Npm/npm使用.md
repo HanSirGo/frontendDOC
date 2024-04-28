@@ -1,7 +1,3 @@
-
-
-
-
 ## npm
 
 ### npm 
@@ -518,3 +514,226 @@ npm ERR!   1 more (react-dom)
 4. 更换包管理器为 yarn 或 pnpm，并尝试再次执行安装命令。
 
 如果以上方法不能解决问题，建议检查一下项目中 package.json 中的依赖是否正确，并且检查网络连接状态是否正常。
+
+### 版本要求不兼容
+```javascript
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR! 
+npm ERR! While resolving: vue-element-plus-admin@2.4.1
+npm ERR! Found: vite@5.0.0
+npm ERR! node_modules/vite
+npm ERR!   dev vite@"5.0.0" from the root project
+npm ERR! 
+npm ERR! Could not resolve dependency:
+npm ERR! peer vite@"^2.0.0 || ^3.0.0 || ^4.0.0" from vite-plugin-purge-icons@0.9.2
+npm ERR! node_modules/vite-plugin-purge-icons
+npm ERR!   dev vite-plugin-purge-icons@"^0.9.2" from the root project
+npm ERR! 
+npm ERR! Fix the upstream dependency conflict, or retry
+npm ERR! this command with --force or --legacy-peer-deps
+npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+npm ERR! 
+npm ERR! 
+npm ERR! For a full report see:
+npm ERR! /home/zhang/.npm/_logs/2023-11-23T08_05_13_256Z-eresolve-report.txt
+ 
+npm ERR! A complete log of this run can be found in: /home/zhang/.npm/_logs/2023-11-23T08_05_13_256Z-debug-0.log
+npm 错误！代码 ERESOLVE
+npm 错误！ERESOLVE 无法解析依赖关系树
+npm 错误！
+npm 错误！解析时：vue-element-plus-admin@2.4.1
+npm 错误！已找到： vite@5.0.0
+npm 错误！node_modules/vite
+npm 错误！  dev vite@“5.0.0” from the root project
+npm 错误！
+npm 错误！无法解析依赖项：
+npm 错误！对等vite@“^2.0.0 ||^3.0.0 ||^4.0.0“ 来自 vite-plugin-purge-icons@0.9.2
+npm 错误！node_modules/vite-plugin-purge-icons
+npm 错误！  dev vite-plugin-purge-icons@“^0.9.2” 从根项目
+npm 错误！
+npm 错误！修复上游依赖冲突，或重试
+npm 错误！此命令带有 --force 或 --legacy-peer-deps
+npm 错误！接受不正确（且可能损坏）的依赖项解析。
+npm 错误！
+npm 错误！
+npm 错误！有关完整报告，请参阅：
+npm 错误！/home/zhang/.npm/_logs/2023-11-23T08_05_13_256Z-eresolve-report.txt
+ 
+npm 错误！此运行的完整日志可在以下位置找到：/home/zhang/.npm/_logs/2023-11-23T08_05_13_256Z-debug-0.log
+
+```
+这个错误信息说明 npm 在尝试解析依赖关系时遇到了问题。具体来说，问题出现在 vite-plugin-purge-icons 这个插件上，它要求与 vite 的版本要匹配 ^2.0.0 || ^3.0.0 || ^4.0.0，这意味着它支持 vite 的 2.x、3.x、4.x 版本。但是你的项目中安装的 vite 版本是 5.0.0，这与 vite-plugin-purge-icons 的版本要求不兼容。
+
+这里有几个解决方案：
+
+1. **安装兼容的Vite版本**： 你可以尝试将 vite 降级到 4.x 或更低的版本以满足 vite-plugin-purge-icons 的要求。使用以下命令来安装兼容的版本：
+
+```javascript
+npm install vite@^4.0.0 --save-dev
+```
+或者，如果需要安装 3.x 版本的 vite：
+```javascript
+npm install vite@^3.0.0 --save-dev
+```
+2.**使用 --legacy-peer-deps**： 作为临时解决方案，你可以在安装时添加 --legacy-peer-deps 标志忽略依赖冲突：
+
+```javascript
+npm install --legacy-peer-deps
+```
+这会让 npm 忽略 peer 依赖版本冲突，但这可能会引入不兼容的依赖，因此使用时需要小心。
+
+3.**使用 --force**： 另一个更激进的选项是使用 --force 标志强制安装，但这通常不推荐因为它可能导致更严重的问题：
+
+```javascript
+npm install --force
+```
+4.**检查是否有可用的插件更新**： 也许 vite-plugin-purge-icons 插件有一个更新的版本，它支持 vite 5.x。检查一下是否有更新的版本可用，并考虑升级：
+
+```javascript
+npm view vite-plugin-purge-icons versions npm install vite-plugin-purge-icons@latest --save-dev
+```
+5.**编辑 package.json 手动解决依赖问题**： 最后，你可以尝试手动编辑 package.json 文件来解决版本冲突，然后运行 npm install。
+
+**选择哪种解决方案，取决于你对项目的依赖和兼容性要求。一般来说，尽量避免使用 --force 或 --legacy-peer-deps，因为这样可能会导致隐蔽的问题，在生产环境中尤其需要谨慎**。
+
+### npm i 卡顿 处理方法
+1.**原因一**：很多朋友直接使用npm外国源，因为国内访问国外网站的网络肯定慢，导致卡顿（这种最好解决）
+
+解决方法：直接将npm源切换成淘宝源或者公司源即可
+```javascript
+npm config set registry https://registry.npm.taobao.org
+```
+查看镜像源地址
+```javascript
+ npm config get registry
+```
+2.**原因二**：npm（node）版本比较低
+
+```javascript
+// 查看npm版本
+npm -v 
+//  升级npm
+npm install -g npm
+```
+3.**原因三**：公司使用的内网，连接不到镜像源上，需要切换到公司自己的镜像源上
+
+```javascript
+npm config set registry http://nexus.xx.cn/registry/xxxx/
+// http://nexus.xx.cn/registry/xxxx/ 是公司自己的镜像源
+npm config get registry
+// 查看镜像源地址
+```
+4.**原因四**：删除node_modules重新npm install
+
+5.**原因五**：使用yarn来进行安装
+
+```javascript
+// 全局安装yarn (mac需要加上sudo)
+npm install -g yarn
+ 
+// 成功后使用yarn install安装
+yarn install
+```
+6.**原因六**：与本地npm相关资源，有冲突
+
+解决方法：只要删除对应的文件夹，重新执行npm i 命令就可以
+
+删除对应的文件
+C:\Users\Administrator\AppData\Roaming\npm
+
+7.**原因七**：需要本地与github配置ssh
+
+   解决办法：根据提示，配置即可
+
+> PS D:\xxxx\temp-cli> npm install inquirer
+> npm ERR! code E401
+> npm ERR! Unable to authenticate, need: BASIC realm="Sonatype Nexus Repository Manager"
+> npm ERR! A complete log of this run can be found in:
+> npm ERR!     C:\Users\Administrator\AppData\Roaming\npm-cache\_logs\2023-01-04T06_05_27_843Z-debug.log  
+> PS D:\xxxx\temp-cli>
+
+**问题原因：**
+执行npm install到仓库拉取代码时需要认证，现在是认证不通过，因此报错 
+**解决方法：**
+先执行npm config list,找到.npmrc的位置
+
+> PS D:\xxxx\temp-cli> npm config list
+> ; cli configs
+> metrics-registry = "http://192.168.xxx.xxx:8073/repository/npm-all/"
+> scope = ""
+> user-agent = "npm/6.14.12 node/v14.16.1 win32 x64"
+> ; userconfig C:\Users\Administrator\.npmrc
+> PS D:\xxxx\temp-cli>
+
+如果 没有找到使用 npm config ls -l
+
+> PS D:\xxxx\temp-cli> npm config ls -l
+> ...
+> ; "user" config from C:\Users\xxxx\.npmrc
+> ....
+
+![1713770586877](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713770586877.png)
+**删除第二行，保存，重新npm i**
+
+**网上其他人的办法：**
+
+方法一：
+
+>  删掉第二行 
+>  //192.168.xx.xx:8073/repository/npm-all/:_authToken=NpmToken.1ee55b58-d164-3b43-a731-xxxxxx
+>   重新执行登录
+>  npm login --registry=http://192.168.xx.xxx:8073/repository/npm-internal/
+
+  方法二：直接删掉.npmrc
+
+> npm config set registry http://192.168.xx.xxxx:8073/repository/npm-all/ 
+> npm config set //192.168.xx.xxx:8073/repository/npm-all/:_authToken=NpmToken.1ee55b58-d164-3b43-a731-xxxxx
+> 说明：上面第一条命令是注册仓库的位置，第二条是仓库的的认证token
+> 这里的token是从同事（他那里是正常）.npmrc文件中复制过来的
+> 然后执行npm install正常了 
+
+方法三
+
+> 这里可能是当前的项目中没有登录公司的私有仓库，需要在该项目目录下重新登录公司的私有仓库
+> group、hosted都需要重新登录
+> npm config set registry='私有仓库地址'
+> usernmae:
+> password:
+> email:
+> 重新执行npm install 查看是否登录成功
+
+### 无法加载文件 E:\NodeJS\npm.ps1
+
+![1713772643886](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713772643886.png)
+
+错误显示
+npm : 无法加载文件 E:\NodeJS\npm.ps1，因为在此系统上禁止运行脚本。有关详细信息，请参阅 https:/go.microsoft.com/fwlin
+ k/?LinkID=135170 中的 about_Execution_Policies。
+ 所在位置 行:1 字符: 1
+
+npm init
+
+  + CategoryInfo          : SecurityError: (:) []，PSSecurityException
+  + FullyQualifiedErrorId : UnauthorizedAccess
+复制
+![1713772655383](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713772655383.png)
+解决办法
+第一步：执行如下命令查看权限
+
+```javascript
+get-ExecutionPolicy
+```
+![1713772665324](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713772665324.png)
+
+显示禁用状态
+
+第二步：执行如下命令设置可用
+
+```javascript
+set-executionpolicy remotesigned
+```
+![1713772677404](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713772677404.png)
+
+测试成功
+![1713772690881](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713772690881.png)

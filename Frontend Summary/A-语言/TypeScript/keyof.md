@@ -222,3 +222,49 @@ type QuantumPerson {
 }
 ```
 
+## OmitThisParameter--从类型A中剔除this参数类型
+
+```ts
+function f0(this:object, x:number) {}
+
+type T = OmitThisParameter<typeof f0>
+// (x: number) => void
+```
+
+
+
+## 关键字NonNullable--去掉联合类型A中的null和undefined
+
+```ts
+type res = NonNullable<string|number|boolean|null|undefined>
+// res string|number|boolean
+```
+
+## 关键字ReturnType--获取函数返回值类型
+
+```ts
+type res = ReturnType<()=>string>
+```
+
+## 关键字ConstructorParameters--获取一个类的构造函数组成的元组类型
+
+```ts
+class Person {
+	constructor(name:string,age:number) {}
+}
+
+type res = ConstructorParameters<typeof Person>
+
+// res [name:string,age:number]
+```
+
+## 关键字Parameters--获取函数的参数类型组成的元组类型
+
+```ts
+function show(name:string,age:number) {}
+
+type res = Parameters<typeof show>
+                      
+// res [name:string,age:number]
+```
+

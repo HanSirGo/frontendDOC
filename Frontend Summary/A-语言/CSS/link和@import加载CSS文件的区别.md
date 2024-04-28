@@ -1,13 +1,13 @@
-# link和@import加载CSS文件的区别
+## link和@import加载CSS文件的区别
 
-# CSS @import
+### CSS @import
 
 - `@import` 用于从其他样式表导入样式规则
 - `@import` 必须在CSS文档的头部，但可以在`@charset`规则后面
 - `@import` 不是一个嵌套语句，不能在条件组的规则中使用
 - `@import` 支持媒介查询
 
-# link和@import的区别
+### link和@import的区别
 
 - 差别1：老祖宗的差别。link属于XHTML标签，而@import完全是CSS提供的一种方式。
 
@@ -32,13 +32,13 @@ link.rel = 'stylesheet'
 document.body.append(link)
 ```
 
-# 不建议使用@import（在webpack、vite项目中忽略）
+### 不建议使用@import（在webpack、vite项目中忽略）
 
 - 原因一：使用@import引入的CSS会影响浏览器的并行下载
 
 > 使用@import引用的CSS文件只有在引入它的那个CSS文件被下载、解析之后，浏览器才会知道还有另外一个CSS需要下载，这时才会去下载，然后下载后开始解析、构建render tree等一系列操作。这就导致了浏览器无法并行下载所需的样式文件。
 
-### 案例A：在css文件中@import另一个css文件， 串行加载
+#### 案例A：在css文件中@import另一个css文件， 串行加载
 
 link.css
 
@@ -63,7 +63,7 @@ link.css
 
 ![1713684992048](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713684992048.png)
 
-### 案例B：2个css文件都使用link加载，并行加载
+#### 案例B：2个css文件都使用link加载，并行加载
 
 ```html
 <!DOCTYPE html>
