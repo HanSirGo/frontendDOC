@@ -149,7 +149,7 @@ let buf = Buffer.from('hello')
 
 > 进程：行进的程序；进程是程序的一次执行过程。
 >
-> 查看进程：任务管理器
+> 查看进程：任务管理器 ctrl + alt + delete
 
 ### 线程
 
@@ -620,9 +620,9 @@ let _path = __dirname + '/data.txt'
 #### __filename
 
 ```js
-# __dirname 与 require 类似，都是Node.js 环境中的‘全局’变量
+# __filename 与 require 类似，都是Node.js 环境中的‘全局’变量
 
-# __dirname 保存着 当前文件的绝对路径.
+# __filename 保存着 当前文件的绝对路径.
 ```
 
 ### path模块
@@ -1077,7 +1077,7 @@ Uniform Resource Locator 统一资源定位符
 >
 > 作用：实现不同主机应用程序之间的通信。
 >
-> 图片
+> ![1714377212675](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714377212675.png)
 
 #### node.js创建http服务
 
@@ -1104,5 +1104,449 @@ server.listen(port, hostname, () => {
 
 > node ./xx.js  启动服务，浏览器发送http请求。
 >
-> ctrl+c 停止服务
+> 命令行 ctrl+c 停止服务
+>
+> 当服务启动后，更新代码 **必须重启服务才能生效**，也可以使用 nodemon ，启动nodemon后会监听文件变化，不用每次更新代码后，重新运行node。（npm i -g nodemon）
+>
+> 响应内容中文乱码的解决办法：
+>
+> ```js
+> response.setHeader('content-type','text/html;charset=utf-8')
+> 
+> // 但是，html中也可以设置 '<meta charset="utf-8">' 这样html文件不会出现中文乱码，其他文件还是会出现，那么后端设置和html本身设置的哪个优先级更高呢--当然是设置content-type的优先级更高。
+> ```
+>
+> 端口号被占用：
+>
+> ```
+> Error: listen EADDRINUSE: address already in use :::9000
+> ```
+>
+> 1) 关闭当前正在运行监听端口的服务
+>
+> 2）修改其他端口号
+>
+> HTTP协议默认端口是80，HTTPS协议默认端口是443
+
+> 如果端口被其他程序占用，可以使用 **资源监视器** 找到占用端口的程序，然后使用任务管理器关闭对应的程序。
+>
+> ![1714377802719](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714377802719.png)
+>
+> ![1714377966167](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714377966167.png)
+>
+> 找到被占用的端口，在任务管理器中找到对应的PID，关闭程序
+
+#### 获取请求报文
+
+想要获取请求的数据，需要通过request对象
+
+| 含义          | 语法                                                     |
+| ------------- | -------------------------------------------------------- |
+| 请求方法      | request.method                                           |
+| 请求版本      | request.httpVersion                                      |
+| 请求路径      | request.url                                              |
+| URL路径       | require('url').parse(request.url).pathname               |
+| URL查询字符串 | require('url').parse(request.url,true).query             |
+| 请求头        | request.headers                                          |
+| 请求体        | request.on('data',(chunk)=>{})或request.on('end',()=>{}) |
+
+> **注意：**
+>
+> 1. request.url只能获取路径以及查询字符串，无法获取URL中的域名以及协议内容
+>
+> 2. request.headers将请求信息转化成一个对象，并将属性名都转化成了 小写
+>
+> 3. 关于路径：如果访问网站的时候，只填写了IP地址或者是域名信息，此时请求的路径为 /
+>
+> 4. 关于 favicon.ico: 这个请求是属于浏览器自动发送的请求；请求的是浏览器标签页的图标
+>
+>    ![1714609090112](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714609090112.png)
+
+#### 设置响应报文
+
+| 作用             | 语法                                     |
+| ---------------- | ---------------------------------------- |
+| 设置响应状态码   | response.statusCode                      |
+| 设置响应状态描述 | response.statusMessage                   |
+| 设置响应头信息   | response.setHeaders(key,value)           |
+| 设置响应体       | response.write('xx')或response.end('xx') |
+
+> 有时候会出现多个同名的响应头：response.setHeader('test',['a','b','c'])
+
+```js
+# write 和 end 的使用情况
+// 1. write和end 结合使用 响应体相对分散
+response.write('xx')
+response.write('xx')
+response.write('xx')
+response.end() //每一个请求，在处理的时候必须要执行end方法
+
+// 2. 只是用 end 响应体相对集中
+response.end('xxx')
+```
+
+#### 网站根目录或者静态资源目录
+
+> HTTP服务在哪个文件夹中寻找静态资源，那个文件夹就是静态资源目录，也称之为网站根目录。
+>
+> vscode中使用live-server访问时，它启动的服务网站根目录是--vscode打开的文件夹。
+
+#### 网页中的URL
+
+> 网页中的URL主要分为两大类：相对路径与绝对路径
+
+##### 绝对路径
+
+绝对路径可靠性强，而且相对容易理解，在项目中运用较多。
+
+| 形式             | 特点                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| http://a.com/web | 直接向目标资源发送请求，容易理解。网站的外链会用到此形式     |
+| //a.com/web      | 与页面URL的协议拼接形成完整的URL再发送请求。大型网站用的比较多 |
+| /web             | 与页面URL的协议、主机名、端口拼接形成完整URL再发送请求。中小型网站 |
+
+##### 相对路径
+
+相对路径在发送请求时，需要与当前页面URL路径进行计算，得到完整的URL后，再发送请求.
+
+例如当前的网页url为   http://www.xx.com/data/a.html
+
+| 形式          | 最终的URL                      |
+| ------------- | ------------------------------ |
+| ./js/a.js     | http://www.xx.com/data/js/a.js |
+| js/a.js       | http://www.xx.com/data/js/a.js |
+| ../js/a.js    | http://www.xx.com/js/a.js      |
+| ../../js/a.js | http://www.xx.com/js/a.js      |
+
+#### mime类型(设置资源类型)
+
+> **媒体类型**（通常称为 Multipurpose Internet Mail Extensions 或 MIME类型）是一种标准，用来表示文档、文件或者字节流的性质和格式。
+>
+> ```js
+> mime 类型结构： [type]/[subType]
+> 
+> 例如：text/html text/css
+> ```
+>
+> HTTP服务可以设置响应头Content-Type来表明响应体的MIME类型，浏览器会根据该类型决定如何处理资源
+
+```js
+# 下面是常见文件对应的mime类型
+html: 'text/html'
+css: 'text/css'
+js: 'text/javescript'
+png: 'image/png'
+jpg: 'image/jpeg'
+gif: 'image/gif'
+mp4: 'video/mp4'
+mp3: 'audio/mpeg'
+json: 'application/json'
+```
+
+> 对于未知的资源类型，可以选择 **application/octet-stream**类型，浏览器在遇到该类型的响应时，会对响应体内容进行独立存储，也是我们常见的下载效果。
+
+#### GET和POST请求
+
+##### 场景
+
+> **GET请求**
+>
+> - 在地址栏直接输入url访问
+> - 点击a链接
+> - link标签引入css
+> - script标签引入js
+> - video与audio引入多媒体
+> - img标签引入图片
+> - form标签中的method为get/GET
+> - ajax中get请求
+>
+> **POST请求**
+>
+> - form标签中的method为post/POST
+> - ajax的post请求
+
+##### 区别
+
+> GET和POST是HTTP协议请求的两种方式，主要有如下几个区别：
+>
+> 1. 作用。GET主要用来获取数据，POST主要用来提交数据。
+> 2. 参数位置。GET带参数请求是将参数缀到URL后面。POST带参数是将参数放到请求体中
+> 3. 安全性。POST请求相对GET安全一些，因为在浏览器中参数会暴露在地址栏
+> 4. GET请求大小有限制，一般为2k，而POST请求则没有大小限制。
+
+### 模块化
+
+#### 暴露数据
+
+```js
+# 模块暴露数据的方式：
+module.exports = value
+exports.name = value
+
+# 注意：
+module.exports 可以暴露任意数据
+不能使用exports = value 的形式暴露数据，模块内部 module 与 exports的隐式关系 exports = module.exports = {}
+```
+
+> **为什么 不能使用exports = value 的形式暴露数据？**
+>
+> exports = module.exports = {}
+>
+> require返回目标结果时，返回的是module.exports的值而不是exports的值。
+>
+> 当 exports = 'xx' 时，require的返回结果是{}
+>
+> 那么 当 exports.name = 'xx' 时，require的返回结果是{name:'xx'}，就是往{} 中添加属性
+
+#### 导入
+
+在模块中使用require传入文件路径即可引入文件
+
+```js
+const test = require('./add.js')
+```
+
+**require使用的一些注意事项：**
+
+> 1. 对于自己创建的模块，导入时路径建议写相对路径，且不能省略 ./ 和 ../
+> 2. js 和json文件导入时可以不用写后缀， c/c++ 编写的node扩展文件也可以不写后缀，但是一般用不到
+> 3. 如果导入其他类型的文件，会以js文件进行处理
+> 4. 如果导入的路径是个文件夹，则会首先检测该文件夹下 **package.json**文件中的main属性对应的文件，如果main属性不存在，或者package.json不存在，则会检测文件夹下的index.js和index.json,如果还没找到，就会报错
+> 5. 导入node.js内置模块时，直接require模块的名字即可，无需加 ./ 和 ../
+> 6. require导入npm包时，在当前的node_modules中未找到该npm包，会向上层的node_modules中查找，一直找到c盘或d盘，还没找到，就会报错
+
+##### 流程
+
+> **require导入自定义模块的基本流程**
+>
+> 1. 将相对路径转为绝对路径，定位目标文件
+> 2. 缓存检测
+> 3. 读取目标文件代码
+> 4. 包裹为一个函数并执行（自执行函数）。通过arguments.callee.toString()查看自执行函数
+> 5. 缓存模块的值
+> 6. 返回module.exports 的值
+
+#### require导入npm包流程
+
+> 在当前文件夹下 node_modules 中寻找同名的文件夹
+>
+> 在上级目录中下的node_modules中寻找同名的文件夹，直到找到磁盘根目录
+>
+> ```js
+> const uniq = require('uniq')
+> 
+> // require 导的 究竟是谁？
+> // 导的是当前文件夹下 node_modules 中的 uniq 文件夹
+> ```
+
+#### 开发与生产依赖
+
+```js
+# 生产依赖
+npm i -S uniq
+npm i --save uniq
+// -S 等效于 --save，-S是默认选项
+// 包信息保存在package.json的dependencies属性中
+
+# 开发依赖
+npm i -D uniq
+npm i --save-dev uniq
+// -D 等效于 --save-dev
+// 包信息保存在package.json的devDependencies属性中
+
+```
+
+#### 全局安装
+
+我们可以执行安装选项 **-g** 进行全局安装
+
+```js
+// 例如：
+npm i -g nodemon
+// 全局安装完成后就可以在命令行的任意位置运行 nodemon命令
+// 该命令的作用是 自动重启 node 应用程序
+```
+
+> **注意**
+>
+> 1. 全局安装的命令不受工作目录位置影响
+> 2. 可以通过 **npm root -g** 可以查看全局安装包的位置
+> 3. 不是所有的包都适合全局安装，只有全局类的工具才适合，可以通过查看包的官方文档来确定安装方式
+
+##### 修改window执行策略
+
+> 原因：全局安装的脚本不能运行
+>
+> ![1714614513863](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614513863.png)
+>
+> window默认不允许npm全局命令执行脚本文件，所以需要修改执行策略
+
+> **解决办法1：**修改window执行策略
+>
+> ![1714614580330](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614580330.png)
+>
+> ![1714614603634](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614603634.png)
+>
+> ![1714614637911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614637911.png)
+
+> **解决办法2：** vscode中配置终端
+>
+> ![1714614735629](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614735629.png)
+>
+> ![1714614698967](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614698967.png)
+>
+> ![1714614784840](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614784840.png)
+>
+> ![1714614819218](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614819218.png)
+>
+> ![1714614831831](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714614831831.png)
+>
+> **既然vscode中的cmd可以运行，那么外部的cmd也是可以运行的**
+
+#### 环境变量path
+
+<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615216756.png" alt="1714615216756" style="zoom:200%;" />
+
+##### cmd中打开QQ
+
+> 1. win+r ，cmd，输入QQ
+>
+> ![1714615255065](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615255065.png)
+
+> 2. 在QQ的安装目录，打开cmd，输入QQ
+>
+> ![1714615293374](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615293374.png)
+>
+> ![1714615319623](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615319623.png)
+>
+> ![1714615359699](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615359699.png)
+>
+> ![1714615377274](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615377274.png)
+>
+> ![1714615398487](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615398487.png)
+>
+> ![1714615414140](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615414140.png)
+
+> **第一种为什么打不开QQ？**
+>
+> 原因：因为在第一种方法中，在当前的‘xiaohigh’的文件夹下，没有QQ的可执行文件（可执行文件：.exe .cmd...）
+
+> **需求：** 想要在任意的命令行位置，都能打开QQ应用程序
+>
+> 1. 复制路径：
+>
+> ![1714615454282](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615454282.png)
+>
+> 2. ‘此电脑’ ，右键 ‘属性’
+>
+> ![1714615484820](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615484820.png)
+>
+> 3. 右侧的’高级系统设置‘
+>
+> 4. ’环境变量‘
+>
+> ![1714615530784](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615530784.png)
+>
+> 5. 在用户的环境变量中，双击’path‘，里边都是些文件的路径，点击’新建‘，将复制的路径粘贴到里边，点击确定
+>
+> ![1714615562759](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615562759.png)![1714615614338](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615614338.png)
+>
+> 6. 打开一个**新的命令行窗口**，输入QQ
+>
+> ![1714615638085](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714615638085.png)
+
+> **为什么配置了环境变量后，QQ就可以打开了？**
+>
+> **原因:** 在任意位置的命令行输入QQ时,会在当前的文件夹下寻找QQ应用的可执行文件,发现没有,就会到'环境变量'的path中寻找.没有就会报错
+>
+> 例如: node -v  npm -v 为什么就会返回版本号,就是因为在环境变量的path中存放了该应用程序的安装路径
+
+#### npm
+
+##### 安装指定版本的包
+
+```js
+npm i 包名@版本号
+
+npm i jquery@1.11.2
+```
+
+##### 删除依赖
+
+```js
+npm remove uniq
+npm r uniq
+npm r -g nodemon
+```
+
+##### 配置命令别名
+
+通过配置命令别名可以更简单的执行命令
+
+```js
+# 配置package.json中的scripts属性
+
+{
+    "scripts": {
+        "server": "node server.js",
+        "start": "node index.js"
+    }
+}
+
+# 配置完成后，可以使用别名执行命令
+npm run server
+npm run start
+
+# 不过start别名比较特殊，使用时可以省略run
+npm start
+```
+
+> - npm start 是项目中常用的一个命令，一般用来启动项目
+> - npm run有自动向上级目录查找的特性，跟require函数一样
+
+##### npm配置淘宝镜像
+
+> **直接配置**
+>
+> ```js
+> # 执行如下命令
+> npm config set registry https://registry.npmmirror.com/
+> ```
+>
+> **工具配置**
+>
+> ```js
+> # 使用nrm配置npm的镜像地址 npm registry manager
+> // 1. 安装nrm
+> npm i -g nrm
+> 
+> // 2. 修改镜像
+> nrm use taobao
+> 
+> // 3. 检查是否配置成功
+> npm config list
+> // 检查registry地址是否为 https://registry.npmmirror.com/，如果是则表明成功
+> ```
+
+#### 包管理工具扩展
+
+很多语言都有包管理工具，比如：
+
+| 语言       | 包管理工具          |
+| ---------- | ------------------- |
+| PHP        | composer            |
+| Python     | pip                 |
+| Java       | maven               |
+| Go         | go mod              |
+| JavaScript | npm/yarn/cnpm/other |
+| Ruby       | rubyGems            |
+
+除了编程语言有包管理工具外，操作系统也存在包管理工具，不过这个包值得是 **软件包**
+
+| 操作系统 | 包管理工具 | 网址                               |
+| -------- | ---------- | ---------------------------------- |
+| Centos   | yum        | https://packages.debian.org/stable |
+| Ubuntu   | apt        | https://packages.ubuntu.com/       |
+| MacOS    | homebrew   | https://brew.sh/                   |
+| Windows  | chocolatey | https://chocolatey.org/            |
 

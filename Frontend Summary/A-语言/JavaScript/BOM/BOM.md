@@ -4,6 +4,31 @@
 BOM 指的是浏览器对象模型，它指的是把浏览器当做一个对象来对待，这个对象主要定义了与浏览器进行交互的法和接口。BOM 的核心是 window，而 window 对象具有双重角色，它既是通过 js 访问浏览器窗口的一个接口，又是一个 Global（全局） 对象。这意味着在网页中定义的任何对象，变量和函数，都作为全局对象的一个属性或者方法存在。window 对象含有 locati on 对象、navigator 对象、screen 对象等子对象，并且 DOM 的最根本的对象 document 对象也是 BOM 的 window 对 象的子对象。
 ```
 
+#### window.open
+
+```js
+window.open(url, [name], [configuration])
+
+# url: 新打开页面的url
+# name: 新打开窗口的名字，可以通过此名字获取该窗口对象
+# configuration: 新打开窗口的一些配置项，比如是否有菜单栏、滚动条、长高等信息
+
+// 例如：新打开一个没有菜单栏、标题栏、工具栏但是有滚动条、状态栏、地址栏且可伸缩窗口的方法调用如下：
+window.open('index.html','newWindow','menubar=0,scrollbars=1,resizable=1,status=1,titlebar=0,toolbar=0,location=1')
+```
+
+**新打开窗口名字可以是自定义的值，此处还可以是以下几个值，与超链接a的target属性的值相同**
+
+| 窗口name的值 | 描述                      |
+| ------------ | ------------------------- |
+| _blank       | 默认值，在新窗口打开url   |
+| _self        | 在当前窗口打开链接url     |
+| _parant      | 在父窗口打开链接url       |
+| _top         | 在顶级窗口打开url         |
+| framename    | 在指定的框架中打开链接url |
+
+
+
 ```js
 window.navigator.onLine // 判断是否有网
 ```

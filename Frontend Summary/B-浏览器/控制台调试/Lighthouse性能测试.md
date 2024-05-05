@@ -14,11 +14,11 @@ Lighthouse 是由Google 开发并开源的Web 性能测试工具，通过监控�
 
 然后打开Chrome开发者工具，点击右上角的【三个点】，点击【更多工具】，再点击【性能监视器】：
 
-<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713072807521.png" alt="1713072807521" style="zoom:50%;" />
+![1714372384200](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714372384200.png)
 
 然后点击【Lighthouse】选项卡，点击【分析网页加载情况】按钮：
 
-![1713072834429](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713072834429.png)
+![1714372396049](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714372396049.png)
 
 如下为正在夹断网页得分：
 

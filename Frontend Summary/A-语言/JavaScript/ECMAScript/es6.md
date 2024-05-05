@@ -1081,6 +1081,214 @@ super 只能在子类中使用：
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml1892\wps50.jpg) 
 
+##### class转换为function
+
+```js
+class Animal {
+    constructor(name){
+        this.name = name;
+    }
+    getName(){
+        return this.name;
+    }
+}
+```
+
+###### **class的特点**
+
+我们在转换之前，先了解一下class的主要的特点。
+
+**1.构造函数 (constructor):**
+
+类中必须包含一个名为 constructor 的方法，它是一个特殊的函数，用于初始化新创建的对象实例。构造函数通常用来设置实例的属性或执行其他必要的初始化操作。
+
+**2.方法定义:**
+
+类的方法（包括实例方法和静态方法）直接在类的主体内定义，不需要通过 .prototype 进行赋值。方法定义采用简洁的函数表达式形式，无需 function 关键字。
+
+**3.继承与 extends 关键字:**
+
+使用 extends 关键字可以实现单继承，一个类可以继承另一个基类，子类自动获得基类的所有非私有属性和方法，并可以通过 super 关键字调用父类的构造函数和方法。
+
+**4.静态成员:**
+
+类可以直接定义静态属性和方法，这些成员属于类本身，而不是其实例。通过 static 关键字标识，静态成员可以通过类直接访问，而无需实例化。
+
+**5.不可枚举性:**
+
+类定义的所有方法默认是不可枚举的，即在使用 Object.keys()、for...in 循环或 Object.getOwnPropertyNames() 时不会出现。
+
+**6.基于原型的底层机制:**
+
+尽管 class 提供了类的外观，但它仍然是基于 JavaScript 的原型继承体系。类的实例仍然通过原型链访问共享的方法和属性，class 只是提供了更易于理解和使用的语法糖。
+
+###### **function实现class**
+
+通过上面对class的基本了解，我们开始来实现:
+
+```js
+function Animal(name){
+    this.name = name;
+}
+
+Animal.prototype.getName = function(){
+    return this.name;
+}
+```
+
+通过一个构造函数、然后通过原型给它添加getName方法。这样基本的就实现了。但是这样和class的特点差距太多，我们继续来完善。
+
+###### **new关键字判断**
+
+正常我们实例化class是这样的。
+
+```js
+new Animal("猫咪");
+```
+
+如果这样是不允许的，说类只能通过new来使用。
+
+```js
+ Animal("猫咪"); 
+ // Uncaught TypeError: Class constructor Animal cannot be invoked without 'new'
+```
+
+但是我们通过function实现的却都可以使用。所以我们的function实现的需要判断一下。
+
+那怎么判断呢，这里通过一个语法，new.target，这个语法它能指示当前的函数是通过什么东西来调用。我们来看看
+
+```js
+function Animal(name){
+    console.log(new.target) // undefined
+    this.name = name;
+}
+Animal('猫咪')
+
+function Animal(name){
+    console.log(new.target)
+    this.name = name;
+}
+new Animal('猫咪')
+```
+
+通过new关键字得到
+
+![1714801991210](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714801991210.png)
+
+所以只要判断new.target就可以了。得到下面代码
+
+```js
+function Animal(name){
+    if(!new.target){
+        throw new TypeError("Uncaught TypeError: Class constructor Animal cannot be invoked without 'new'")
+    }
+    this.name = name;
+}
+
+Animal.prototype.getName = function(){
+    return this.name;
+}
+```
+
+###### **不可枚举性**
+
+当我使用for in去循环class创建对象时
+
+```js
+class Animal {
+    constructor(name){
+        this.name = name;
+    }
+    getName(){
+        return this.name;
+    }
+}
+
+const data = new Animal("猫咪");
+
+for (const key in data) {
+    console.log(key) // name
+}
+```
+
+这个时候会输出一个name。但是使用function它就不是一个了。
+
+```js
+function Animal(name){
+    if(!new.target){
+        throw new TypeError("Uncaught TypeError: Class constructor Animal cannot be invoked without 'new'")
+    }
+    this.name = name;
+}
+
+Animal.prototype.getName = function(){
+    return this.name;
+}
+
+const data = new Animal("猫咪");
+
+for (const key in data) {
+    console.log(key)//name、getName
+}
+```
+
+会发现，在class里面的方法是不可枚举的，但是function原型上是可以枚举的，所以需要处理一下。那怎么实现呢。
+
+```js
+function Animal(name){
+    if(!new.target){
+        throw new TypeError("Uncaught TypeError: Class constructor Animal cannot be invoked without 'new'")
+    }
+    this.name = name;
+}
+
+Animal.prototype.getName = function(){
+    return this.name;
+}
+
+Object.defineProperty(Animal.prototype, 'getName', {
+    enumerable: false
+})
+const data = new Animal("猫咪");
+
+for (const key in data) {
+    console.log(key)//name
+}
+```
+
+通过defineProperty设置一下enumerable即可。这样它就只能枚举一个了。
+
+###### **原型上的方法**
+
+在class的原型上的方法是不允许调用的。它会报错，它说他不是一个构造器，不能使用new的方式来调用
+
+```js
+class Animal {
+    constructor(name){
+        this.name = name;
+    }
+    getName(){
+        return this.name;
+    }
+}
+
+new Animal.prototype.getName();
+// Uncaught TypeError: Animal.prototype.getName is not a constructor
+```
+
+这样和上面的那个差不多，同样使用new.target。那我们在哪里设置呢，同样的在defineProperty里面，只是是在value内设置。
+
+```js
+Object.defineProperty(Animal.prototype, 'getName', {
+    value: function(){
+        if(new.target){
+            throw new TypeError("Uncaught TypeError: Animal.prototype.getName is not a constructor")
+        }
+    },
+    enumerable: false
+})
+```
+
 #### 模块化 
 
 > **模块化**：将软件分解成若干个独立的，可替换的，具备预定功能的模块，每个模块实现一个功能，个模块通过接口，组合在一起，形成最终程序

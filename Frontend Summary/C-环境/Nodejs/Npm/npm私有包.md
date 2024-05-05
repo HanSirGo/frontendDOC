@@ -105,7 +105,7 @@ docs/
 
 ### **创建项目**
 
-创建名为hello-npm文件夹，然后在该目录下，执行npm init -y初始化一下
+创建名为hello-npm文件夹，然后在该目录下，执行**npm init -y**初始化一下
 
 ```js
 /hello-npm
@@ -450,6 +450,31 @@ npm publish
 ![1713680223755](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713680223755.png)
 
 ![1713680246192](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713680246192.png)
+
+## 更新包
+
+> 1. 更新保重的代码
+> 2. 测试代码是否可用
+> 3. 修改package.json中的版本号
+> 4. 发布更新
+>
+> ```js
+> npm publish
+> ```
+
+## 删除包
+
+> 执行如下的命令删除包
+>
+> ```js
+> npm unpublish
+> ```
+>
+> 删除包需要满足一定的条件，https://docs.npmjs.com/policies/unpublish
+>
+> 1. 你是包的作者
+> 2. 发布小于24小时
+> 3. 大于24小时后，没有其他包依赖，并且每周小于300下载量，并且只有一个维护者
 
 ## **发布npm包时可能会遇到的一些坑**
 

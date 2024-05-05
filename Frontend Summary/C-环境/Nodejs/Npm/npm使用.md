@@ -195,6 +195,7 @@ npm 为我们提供了search 命令，用于搜索npm仓库，它搜索的参数
 
 ```
 npm search react
+npm s react
 ```
 
 搜索结果如下：

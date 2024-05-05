@@ -1,10 +1,20 @@
+## VScode插件
+
+#### Draw.io Integration
+
+> ![1714804574206](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1714804574206.png)
+>
+> 绘图软件
+>
+> 创建xx.dio或者xx.drawio 的文件开始绘图 drawio.png也可以
+
 #### 驼峰翻译助手
 
 ![1713591953197](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713591953197.png)
 
 中文一键翻译转换成常用大小驼峰、蛇形等格式。
 
-![1713591983408](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713591983408.png)image.png
+![1713591983408](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713591983408.png)
 
 安装好插件后，选择需要翻译的内容，按快捷键就可以调出上面的翻译内容，选择你需要的就行了。
 
