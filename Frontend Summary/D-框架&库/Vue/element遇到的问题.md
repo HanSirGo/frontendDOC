@@ -122,8 +122,28 @@ const rules = reactive({
         }
       }
     }
+  ],
+  // 日期区间的规则
+  dataRange: [
+      {
+          type: 'array',
+          required: true,
+          message:'请选择日期区间',
+          fileds: {
+              // type类型视情况而定，所以如果返回的是date就改成date，如果返回的是string就改成string
+              0:{
+                  type: 'date',
+                  required: true,
+                  message: '请选择开始日期'
+              },
+              1:{
+                  type: 'date',
+                  required: true,
+                  message: '请选择结束日期'
+              }
+          }
+      }
   ]
-
 })
 ```
 

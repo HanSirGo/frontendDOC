@@ -39,8 +39,9 @@ dayjs().format() //2019-03-06T08:00:00+08:00
 dayjs.utc().format() // 2019-03-06T00:00:00Z
 ```
 
+#### 本地时间转换为UTC
+
 ```js
-# 本地时间转换为UTC
 dayjs().utc().format()
 // 获取UTC时间'2023-07-09T01:22:22Z'
 
@@ -56,8 +57,9 @@ dayjs.utc('2023-07-09 02:00:00').format('YYYY-MM-DD HH:mm:ss')
 // '2023-07-09 02:00:00'
 ```
 
+#### UTC转换为本地时间
+
 ```js
-# UTC转换为本地时间
 // 假设UTC时间1688896817000
 
 // UTC转换本地时间
@@ -68,6 +70,33 @@ dayjs(1688896817000).format('YYYY-MM-DD HH:mm:ss')
 // UTC转换为UTC时间
 dayjs.utc(1688896817000).format('YYYY-MM-DD HH:mm:ss')
 // '2023-07-09 10:00:17'
+```
+
+```js
+// 假设我们有一个UTC时间
+const utcTime = '2023-04-01T12:00:00Z' // 格式必须是ISO 8601
+// 使用 dayjs设置utc时间
+cosnt utc = dayjs.utc(utcTime)
+// 转为北京时间
+const bjTime = utc.utcOffset(480).format('YYYY-MM-DD HH:mm:ss') // 480分钟代表8小时
+
+// 获取ISO 8601 格式的时间
+utc.format() //默认情况下，dayjs使用 ISO 8601格式
+
+# 例子
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+dayjs.extend(utc)
+// utc 时间
+console.log(dayjs.utc('2024-05-11 17:08:00').format())
+// utc 转 北京时间
+console.log(dayjs.utc('2024-05-11 17:08:00').utcOffset(480).format('YYYY-MM-DD HH:mm:ss'))
+// 北京时间 转 utc
+console.log(dayjs('2024-05-11 17:08:00').utc().format())
+
+2024-05-11T17:08:00Z
+2024-05-12 01:08:00
+2024-05-11T09:08:00Z
 ```
 
 ```js

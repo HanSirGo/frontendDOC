@@ -320,6 +320,8 @@ git status // 命令用于检查存储库的状态（例如未跟踪的文件和
 Git show
 // or
 Git log -n1 -p
+// or
+git reflog
 ```
 
 ![1713602804521](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713602804521.png)
@@ -516,6 +518,35 @@ git push origin --delete <name>
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712413533969.png" alt="1712413533969" style="zoom:50%;" />
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712413571317.png" alt="1712413571317" style="zoom:50%;" />
+
+##### GIT 恢复已删除的本地分支
+
+> 首先键入命令以标准时间格式展示日志：
+>
+> ```bash
+> git reflog --date=iso
+> ```
+>
+> reflog是reference log的意思，也就是引用log，记录HEAD在各个分支上的移动轨迹。
+>
+> ![1715503679410](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715503679410.png)
+>
+> 左侧黄字部分为每一次执行 branch 操作的 **Hash** **ID** ，包括不限于 checkout、merge、reset、rebase、commit 等等 branch 相关操作，我们在当前项目管理库中所有本地分支的 Commit 都会记录在该日志中。
+>
+> 而恢复被删除分支也很简单，执行：("<", ">"在实际执行时省略)
+>
+> ```bash
+> git checkout -b <分支名> <hash ID>
+> ```
+>
+> 其中 <分支名> 是用来存放**目标分支**的“新分支的名字”，<hash ID> 是目标恢复分支的 hash ID
+>
+> git checkout -b 命令中的 -b 作用为 "新建并切换"，相当于：
+>
+> ```bash
+> git branch <分支名>
+> git checkout <分支名>
+> ```
 
 ##### Git 查看分支
 
@@ -731,6 +762,82 @@ $ git commit --amend --only -m 'xxxxxxx'
 # 如果你已经推(push)了这次提交(commit), 你可以修改这次提交(commit)然后强推(force push), 但是不推荐这么做。
 ```
 
+###### 场景一：
+
+> ![1715501254169](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501254169.png)
+>
+> 当我们提交了一个commit 发现完犊子了,打错了刚刚想喷产品没想到打出来了.
+>
+> 这肯定是不行的这个commit肯定是不能push的那我们怎么修改了?
+>
+> 1,很多人肯定想到git reset 一下,这半天的活不就白干了呗.这时候我们有一个命令来修改这个commit.
+>
+> git commit --amend
+>
+> 这时候就会弹出一个操作框需要会点基本的vim操作
+>
+> ![1715501281592](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501281592.png)
+>
+> 我们输入 i 进行对commit的修改,当我们改完后输入esc 表示改完了,输入 :wq就可以保存了对吧.
+>
+> ![1715501304731](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501304731.png)
+>
+> 这时候我们再log一下发现就改完了.这样产品看到我们的提交就很开心.
+
+###### 场景二:
+
+> 我发现我没改完了,还漏了一点但是已经commit 了改完又要commit那不就两个commit了吗?我只想提交一个commit呀.
+>
+> 还是这个命令: git commit --amend --no-edit
+>
+> --no-edit就是表示我们不修改了还是和前面那个提交同一个提交.
+>
+> 如图:
+>
+> ![1715501405765](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501405765.png)
+>
+> 这样我们就并没有多一次提交.
+
+###### 场景三：
+
+> 我一不小心提交了,这时候就有两个commit了
+>
+> ![1715501535245](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501535245.png)
+>
+> 那就到我们今天的重点了.
+>
+> rebase
+>
+> git rebase -i HEAD~2
+>
+> 也可以git rebase -i 版本号
+>
+> ![1715501561805](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501561805.png)
+>
+> 这时候我们同理输入i 进行编辑 输入完esc退出编辑状态 :wq保存.
+>
+> 其中squash是将两个commit合并成一个提交.
+>
+> edit是可以编辑提交
+>
+> 这里附上rebase的官网有兴趣的同学可以去看一下
+>
+> [https://docs.github.com/en/get-started/using-git/about-git-rebase#commands-available-while-rebasingdocs.github.com/en/get-started/using-git/about-git-rebase#commands-available-while-rebasing](https://link.zhihu.com/?target=https%3A//docs.github.com/en/get-started/using-git/about-git-rebase%23commands-available-while-rebasing)
+>
+> 这时候那个我不想加班的提交就没有了
+>
+> ![1715501597476](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715501597476.png)
+>
+> 这时候我们就改完了.
+>
+> 当然我们很多同学可能第一次用老是会害怕错了怎么办.其实 不用怕我们可以使用
+>
+> ```js
+> git rebase --abort
+> ```
+>
+> 这个就是取消前面的rebase,我发现我不会玩了,那我不玩了我直接退出我摆烂.
+
 ##### Git修改提交的commit
 
 ```js
@@ -743,11 +850,126 @@ git commit --amend // 弹出一个操作框(需要会点基本的vim知识: 我�
 ```js
 # 提交到本地仓库
 git commit --amend --no-edit // 将修改的代码合并到上一个commit中
+```
 
+```js
 # 或
 git rebase -i [commit Id] //commit Id 是你要合并的几个commit中最老的commit Id
-
 ```
+
+###### 场景1：
+
+> 要将多个commit合并成一个，可以使用git rebase -i命令。
+>
+> 首先，使用[git log命令](https://www.zhihu.com/search?q=git log命令&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A3296482616})查看当前分支的提交记录:
+>
+> ```text
+> $ git log
+> ```
+>
+> ![1715498084048](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715498084048.png)
+>
+> 然后找出要合并的哪几个[commit](https://www.zhihu.com/search?q=commit&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A3296482616})的前一个commit的ID（例如合并前两个commit需要选择2f384faf6352291661...9a这个commit的ID），执行以下命令：
+>
+> ```text
+> git rebase -i 2f384faf6352291661817cb993e8083b49755e9a
+> // 或者
+> git rebase -i HEAD~2
+> ```
+>
+> ![1715498053836](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715498053836.png)
+>
+> 在打开的[编辑器](https://www.zhihu.com/search?q=编辑器&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A3296482616})中，将待合并的commit更改为[squash](https://www.zhihu.com/search?q=squash&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A3296482616})或fixup，保存并关闭编辑器时，这些commit将会被合并成一个。具体操作步骤：
+>
+> - 在当前这个页面键入`i`(进入编辑模式)，此时会出现光标；
+> - 移动光标到第二行，将pick编辑为s，此处将pick 49353f4修改为s 49353f4；
+> - 按`esc`，然后输入`:`(键盘上shift+：)，输入`wq`，即保存退出。（特殊情况下 :wq! 强制保存退出）
+>
+> 在保存退出后，立刻又进到另一个编辑界面，如下：
+>
+> ![1715498020864](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715498020864.png)
+>
+> 编辑后的提交信息：
+>
+> ![1715498110408](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715498110408.png)
+>
+> 保存之后，输入git log查看提交合并的结果：
+>
+> ![1715498129570](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715498129570.png)
+>
+> **squash和fixup的区别：** 
+>
+> - squash：该命令可以将两个或多个提交合并为一个提交。提交被压缩到其上方的提交中。可以编写描述这两个更改的新提交消息。
+> - fixup：这类似于squash，但是要合并的提交已丢弃其消息。提交仅合并到其上方的提交中，并且较早提交的消息用于描述这两个更改。
+>
+> 交互编辑的指令解释
+>
+> - pick：使用commit
+> - fixup：使用commit，丢弃commit信息
+> - reword：使用commit，修改commit信息
+> - squash：使用commit，将commit信息合入上一个commit
+
+###### 场景二：将本地分支的多次提交合并为一个commit到远程仓库
+
+> 假设当前开发完成的功能模块有3次commit提交，我们需要将这个完整的模块推送至远程仓库，首先需要将这 3 次 commit 进行合并操作
+>
+> ![1715503951362](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715503951362.png)
+>
+> 取这 3 次 commit 的上一个 commit ID 执行 rebase 操作
+>
+> ![1715503968805](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715503968805.png)
+>
+> 进入操作面板，可见 Rebase 排序是由倒序排列的，我们可以用 squash (缩写 s ) 将每次 commit 合并至前一个 commit
+>
+> ![1715503987566](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715503987566.png)
+>
+> 键入i，将需要合并的 commit 前的 pick 操作 改为 squash
+>
+> ![1715504011531](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504011531.png)
+>
+> squash 做的事就是把每次 commit 合并到更早的一次 commit，因此最早的分支应该是 pick 操作，因为在这次 Rebase 中它是最早的一次 commit
+>
+> 如果是 squash 将会报错，如下：
+>
+> ![1715504035011](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504035011.png)
+>
+> 修改后键入 :wq 保存退出，假若报错：
+>
+> ![1715504056200](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504056200.png)
+>
+> 用自己习惯的方式解决此次本地冲突，解决所有冲突之后git status查看：
+>
+> ![1715504074326](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504074326.png)
+>
+> 按提示git rebase --continue：
+>
+> ![1715504093295](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504093295.png)
+>
+> 如果rebase操作没有代码冲突保存退出后直接进入日志面板：
+>
+> ![1715504121707](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504121707.png)
+>
+> 仍然是键入 i 进入编辑模式，将三次 commit 的工作树日志合并：
+>
+> ![1715504154127](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504154127.png)
+>
+> 编辑完成后键入 :wq 保存退出回到主面板：
+>
+> ![1715504174410](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504174410.png)
+>
+> 使用 git log 查看是否合并成功：
+>
+> ![1715504198817](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504198817.png)
+>
+> 可以看到 rebase 操作后的 3 次 commit 已经合并为一次 commit，并更换了 commit ID
+>
+> ![1715504227991](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715504227991.png)
+>
+> 这时就可以 push 到远程仓库了，假设之前的三次 commit 已经有进行过 push 操作，那么此次 push 会被检测到本地工作树与远程仓库的工作树相异而报错，
+>
+> 此时可以使用 --force 将本地版本库强制覆盖至远程仓库：
+>
+> 
 
 ##### Git提交远程仓库
 
@@ -1525,6 +1747,40 @@ https://blog.csdn.net/dxy1128/article/details/106363962
 
  \5. 然后再push就OK啦！解决！ 
 
+
+
+##### 5.git提示fatal: not a git repository (or any of the parent directories): .git
+
+> 1、创建分支时提示：not a git repository
+>
+> E:\myproject>git checkout -b zhenzhu
+> fatal: not a git repository (or any of the parent directories): .git
+>
+> 2、怎么办？
+>
+> git init--》git status--》git checkout -b test20230217--》成功
+>
+> 3、为什么？
+>
+> 一般是没有初始化git本地版本管理仓库，使用init命令行初始化，再status查看状态，正常后继续报错前命令行即可；
+>
+> 补充说明：
+>
+> 1、git init 初始化git仓库
+> 2、git status 查看文件状态
+>
+> 3、创建并切换到新分支
+>     git checkout -b xxxx   （xxx--》是你自己起的分支名称）
+>
+> 4、git checkout命令加上-b参数表示创建并切换，相当于以下两条命令：
+>
+>  $ git branch dev （创建）
+>
+> $ git checkout dev （切换--》切换到基础分支如下：git checkout master）
+>
+> ![1715509746381](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1715509746381.png)
+>
+
 ### 工具
 
 #### GitLens
@@ -1570,3 +1826,27 @@ Git History 是一个VS Code插件，增强了Git 的功能，它可以用来查
 在c：/用户/appdata/atlassian/   userhosts 和 passwd 文件 的内容 清空 
 
 然后 sourcetree 中在提 拉 推  就会出现  输入用户密码的弹窗 
+
+![1716109881751](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716109881751.png)
+
+![1716109907606](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716109907606.png)
+
+![1716109927989](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716109927989.png)
+
+![1716109945879](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716109945879.png)
+
+![1716109963056](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716109963056.png)
+
+![1716109990239](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716109990239.png)
+
+![1716110008992](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716110008992.png)
+
+![1716110088507](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716110088507.png)
+
+![1716110121099](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716110121099.png)
+
+![1716110138405](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716110138405.png)
+
+![1716110162751](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716110162751.png)
+
+![1716110184106](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1716110184106.png)

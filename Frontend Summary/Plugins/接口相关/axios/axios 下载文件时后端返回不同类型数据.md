@@ -78,6 +78,22 @@ async downloadFile(file) {
 }
 ```
 
+```js
+const res = axios.post(url, { responseType: "blob" });
+
+function downloadfile(blob,name){
+    const url = window.URL.createObjectURL(new Blob(blob));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = decodeURI(name);
+    link.style.display= 'none';
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
+    window.URL.revokeObjectURL(url);
+}
+```
+
 ------
 
 通过以上两种情况的优化解决方案，我们可以在使用axios下载文件时更加简洁和高效地处理后端返回不同类型数据的情况。希望本文对您有所帮助！
