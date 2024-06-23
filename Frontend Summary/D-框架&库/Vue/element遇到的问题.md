@@ -227,3 +227,43 @@ const rules = reactive({
 </script>
 ```
 
+##### 弹窗中的表格有数据但不展示
+
+```js
+# 弹窗中的表格有时有数据，但是，就是不展示（当前浏览器版本71）
+# 原因： 与弹窗的遮罩层有关，去掉弹窗原有的遮罩层，数据就可以正常显示
+<el-dialog :model="false">
+    <el-table></el-table>
+</el-dialog>
+
+<!-- 添加一个遮罩层 -->
+<div class='xx' v-if='xxx' ></div>
+
+.xx {
+    position:fixed;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    background-color:rgba(0,0,0,.5);
+    z-index:2000;
+}
+```
+
+##### 设置单行溢出隐藏...
+
+```js
+<el-table-column show-overflow-tooltip></el-table-column>
+```
+
+##### 设置show-overflow-tooltip不生效
+
+```js
+# 不生效代码
+<el-table-column show-overflow-tooltip>
+    <div>xxx<div>
+</el-table-column>
+
+# 将div设置为行内元素 span 等或 template
+```
+

@@ -86,11 +86,7 @@ npm run electron:build
 
 ## **其他问题**
 
-##  
-
-## 1. 登录成功不能跳转，是因为jscookie的问题，将登录页面 （login）页面的所有cookies修改成 localStorage
-
-
+#### 1. 登录成功不能跳转，是因为jscookie的问题，将登录页面 （login）页面的所有cookies修改成 localStorage
 
 > -  const username = Cookies.get("username")
 >

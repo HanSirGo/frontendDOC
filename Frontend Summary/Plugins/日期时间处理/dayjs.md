@@ -20,17 +20,42 @@ dayjs(1318781876406).format('YYYY-MM-DD HH:mm:ss');   // 2011-10-17 00
 
 **Github：**https://github.com/iamkun/dayjs/
 
+### 安装
+
+```js
+npm i dayjs
+
+import dayjs from 'dayjs'
+const dayjs = require('dayjs')
+```
+
+### 基础使用
+
+```js
+# 当前时间
+dayjs()
+dayjs('2024-05-29') // 字符串
+dayjs(new Date(2024,5,29)) // Date对象
+dayjs(1318781876406) // number 时间戳
+```
+
+##### 自定义事件格式
+
+```js
+# 解析自定义时间格式 如：
+dayjs('12-25-2024', 'MM-DD-YYYY') // 可以使用插件 CustomParseFormat
+```
+
+
+
 ### UTC和本地时间互相转换
 
 ```js
-默认情况下，Day.js 会把时间解析成本地时间。
-
-如果想使用 UTC 时间，您可以调用 dayjs.utc() 而不是 dayjs()。
-
-在 UTC 模式下，所有显示方法将会显示 UTC 时间而非本地时间。
-
-这依赖 UTC 插件，才能正常运行
-
+// 默认情况下，Day.js 会把时间解析成本地时间。
+// 如果想使用 UTC 时间，您可以调用 dayjs.utc() 而不是 dayjs()。
+// 在 UTC 模式下，所有显示方法将会显示 UTC 时间而非本地时间。
+// 这依赖 UTC 插件，才能正常运行
+import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
 
 // 默认是当地时间

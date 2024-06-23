@@ -218,6 +218,20 @@ VScode插件地址 [https://marketplace.visualstudio.com](https://marketplace.vi
 > 注意：好像只有ts js文件有用
 > https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments
 > ![1713700477644](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713700477644.png)![1713700487974](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713700487974.png)
+#### 33. Console Ninja
+
+> 作为前端，调试是我们日常工作中最常用的一项工作了，通常的做法是：代码里添加console.log调试代码，然后到浏览器的devTool查看打印结果。也就是需要不断在编辑器和浏览器之间切换，有没有更好的方式呢？
+>
+> 答案显而易见， Console Ninja就是用来干这事得。
+>
+> ![1717919327898](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919327898.png)
+>
+> 使用也很简单，安装该插件后，代码运行后console.log后面就会显示其运行信息。
+>
+> ![1717919359447](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919359447.png)
+>
+> **那接口的怎么显示console.log(res)??**
+
 #### .Tailwind CSS IntelliSense
 
 > Tailwind CSS IntelliSense 提供了对 Tailwind CSS 的智能提示和自动补全功能，可以帮助开发者更快地编写 CSS 样式代码，减少输入错误和提高工作效率。

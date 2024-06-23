@@ -205,3 +205,150 @@ export PATH="$NVMD_DIR/bin:$PATH"
 > 在 Windows 上，支持在右下角菜单便捷修改 Node.js 版本：
 
 ![1711793712857](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1711793712857.png)
+
+## Mise
+
+### **Node.js 版本问题**
+
+在前端开发的世界中，`Node.js` 版本管理是一个常见且棘手的问题。
+
+许多开发者在`启动项目`时，可能会遇到因`版本不匹配`而导致的项目无法运行的情况。这不仅会拖慢开发进度，还可能在接手旧项目时带来额外的挑战。
+
+想象一下，刚刚接手一个遗留项目，却发现本地的 `Node` 版本是 `V20`，而项目却需要 `V14` 才能正常运行。这不仅令人沮丧，还可能需要您花费宝贵的时间去下载和配置正确的 `Node` 版本。
+
+但不必担忧，`Mise` 来帮您解决这个问题。
+
+也许有同学会说：`nvm 不是也可以解决这个问题吗？`
+
+确实，`nvm` 是一个广泛使用的 `Node.js` 版本管理工具，它允许用户在同一台机器上安装和使用`多个版本`的 `Node.js`。
+
+对于那些熟悉 `nvm` 的开发者来说，它提供了一个简单的方式来解决版本兼容性问题。然而，`Mise` 带来了一些独特的优势和特点，这些可能会吸引那些寻求更全面解决方案的开发者
+
+### **什么是 Mise**
+
+`Mise` 是一个基于`Rust`实现的多语言工具版本管理器！
+
+![1718453480119](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1718453480119.png)
+
+它以其卓越的灵活性和强大的功能，优雅地替代了 `asdf`、`nvm`、`pyenv`、`rbenv` 等传统工具，为开发者提供了一种全新的、统一的方式来管理`不同语言`的开发工具和版本。
+
+作为一款卓越的多语言工具版本管理器，`Mise` 能够让您轻松管理不同项目的 Node.js 版本需求：
+
+- **多语言支持**：与 nvm 仅管理 Node.js 版本不同，Mise 是一个多语言工具版本管理器，支持包括 Node.js 在内的多种编程语言和工具，如 Python、Ruby、Go 等。
+- **无缝切换**：Mise 允许您在不同版本的 Node.js 之间无缝切换，确保每个项目都能使用到它所需的确切版本。
+- **环境一致性**：无论您处理多少项目，Mise 都能保证开发环境的一致性，减少因版本差异引起的问题。
+- **简化配置**：使用 Mise，您不再需要手动下载和配置 Node 版本，它会自动为您处理这一切。
+- **提高效率**：Mise 的自动化功能节省了您的时间，让您能够专注于编码和创新，而不是环境配置。
+
+### **支持的语言和特点**
+
+- **Bun**：现代的 JavaScript 运行时，Mise 确保您可以轻松切换和使用不同版本的 Bun。
+- **Deno**：安全的 JavaScript 和 TypeScript 运行时，Mise 让您能够无缝管理 Deno 的多个版本。
+- **Erlang**：用于构建可扩展和可靠的系统的编程语言，Mise 提供了对 Erlang 版本的精细控制。
+- **Go**：简洁、高效的编程语言，Mise 支持 Go 的多版本管理，让开发更加灵活。
+- **Java**：广泛使用的跨平台语言，Mise 允许开发者根据不同项目需求选择合适版本的 Java。
+- **Node.js**：流行的 JavaScript 运行环境，Mise 提供了对 Node.js 版本的全面管理。
+- **Python**：强大的多用途编程语言，Mise 使得 Python 版本的管理变得简单直观。
+- **Ruby**：优雅而富有表现力的语言，Mise 帮助您在不同项目中使用特定版本的 Ruby。
+- **Rust**：注重性能和安全的系统编程语言，Mise 支持 Rust 的多版本管理，让系统开发更加高效。
+
+### **以 Node.js 为例**
+
+##### **安装 Mise**
+
+第一步先下载`Mise Cli`：
+
+```
+curl https://mise.run | sh
+```
+
+查看版本：
+
+```
+~/.local/bin/mise --version
+mise 2024.x.x
+```
+
+##### **安装指定版本 Node.js**
+
+安装 `node V20` 版本，并使其成为`全局默认版本`：
+
+```
+mise use -g node@20
+```
+
+查看 Node.js 版本：
+
+```
+node -v
+v20.0.0
+```
+
+##### **管理环境变量**
+
+`Mise` 通过`.env`文件来管理环境变量，首先在项目目录下创建一个`.env`文件：
+
+```
+echo 'DATABASE_URL=postgres://user:pass@localhost/dbname' > .env
+```
+
+然后 Mise 会自动加载这个文件中的环境变量：
+
+```
+mise env
+```
+
+##### **任务管理**
+
+Mise 提供一个简单的任务管理功能，项目目录下创建一个`mise.yml`文件：
+
+```
+# mise.yml
+tasks:
+  build:
+    - npm install
+    - npm run build
+  test:
+    - npm test
+```
+
+执行任务：
+
+```
+mise run build
+```
+
+### **Windows 支持问题**
+
+Mise 目前`不支持 Windows` 操作系统。它支持的操作系统和架构包括：
+
+- macOS（x64 和 arm64）
+- Linux（x64、x64-musl、arm64、arm64-musl、armv6、armv6-musl、armv7、armv7-musl）
+
+对于 Windows 用户，可能需要寻找其他工具或等待 Mise 未来可能的 Windows 支持更新。
+
+并且在 `Github` 中有相关的讨论帖子：
+
+> ```
+> https://github.com/jdx/mise/discussions/66
+> ```
+
+主题是`关于 Windows 支持`的。在这个讨论中，有人分享了他们对 mise 项目的一些想法和尝试，包括使用 Lua 作为插件的主要语言，并围绕它创建一套标准化的 API，以便于插件的开发和使用。
+
+讨论中提到了一些关键点：
+
+- **Lua 插件**: 作者提出了使用 Lua 作为插件语言的想法，并考虑了向后兼容性，以便现有的 asdf 插件能够与 mise 兼容。
+- **API 设计**: 讨论了一组 API 的概念，这些 API 将提供执行各种操作的功能，例如平台检测、子进程生成、HTTP 请求、文件下载和 JSON 数据处理等。
+- **示例脚本**: 提供了一个 Lua 脚本示例，展示了如何使用这些 API 来实现插件的功能，例如列出、下载、安装和获取最新稳定版本的命令。
+
+这个讨论表明 Mise 社区正在积极探索扩展其功能和兼容性，包括对 `Windows 系统`的支持。
+
+虽然讨论帖本身并没有直接说明 mise 目前已经支持 Windows，但它揭示了社区对于跨平台支持的兴趣和开发动态。
+
+### **Mise 相关参考**
+
+Mise 的设计理念是提供一个简洁、一致的接口，让开发者能够专注于创新和构建，而不必被环境配置的复杂性所困扰。通过 Mise，您可以轻松地在不同项目之间切换，确保每个项目都能使用到正确的工具版本，从而提高开发效率和项目的可维护性。
+
+- **官网**：`https://mise.jdx.dev/`
+- **Github 地址**：`https://github.com/jdx/mise`
+- **Windows 系统支持相关**：`https://github.com/jdx/mise/discussions/66`

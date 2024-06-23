@@ -423,6 +423,79 @@ npm root
 
 假如我之前安装了axios等等大量无用的包![1713687665123](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687665123.png)但是我不想用命令一个一个的删，那就执行它![1713687680216](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713687680216.png)这样再去看node_modules里面就没有了。
 
+### npm link
+
+```
+实习同学:大哥，帮忙发下依赖            
+我:嗯，好。                 
+10 分钟后            
+实习同学：大哥，帮忙发下依赖               
+我：嗯，好。                
+20分钟后。            
+实习同学：大哥，再帮忙发下依赖             
+我：嗯，好。              
+30分钟后。          
+实习同学：大哥。滴滴。            
+我：嗯？好。             
+40分钟后。              
+实习同学：大哥，再帮忙发下依赖                
+我：嗯.....碰见什么问题了？你是一直被测试打回了吗?             
+实习同学：没有，自测出来的问题。这个要重新发上去，然后重新装依赖。我才知道自己有没有改对。好麻烦啊。              
+我:额.....em...是很麻烦。不过你的带教，没有告诉你怎么在本地改这玩意吗？你知道npm link 吗？            
+实习同学：不知道。带教他很忙，这是干啥用的。
+我：没事，npm link 一个非常不常用的命令。不知道很正常。我给你讲讲，(&**@#￥%……叭叭叭叭)
+```
+
+**我们的项目是如何寻找依赖文件的？**
+
+在介绍npm link以前，我们先来了解一下，咱们的项目，是如何寻找依赖文件的。
+
+*依赖文件系统会在node_modules文件夹下寻找。比如咱们项目依赖了一个antd。那么这个antd的依赖。会优先从当前目录下的node_modules下寻找，如果没有找到，则往父级目录寻找node_modules。一直到根目录为止。*
+
+我们用（D:\文件夹1\文件夹2\项目文件夹）作为项目文件夹，画个图看看
+
+![1717919119778](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919119778.png)
+
+**npm link 把文件链接到哪里去了**
+
+我们一般使用npm 下载全局依赖的时候，依赖会被默认安装到*C:\Users\你的用户名\AppData\Roaming\npm* 这个位置的node_modules中
+
+![1717919147481](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919147481.png)
+
+使用npm link也一样。npm link会在上述位置给你生产一个软连接（可以理解为快捷方式）。我们以gbye_util_pack这个测试包举个例子。
+
+*npm unlink -g 包名* 则是删除这个包在全局的链接
+
+注意：npm link是创建一个软连接，不是真的复制了一份代码到全局依赖里面。软链接文件前面的图标有一个小箭头。
+
+![1717919166386](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919166386.png)
+
+**如何使用被链接到全局的包？**
+
+在需要引用全局包的地方，执行*npm link 包名* 命令即可
+
+举个例子
+
+gbyz_util_pack 这个包是我们刚才link到全局的包。然后我们在项目目录下执行 npm link gbyz_util_pack，
+
+![1717919184726](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919184726.png)
+
+然后这个包就会出现在当前项目文件夹的node_modules目录下。无需我们下载依赖。即可进行引用和调试。本地引用的包因为是软连接的形式，并不是克隆了一份代码，所以，被引用的包的更改，*会在引用项目中实时更新*。便于调试。
+
+![1717919199941](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1717919199941.png)
+
+**最后**
+
+汇总下常用命令
+
+npm link -会把当前文件夹的项目（包）链接到全局
+
+npm unlink -g 包名 -取消当前文件夹项目在全局中的引用
+
+npm link 包名 -引用被链接到全局的包到当前文件夹下的node_modules中
+
+npm unlink 包名 -在当前文件夹项目中取消引用该全局包
+
 ##  查看已安装的包
 
 可以通过以下命令来获取整个项目的包信息：

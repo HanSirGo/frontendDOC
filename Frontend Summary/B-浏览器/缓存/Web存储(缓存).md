@@ -75,6 +75,85 @@ clear(): 清空 LocalStorage
 key(): 传递一个数字 n，获取第 n 个键的数据
 ```
 
+#### **localStorage 的局限性**
+
+尽管 localStorage 很方便，但它也有一些限制：
+
+- **阻塞 API：**  localStorage 是同步操作的，可能会阻塞主线程，影响应用性能。
+- **数据结构有限：**  localStorage 只支持简单的键值对存储，无法处理复杂的数据结构或关系。
+- **存储限制：**  每个域的 localStorage 存储容量有限，大约 5MB。
+- **缺乏索引:**  localStorage 无法进行高效的查询和迭代操作。
+- **标签页阻塞:**  多标签页环境下，一个标签页的 localStorage 操作可能会影响其他标签页的性能。
+
+#### **为什么 localStorage 仍然有价值**
+
+与人们对性能的担忧相反，localStorage 实际上在与 IndexedDB 或 OPFS 等其他存储方案相比时，速度相当快。它尤其擅长处理小型键值对的存储。由于其简洁性和与浏览器的紧密集成，访问和修改 localStorage 数据的开销很小。
+
+对于需要快速且简单数据存储的场景，localStorage 仍然是一个不错的选择，例如：
+
+- RxDB 使用 localStorage 来管理简单的键值对，而将 "正常" 文档存储在 IndexedDB 等其他存储中。
+
+#### **何时不使用 localStorage**
+
+虽然 localStorage 很方便，但并非所有场景都适合它。以下情况，你可能需要考虑其他方案：
+
+- **数据需要查询:**  如果你的应用需要根据特定标准查询数据，localStorage 可能会效率低下。
+- **存储大型 JSON 文档:**  localStorage 不适合存储大型 JSON 文档，会导致性能下降。
+- **频繁读写操作:**  频繁的读写操作会影响 localStorage 的性能，建议使用其他更适合频繁操作的方案。
+- **需要跨会话持久化:**  如果你的应用需要在不同会话间保存数据， localStorage 可能不适合。
+
+#### **其他存储选项**
+
+**IndexedDB**
+
+IndexedDB 专门用于存储 JSON 文档，而不是简单的键值对。它可以处理更大的数据集，并支持索引，方便高效查询。不过，IndexedDB 比 localStorage 稍微复杂一些。
+
+你可以使用像 RxDB 或 Dexie.js 这样的库来简化 IndexedDB 的使用，并提供更多功能。
+
+**文件系统 API (OPFS)**
+
+OPFS 提供了对基于源的、沙盒化的文件系统的直接访问，性能更佳。但 OPFS 使用起来比较复杂，只能在 WebWorker 中使用。
+
+你可以使用 RxDB 的 OPFS RxStorage 库来简化 OPFS 的使用。
+
+**Cookies**
+
+Cookies 曾经是主要的客户端数据存储方式，但现在已经不再流行了，因为它的性能远不如 localStorage。
+
+**WebSQL**
+
+WebSQL 是一种被弃用的技术，不建议使用。
+
+**sessionStorage**
+
+sessionStorage 仅在当前浏览器会话期间保存数据，页面刷新后会丢失。它适合存储一些临时数据。
+
+**React Native 的 AsyncStorage**
+
+React Native 开发者可以使用 AsyncStorage API 进行数据持久化，它类似于 localStorage，但支持异步操作。
+
+**Node.js 的 node-localstorage**
+
+Node.js 中没有内置的 localStorage，可以使用 node-localstorage 包来模拟浏览器中的 localStorage 行为。
+
+**浏览器扩展中的 localStorage**
+
+浏览器扩展可以使用 localStorage API，但最好使用 Extension Storage API 来存储与扩展相关的数据，因为它提供了更多功能和更好的安全性。
+
+**Deno 和 Bun 中的 localStorage**
+
+Deno 支持 localStorage API，而 Bun 不支持。在 Bun 中，可以使用 bun:sqlite 模块或其他 JavaScript 数据库来代替。
+
+#### **选择合适的存储方案**
+
+localStorage 是一种简单高效的存储方案，适合存储少量键值对数据。但对于复杂的应用场景，你需要根据实际情况选择更合适的存储方案。
+
+- **IndexedDB**: 适合存储大量数据，并需要进行高效查询。
+- **OPFS**: 适合需要高性能的文件存储。
+- **React Native AsyncStorage**: 适合 React Native 应用中的数据持久化。
+- **Node.js node-localstorage**: 适合 Node.js 中模拟浏览器 localStorage 行为。
+- **浏览器扩展的 Extension Storage API**: 适合存储浏览器扩展相关数据。
+
 ### Sessionstorage
 
 ```
