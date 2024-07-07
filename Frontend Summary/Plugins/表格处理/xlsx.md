@@ -361,3 +361,119 @@ openDownload(url, saveName) {
       aLink.dispatchEvent(event);
     },
 ```
+
+# vue3中如何使用xlsx插件
+
+- - 
+
+## 1. vue3中如何使用xlsx插件
+
+在Vue3中使用`xlsx`插件来实现Excel的上传与下载，你需要经历几个关键步骤。
+
+下面是一个简化的指南，展示如何实现这些功能：
+
+### 1.1. 安装`xlsx`库
+
+首先，确保你已经安装了`xlsx`库。如果还没有安装，可以通过以下命令进行安装：
+
+```
+npm install xlsx
+```
+
+### 1.2. 导入`xlsx`库
+
+在你想要使用`xlsx`功能的Vue组件中，导入`xlsx`库：
+
+```
+<script setup>
+import * as XLSX from 'xlsx';
+</script>
+```
+
+### 1.3. 实现Excel上传
+
+#### 1.3.1. **创建文件输入组件**：
+
+在模板中添加一个文件输入框，用于用户选择Excel文件。
+
+#### 1.3.2. **处理文件读取**：
+
+在`onFileChange`方法中，使用`FileReader`读取用户选择的文件，并利用`xlsx`进行解析。
+
+```js
+<template>
+  <div>
+    <input type="file" @change="onFileChange" accept=".xlsx, .xls" />
+    <!-- 展示解析后的数据 -->
+  </div>
+</template>
+
+<script setup>
+import * as XLSX from 'xlsx';
+
+const onFileChange = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = e.target.result;
+    const workbook = XLSX.read(data, { type: 'binary' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const excelData = XLSX.utils.sheet_to_json(worksheet);
+    // 处理excelData，如存入Vue的响应式数据中
+  };
+  reader.readAsBinaryString(file);
+};
+</script>
+```
+
+### 1.4. 实现Excel下载
+
+#### 1.4.1. **定义导出方法**：
+
+创建一个方法来将数据转换为Excel格式并提供下载。
+
+```js
+const downloadExcel = (data, filename = 'export.xlsx') => {
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+  // 将工作簿转换为二进制字符串
+  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
+
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+    return buf;
+  }
+
+  // 创建Blob对象并触发下载
+  const blob = new Blob([s2ab(wbout)], { type: '' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+```
+
+#### 1.4.2. **使用导出方法**：
+
+在适当的地方调用`downloadExcel`方法，传入你希望导出的数据。
+
+```
+<button @click="downloadExcel(yourData)">导出Excel</button>
+```
+
+在这个例子中，`yourData`是你要导出的数据数组。
+
+这样，你就可以在Vue3应用中实现Excel文件的上传与下载功能了。
+
+记得根据实际情况调整代码，比如处理错误、优化用户体验等。
+

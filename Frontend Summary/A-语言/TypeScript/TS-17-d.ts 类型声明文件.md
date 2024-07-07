@@ -136,7 +136,7 @@ TypeScript 编译器会自动根据编译目标target的值，加载对应的内
 
 **（2）这个库没有自带，但是可以找到社区制作的类型声明文件。**
 
-第三方库如果没有提供类型声明文件，社区往往会提供。TypeScript 社区主要使用 DefinitelyTyped 仓库，各种类型声明文件都会提交到那里，已经包含了几千个第三方库。
+第三方库如果没有提供类型声明文件，社区往往会提供。TypeScript 社区主要使用 DefinitelyTyped 仓库（https://github.com/DefinitelyTyped/tree/master/types），各种类型声明文件都会提交到那里（https://www.typescriptlang.org/dt/serch?search=），已经包含了几千个第三方库。
 
 这些声明文件都会作为一个单独的库，发布到 npm 的@types名称空间之下。比如，jQuery 的类型声明文件就发布成@types/jquery这个库，使用时安装这个库就可以了。
 ```javascript

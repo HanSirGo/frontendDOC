@@ -1,4 +1,4 @@
-# Token无感知刷新的
+## Token无感知刷新的
 
 ### 什么是JWT
 
@@ -315,5 +315,326 @@ export default async (error: AxiosError<ResponseDataType>) => {
 
   return Promise.reject(error);
 };
+```
+
+## 实现无感刷新 token-2
+
+### 环境
+
+1. 请求采用的 Axios V1.3.2。
+2. 平台的采用的 `JWT(JSON Web Tokens)` 进行用户登录鉴权。
+   **「（拓展：JWT 是一种认证机制，让后台知道该请求是来自于受信的客户端；更详细的可以自行查询相关资料）」**
+
+### 问题现象
+
+线上用户在使用的时候，偶尔会出现突然跳转到登录页面，需要重新登录的现象。
+
+### 原因
+
+1. 突然跳转到登录页面，是由于当前的 token 过期，导致请求失败；在 `axios` 的响应拦截`axiosInstance.interceptors.response.use`中处理失败请求返回的状态码 401，此时得知`token`失效，因此跳转到登录页面，让用户重新进行登录。
+2. 平台目前的逻辑是在 `token` 未过期内，用户登录平台可直接进入首页，无需进行登录操作；因此就存在该现象：用户打开平台，由于此时 `token` 未过期，用户直接进入到了首页，进行其他操作。但是在用户操作的过程中，`token` 突然失效了，此时就会出现突然跳转到登录页面，严重影响用户的体验感！
+   （**「注：目前线上项目中存在数据大屏，一些实时数据的显示；因此存在用户长时间停留在大屏页面，不进行操作，查看实时数据的情况」**）
+
+### 切入点
+
+1. 怎样及时的、在用户感知不到的情况下更新`token`？
+2. 当 `token` 失效的情况下，出错的请求可能不仅只有一个；当失效的 `token` 更新后，怎样将多个失败的请求，重新发送？
+
+### 操作流程
+
+好了！经过了一番分析后，我们找到了问题的所在，并且确定了切入点；那么接下来让我们实操，将问题解决掉。
+**「前要：」**
+1、我们仅从前端的角度去处理。
+2、后端提供了两个重要的参数：`accessToken`（用于请求头中，进行鉴权，存在有效期）；`refreshToken`（刷新令牌，用于更新过期的 accessToken，相对于 accessToken 而言，它的有效期更长）。
+
+#### 1、处理 axios 响应拦截
+
+**「注：在我实际的项目中，accessToken 过期后端返回的 statusCode 值为 401，需要在axiosInstance.interceptors.response.use 的 error回调中进行逻辑处理。」**
+
+```js
+// 响应拦截
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    let {
+      data, config
+    } = error.response;
+    return new Promise((resolve, reject) => {
+      /**
+       * 判断当前请求失败
+       * 是否由 toekn 失效导致的
+       */
+      if (data.statusCode === 401) {
+         /**
+         * refreshToken 为封装的有关更新 token 的相关操作 
+         */
+        refreshToken(() => {
+          resolve(axiosInstance(config));
+        });
+      } else {
+        reject(error.response);
+      }
+    })
+  }
+)
+```
+
+1. 我们通过判断`statusCode`来确定，是否当前请求失败是由`token`过期导致的；
+2. 使用 Promise 处理将失败的请求，将由于 `token` 过期导致的失败请求存储起来（存储的是请求回调函数，resolve 状态）。**「理由：后续我们更新了 token 后，可以将存储的失败请求重新发起，以此来达到用户无感的体验」**
+
+##### **「补充：」**
+
+**「现象」**：在我过了几天登录平台的时候发现，`refreshToken`过期了，但是没有跳转到登录界面**「原因」**：
+1、当refreshToken过期失效后，后端返回的状态码也是 `401`
+2、发起的更新`token`的请求采用的也是处理后的`axios`，因此**「响应失败的拦截，对更新请求同样适用」**。
+**「问题：」**
+这样会造成，当refreshToken过期后，会出现停留在首页，无法跳转到登录页面。
+**「解决方法」**
+针对这种现象，我们需要完善一下`axios`中响应拦截的逻辑。
+
+```js
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    let {
+      data, config
+    } = error.response;
+    return new Promise((resolve, reject) => {
+      /**
+       * 判断当前请求失败
+       * 是否由 toekn 失效导致的
+       */
+      if (
+        data.statusCode === 401 &&
+        config.url !== '/api/token/refreshToken'
+      ) {
+        refreshToken(() => {
+          resolve(axiosInstance(config));
+        });
+      } else if (
+        data.statusCode === 401 &&
+        config.url === '/api/token/refreshToken'
+      ) {
+        /**
+         * 后端 更新 refreshToken 失效后
+         * 返回的状态码， 401
+         */
+        window.location.href = `${HOME_PAGE}/login`;
+      } else {
+        reject(error.response);
+      }
+    })
+  }
+)
+```
+
+#### 2、封装 refreshToken 逻辑
+
+**「要点：」**
+
+1. 存储由于`token`过期导致的失败的请求。
+2. 更新本地以及axios中头部的`token`。
+3. 当 `refreshToken` 刷新令牌也过期后，让用户重新登录。
+
+```js
+// 存储由于 token 过期导致 失败的请求
+let expiredRequestArr: any[] = [];
+
+/**
+ * 存储当前因为 token 失效导致发送失败的请求
+ */
+const saveErrorRequest = (expiredRequest: () => any) => {
+  expiredRequestArr.push(expiredRequest);
+}
+
+// 避免频繁发送更新 
+let firstRequre = true;
+/**
+ * 利用 refreshToken 更新当前使用的 token
+ */
+const updateTokenByRefreshToken = () => {
+  firstRequre = false;
+  axiosInstance.post(
+    '更新 token 的请求',
+  ).then(res => {
+    let {
+      refreshToken, accessToken
+    } = res.data;
+    // 更新本地的token
+    localStorage.setItem('accessToken', accessToken);
+    // 更新请求头中的 token
+    setAxiosHeader(accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+
+    /**
+     * 当获取了最新的 refreshToken, accessToken 后
+     * 重新发起之前失败的请求
+     */
+    expiredRequestArr.forEach(request => {
+      request();
+    })
+    expiredRequestArr = [];
+  }).catch(err => {
+    console.log('刷新 token 失败err', err);
+    /**
+     * 此时 refreshToken 也已经失效了
+     * 返回登录页，让用户重新进行登录操作
+     */
+    window.location.href = `${HOME_PAGE}/login`;
+  })
+}
+
+/**
+ * 更新当前已过期的 token
+ * @param expiredRequest 回调函数，返回由token过期导致失败的请求
+ */
+export const refreshToken = (expiredRequest: () => any) => {
+  saveErrorRequest(expiredRequest);
+  if (firstRequre) {
+    updateTokenByRefreshToken();
+  }
+}
+```
+
+##### **「补充：」**
+
+**「问题：」**
+1、怎么能保证当更新token后，在处理存储的过期请求时，此时没有过期请求还在存呢？；万一此时还在`expiredRequestArr`推失败的请求呢？
+**「解决方法」**我们需要调整一下更新 token的逻辑，确保当前由于过期失败的请求都接收到了，再更新token然后重新发起请求。
+
+### **「最终结果：」**
+
+```js
+// refreshToken.ts
+
+/**
+ * 功能：
+ *  用于实现无感刷新 token
+ */
+import { axiosInstance, setAxiosHeader } from "@/axios"
+import { CLIENT_ID, HOME_PAGE } from "@/systemInfo"
+
+// 存储由于 token 过期导致 失败的请求
+let expiredRequestArr: any[] = [];
+
+/**
+ * 存储当前因为 token 失效导致发送失败的请求
+ */
+const saveErrorRequest = (expiredRequest: () => any) => {
+  expiredRequestArr.push(expiredRequest);
+}
+
+/**
+ * 执行当前存储的由于过期导致失败的请求
+ */
+const againRequest = () => {
+  expiredRequestArr.forEach(request => {
+    request();
+  })
+  clearExpiredRequest();
+}
+
+/**
+ * 清空当前存储的过期请求
+ */
+export const clearExpiredRequest = () => {
+  expiredRequestArr = [];
+}
+
+/**
+ * 利用 refreshToken 更新当前使用的 token
+ */
+const updateTokenByRefreshToken = () => {
+  axiosInstance.post(
+    '更新请求url',
+    {
+      clientId: CLIENT_ID,
+      userName: localStorage.getItem('userName')
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': 'bearer ' + localStorage.getItem("refreshToken")
+      }
+    }
+  ).then(res => {
+    let {
+      refreshToken, accessToken
+    } = res.data;
+    // 更新本地的token
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    setAxiosHeader(accessToken);
+    /**
+     * 当获取了最新的 refreshToken, accessToken 后
+     * 重新发起之前失败的请求
+     */
+    againRequest();
+  }).catch(err => {
+    /**
+     * 此时 refreshToken 也已经失效了
+     * 返回登录页，让用户重新进行登录操作
+     */
+    window.location.href = `${HOME_PAGE}/login`;
+  })
+}
+
+let timer: any = null;
+/**
+ * 更新当前已过期的 token
+ * @param expiredRequest 回调函数，返回过期的请求
+ */
+export const refreshToken = (expiredRequest: () => any) => {
+  saveErrorRequest(expiredRequest);
+  // 保证再发起更新时，已经没有了过期请求要进行存储
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => {
+    updateTokenByRefreshToken();
+  }, 500);
+}
+```
+
+```js
+// 响应拦截 区分登录前
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    let {
+      data, config
+    } = error.response;
+    return new Promise((resolve, reject) => {
+      /**
+       * 判断当前请求失败
+       * 是否由 toekn 失效导致的
+       */
+      if (
+        data.statusCode === 401 &&
+        config.url !== '/api/token/refreshToken'
+      ) {
+        refreshToken(() => {
+          resolve(axiosInstance(config));
+        });
+      } else if (
+        data.statusCode === 401 &&
+        config.url === '/api/token/refreshToken'
+      ) {
+        /**
+         * 后端 更新 refreshToken 失效后
+         * 返回的状态码， 401
+         */
+        clearExpiredRequest();
+        window.location.href = `${HOME_PAGE}/login`;
+      } else {
+        reject(error.response);
+      }
+    })
+  }
+)
 ```
 
