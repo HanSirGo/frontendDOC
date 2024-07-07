@@ -103,39 +103,26 @@ Day.js 还提供了许多其他功能，如插件支持、本地化等。要了�
 
 在 UTC 模式下，所有显示方法将会显示 UTC 时间而非本地时间。
 
-- 
-- 
-- 
-- 
-
 ```
-// 默认是当地时间dayjs().format() //2019-03-06T08:00:00+08:00// UTC 时间dayjs.utc().format() // 2019-03-06T00:00:00Z
+// 默认是当地时间
+dayjs().format() //2019-03-06T08:00:00+08:00// UTC 时间
+dayjs.utc().format() // 2019-03-06T00:00:00Z
 ```
-
-
 
 现在，你可以使用 Day.js 的 utc() 方法处理 UTC 时间，然后使用 tz() 方法将其转换为不同地区的时间。例如，将 UTC 时间转换为纽约时间：
 
-- 
-- 
-- 
-
+```js
+const utcTime = '2021-09-01T12:00:00Z'; // UTC 时间
+const newYorkTime = dayjs.utc(utcTime).tz('America/New_York').format();
+console.log('New York Time:', newYorkTime);
 ```
-const utcTime = '2021-09-01T12:00:00Z'; // UTC 时间const newYorkTime = dayjs.utc(utcTime).tz('America/New_York').format();console.log('New York Time:', newYorkTime);
-```
-
-
 
 要将 UTC 时间转换为其他地区的时间，只需将 tz() 方法中的时区参数更改为所需的时区。例如，将 UTC 时间转换为东京时间：
 
-- 
-- 
-
+```js
+const tokyoTime = dayjs.utc(utcTime).tz('Asia/Tokyo').format();
+console.log('Tokyo Time:', tokyoTime);
 ```
-const tokyoTime = dayjs.utc(utcTime).tz('Asia/Tokyo').format();console.log('Tokyo Time:', tokyoTime);
-```
-
-
 
 请注意，时区字符串（如 'America/New_York' 和 'Asia/Tokyo'）是基于 IANA 时区数据库的。你可以在这里找到完整的时区列表：https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
@@ -208,8 +195,6 @@ ss：2 位数的秒，例如 00、01、59 等。
 A：大写的上午/下午标识符，例如 AM、PM。
 
 a：小写的上午/下午标识符，例如 am、pm。
-
-
 
 这些仅是 Day.js 中可用的一些格式选项。更多格式选项和详细信息，请参阅 Day.js 文档：https://day.js.org/docs/en/display/format
 
