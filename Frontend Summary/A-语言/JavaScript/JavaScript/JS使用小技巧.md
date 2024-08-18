@@ -568,4 +568,249 @@ for (let key in obj) {
 }
 ```
 
-  
+## **变量交换**
+
+```
+let a = 1,
+  b = 2;
+
+[a, b] = [b, a];
+
+// 输出：a = 2，b = 1
+```
+
+## **对象解构，数据访问更便捷**
+
+```
+const { name, age } = { name: "Riki", age: 22 };
+
+// 输出：name = 'Riki', age = 22
+```
+
+## **克隆对象**
+
+> 当然这里是浅拷贝
+
+```
+const Obj = { name: "Riki", age: 22 };
+const clonedObj = { ...Obj };
+
+// 输出：clonedObj = {name: 'Riki', age: 22}
+```
+
+## **合并对象**
+
+```
+const obj1 = { name: "Riki" };
+const obj2 = { age: 22 };
+
+const mergedObj = { ...obj1, ...obj2 };
+
+// 输出：mergedObj = {name: 'Riki', age: 22}
+```
+
+## **清理数组中的空值**
+
+```
+const arr = [0, 1, false, 2, "", 3];
+
+const cleanedArray = arr.filter(Boolean);
+
+// 输出：cleanedArray = [1, 2, 3]
+```
+
+## **将 NodeList 转换为数组**
+
+```
+const nodesArray = [...document.querySelectorAll("div")];
+// 或者
+const nodesArray = Array.form(document.querySelectorAll("div"));
+```
+
+## **检查数组是否符合特定条件**
+
+```
+const arr = [1, 2, 3, -1, 4];
+
+// 检查数组中是否有一项符合预期
+const hasNegativeNumbers = arr.some((num) => num < 0);
+// 输出：hasNegativeNumbers = true
+
+// 检查数组中是否所有项符合预期
+const allPositive = arr.every((num) => num > 0);
+//输出：allPositive = false
+```
+
+## **将文本复制到剪贴板**
+
+```
+navigator.clipboard.writeText("要复制的文本");
+```
+
+## **数组去重复**
+
+```
+const arr = [1, 2, 2, 3, 4, 4, 5];
+const unique = [...new Set(arr)];
+```
+
+## **查找数组的交集**
+
+```
+const arr1 = [1, 2, 3, 4];
+const arr2 = [2, 4, 6, 8];
+
+const intersection = arr1.filter((value) => arr2.includes(value));
+
+// 输出：intersection = [2, 4]
+```
+
+## **数组值的总和**
+
+```
+const arr = [1, 2, 3, 4];
+
+const sum = arr.reduce((total, value) => total + value, 0);
+// 输出：sum = 10
+```
+
+## **条件对象属性**
+
+```
+const condition = true;
+const value = "Hello World";
+
+const newObject = { ...(condition && { key: value }) };
+// 输出：newObject = { key: 'Hello World' }
+```
+
+## **动态对象属性**
+
+```
+const dynamicKey = "name";
+const value = "Riki Doe";
+
+const obj = { [dynamicKey]: value };
+// 输出：obj = { name: 'Riki Doe' }
+```
+
+## **在线状态检查器**
+
+```
+const isOnline = navigator.onLine ? "Online" : "Offline";
+// 输出：isOnline = 'Online'
+```
+
+## **离开页面前确认**
+
+```
+window.onbeforeunload = () => "Are you sure you want to leave?";
+```
+
+## **按键计算对象值之和**
+
+```
+const arrayOfObjects = [{ x: 1 }, { x: 2 }, { x: 3 }];
+
+const sumBy = (arr, key) => arr.reduce((acc, obj) => acc + obj[key], 0);
+
+sumBy(arrayOfObjects, "x");
+
+// 输出：6
+```
+
+## **将 query string 解析为对象**
+
+```
+const query = "name=Riki&age=30";
+
+const parseQuery = (query) =>Object.fromEntries(new URLSearchParams(query));
+
+// 输出：parseQuery = { name: 'Riki', age: '30' }
+```
+
+## **将秒转换为时间字符串**
+
+```
+const seconds = 3661;
+
+const toTimeString = (seconds) =>newDate(seconds * 1000).toISOString().substr(11, 8);
+
+toTimeString(seconds);
+// 输出：'01:01:01'
+```
+
+## **对象中的最大值**
+
+```
+const scores = { math: 95, science: 99, english: 88 };
+
+const maxObjectValue = (obj) =>Math.max(...Object.values(obj));
+
+maxObjectValue(scores);
+// 输出：99
+```
+
+## **检查对象是否包含值**
+
+```
+const person = { name: "John", age: 30 };
+
+const hasValue = (obj, value) =>Object.values(obj).includes(value);
+
+hasValue(person, 30);
+// 输出：true
+```
+
+## **有条件的修改项**
+
+```
+const scores = [45, 75, 62, 55, 90];
+
+const updatedScores = scores.map((score) => (score < 60 ? score + 20 : score));
+// 输出：updatedScores = [65, 75, 62, 75, 90]
+```
+
+## **生成数组**
+
+```
+const range = Array.from({ length: 5 }, (_, i) => i + 1);
+// 输出：range = [1, 2, 3, 4, 5]
+```
+
+## **超时请求**
+
+```
+const timeout = (promise, ms) =>Promise.race([promise, newPromise((_, reject) => setTimeout(() => reject(newError("Timeout")), ms))]);
+
+timeout(fetch("https://api.riki.wang"), 5000)
+  .then(() =>"handleResponse")
+  .catch(() =>"handleError");
+
+// 如果在指定的毫秒数内未返回，则拒绝并显示“超时”错误
+```
+
+## **提取文件扩展名**
+
+```
+const fileName = "example.png";
+
+const getFileExtension = (str) => str.slice(((str.lastIndexOf(".") - 1) >>> 0) + 2);
+// 输出：getFileExtension = 'png'
+```
+
+## **检查 tab 是否激活**
+
+```
+const isTabFocused = () =>document.hasFocus();
+```
+
+## **切换元素的类名**
+
+```
+const element = document.querySelector(".my-element");
+
+const toggleClass = (el, className) => el.classList.toggle(className);
+
+toggleClass(element, "active");
+```

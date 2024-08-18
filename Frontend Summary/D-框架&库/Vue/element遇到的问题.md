@@ -267,3 +267,34 @@ const rules = reactive({
 # 将div设置为行内元素 span 等或 template
 ```
 
+## MessageBox 弹窗
+
+##### 修改弹窗按钮样式
+
+```js
+# element-ui
+
+this.$alert('content','title',{
+    confirmButtonText: '确定',
+    showClose: false,
+    showCancelButton: false,
+    closeOnClickModal: false,
+    confirmButtonClass: 'confirmButtonClassName',
+    callback: (action)=>{}
+})
+
+<style scoped>
+	.confirmButtonClassName {
+        background-color: #10ab7c !important;
+    }
+</style>
+# 注意 样式写到 带有scoped 属性的style标签中，样式不生效。（原因可能是 scoped 限定了样式只能在当前组件生效，而 弹窗组件 编译后不属于该组件，所以不生效）
+// 正确写法 在不携带属性scoped的style标签中 修改样式
+<style>
+	.confirmButtonClassName {
+        background-color: #10ab7c !important;
+    }
+</style>
+
+```
+

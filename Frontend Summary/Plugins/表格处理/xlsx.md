@@ -173,7 +173,7 @@ import XLSX from "xlsx"; // vue2可用此引入
 ```javascript
 const workbook = XLSX.utils.book_new()
 const worksheet = XLSX.utils.json_to_sheet(value)
-XLSX.utils.book_append_sheet(workbook,worksheet,'shell')
+XLSX.utils.book_append_sheet(workbook,worksheet,'sheet')
 XLSX.witeFile(workbook,'xxx.xlsx')
 ```
 例子
@@ -233,15 +233,25 @@ export function saveFile (blob:Blob,name:string) {
 	dom.parentNode?.removeChild(dom)
 	window.URL.revokeObjectURL(url)
 }
+
+# window.URL.createObjectURL() 可以直接生成blob:开头的链接，该链接产生于流浪器端，不会占用服务器资源。
+# window.URL.createObjectURL()在IE10，IE11以及Microsoft Edge中生成的blob:链接，你不能把它加到一个<a>节点上，也不能直接在浏览器地址栏打开访问，并且得到 “Error: 拒绝访问。”错误。open links made by window.URL.createObjectURLin IE/Edge 这样的提问到处都是，iE9根本不支持window.URL.createObjectURL()创建Blob URLs就更惨了。
+# Microsoft Internet Explorer Edge 和高大上的Google Chrome / Mozilla Firefox对于window.URL.createObjectURL()创建blob:链接形式不一样，分别在微软浏览器和标准浏览器中运行以下代码，得到两种Blob链接形式：
+# 1. 第一种为Chrome和Firefox生成的带有当前域名的标准blob:链接形式
+# 2. 第二种为Microsoft IE和Microsoft Edge生成的不带域名的blob:链接
+# 可以通过window.URL.createObjectURL(new Blob()).indexOf(location.host)<0来检测是否是IE或者早期生成Object URL不带域名的Edge。如果表达式返回true则是IE或Edge旧版本。
+
+//  所以应该这么区分：
+if('msSaveOrOpenBlob' in navigator) {
+    window.navigator.msSaveOrOpenBlob(new Blob())
+} else {
+    saveFile(blob)
+}
 ```
 
 
 
-
-
 ------
-
-
 
 #### 1、引入依赖
 
