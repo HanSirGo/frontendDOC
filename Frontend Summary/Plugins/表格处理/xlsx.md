@@ -7,7 +7,8 @@ npm install xlsx
 
 # 导入依赖：在你的代码中导入xlsx库。
 
-import XLSX from 'xlsx';
+import XLSX from 'xlsx'; // xlsx@0.17.0
+import * as XLSX from 'xlsx' // xlsx@0.18.5
 ```
 
 ```js
@@ -219,6 +220,9 @@ xxx().then(res=>{
 ```
 
 在接口的成功返回中调用下面的函数就可以了。
+
+#### 前端自己填写filename
+
 ```javascript
 // blob 是后端返回的文件流
 // name 文件的名字
@@ -246,6 +250,45 @@ if('msSaveOrOpenBlob' in navigator) {
     window.navigator.msSaveOrOpenBlob(new Blob())
 } else {
     saveFile(blob)
+}
+```
+
+#### 前端获取后端filename
+
+```js
+// 后端的filename放在响应头的content-disposition中，需要后端配置，让流浪器暴露给前端
+
+function download (response,defaultname) {
+    const { data, header } = response
+    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+    const filenameArray = filenameRegex.exec(headers['content-disposition'])||[]
+    const filename = filenameArray[1]|| defaultname
+    const dom = document.createElement('a')
+	const url = window.URL.createObjectURL(data)
+	dom.herf = url
+	dom.download = docodeURI(filename)
+	dom.style.display = 'none'
+	document.body.appendChild(dom)
+	dom.click()
+	dom.parentNode&&dom.parentNode.removeChild(dom)
+	window.URL.revokeObjectURL(url)
+}
+```
+
+#### 获取后端接口错误时的返回的错误信息
+
+> 因为下载接口使用 responseType: 'blob' 来接收信息，所有，接口报错时，错误信息也会转为blob类型，这样就需要我们读取出来，把message展示出来
+
+```js
+function readBlobMessage (data) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.result
+      // 获取text中的message，并用弹窗展示
+      // ......
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsText(data);
 }
 ```
 
@@ -373,8 +416,6 @@ openDownload(url, saveName) {
 ```
 
 # vue3中如何使用xlsx插件
-
-- - 
 
 ## 1. vue3中如何使用xlsx插件
 

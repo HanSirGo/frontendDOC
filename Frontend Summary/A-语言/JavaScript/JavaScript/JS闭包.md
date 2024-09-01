@@ -201,3 +201,227 @@ myFunction = null; // 解除引用
 **结束**
 
 闭包可以通过让函数记住已经计算过的数据，避免重复计算，从而提高效率。它还可以通过将某些变量保留在函数实例内，使代码更易于理解和维护。这意味着函数更加专注，并且你不必每次使用它们时都传入相同的信息。
+
+# JavaScript 中的闭包陷阱案发现场
+
+## **setInterval中的闭包**
+
+### **案发现场**
+
+先来看一段代码：
+
+```
+import { useState } from 'react';
+import './App.css';
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  const handleClick = () => {
+    setInterval(() => {
+      setCount(count + 1);
+      console.log(count);
+    }, 1000);
+  };
+
+  return (
+    <>
+    <button onClick={handleClick}>click button</button>
+    <text>{count}</text>
+    </>
+  );
+}
+
+export default App;
+```
+
+这段代码的逻辑很简单，点击`button`，触发`handleClick`，然后启动了一个定时器，每1000ms让`count`的值+1。
+然后我们观察一下打印的`count`和页面渲染的`count`值是如何变化的？你猜猜结果是什么？
+![1724492745969](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724492745969.png)
+
+结果是打印的一直是0，页面输出的一直是1。为什么会是这样呢？不应该是打印和页面输出的都是count++以后的值吗？
+
+### **案情分析**
+
+我们来分析一下原因。
+你这段代码中，`count` 的打印值一直不变化是因为 `setInterval` 内部的 `count` 值是在首次调用 `handleClick` 时被捕获的，而不会随着状态更新而改变。这是因为 JavaScript 闭包的特性。
+
+- 当你首次点击按钮时，`handleClick` 函数被调用，`setInterval` 开始执行。
+- `setInterval` 内部的 `count` 值是 `handleClick` 被调用时的值（初始值为 0），而且由于闭包的关系，这个 `count` 值不会随着组件的重新渲染而更新。
+- 所以，虽然 `setCount` 会更新 `count` 的状态，但是 `setInterval` 内部依然引用的是最初的 `count` 值，并且这个值不会随着状态变化而更新。
+
+知道了缘由，如何解决上述问题呢？
+
+### **结案**
+
+我们可以使用函数形式的 `setCount` 来解决这个问题。
+
+> 大家可以参考react官方示例函数形式的用法：https://react.dev/reference/react/useState#examples-updater
+
+这样修改以后，函数形式的 `setCount` 可以获取到最新的状态值：
+
+```
+const handleClick = () => {
+  setInterval(() => {
+    setCount(prevCount => {
+      console.log(prevCount + 1);
+      return prevCount + 1;
+    });
+  }, 1000);
+};
+```
+
+- `setCount` 的函数形式会接收当前状态的前一个值 `prevCount`，并返回更新后的值。
+- 这样，`count` 的值在每次更新时都会递增并且正确输出。
+
+通过这种方式，`console.log(prevCount + 1)` 将每秒打印出更新后的值，并且页面渲染的count也是更新后的值。
+
+![1724492792428](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724492792428.png)
+
+> 源代码地址：https://stackblitz.com/edit/vitejs-vite-nsxni1?file=src%2FApp.tsx
+
+
+
+## **其他作案现场**
+
+在其他的一些闭包使用场景中，闭包陷阱经常存在，由于变量的作用域、生命周期等原因，导致代码行为与预期不一致的情况。
+
+### **1. \**循环中的闭包\****
+
+在循环中创建闭包，闭包中的变量总是引用循环中的最后一个值，而不是当时循环的值。
+
+```
+function createButtons() {
+  const buttons = [];
+  for (var i = 0; i < 5; i++) {
+    buttons.push(function() {
+      console.log('Button', i);
+    });
+  }
+  return buttons;
+}
+
+const buttons = createButtons();
+buttons[0](); // 打印 5，而不是 0
+buttons[1](); // 打印 5，而不是 1
+```
+
+在上述代码中，`i` 是使用 `var` 声明的，它在整个函数作用域内是共享的。当循环结束时，`i` 的值变为 5，闭包引用的也是这个值。因此，无论点击哪个按钮，都会打印 5。
+解决方案：使用 `let` 替代 `var`，或者使用立即执行函数（IIFE）。
+
+```
+// 使用let
+function createButtons() {
+  const buttons = [];
+  for (let i = 0; i < 5; i++) {
+    buttons.push(function() {
+      console.log('Button', i);
+    });
+  }
+  return buttons;
+}
+
+
+// 使用 IIFE：
+function createButtons() {
+  const buttons = [];
+  for (var i = 0; i < 5; i++) {
+    (function(i) {
+      buttons.push(function() {
+        console.log('Button', i);
+      });
+    })(i);
+  }
+  return buttons;
+}
+```
+
+
+
+### **2. \**异步操作中的闭包\****
+
+场景：在异步操作中使用闭包时，闭包捕获的变量值可能与预期不同，导致错误的结果。
+示例代码：
+
+```
+function fetchData() {
+  for (var i = 0; i < 3; i++) {
+    setTimeout(function() {
+      console.log('Fetching data for index:', i);
+    }, 1000);
+  }
+}
+
+fetchData();
+// 1秒后连续打印：Fetching data for index: 3
+//               Fetching data for index: 3
+//               Fetching data for index: 3
+```
+
+原因：因为 `i` 是用 `var` 声明的，所以它在每次循环中是同一个变量。在 `setTimeout` 执行时，`i` 的值已经是 3。
+解决方案：同样可以使用 `let` 或 IIFE。
+使用 `let`：
+
+```
+function fetchData() {
+  for (let i = 0; i < 3; i++) {
+    setTimeout(function() {
+      console.log('Fetching data for index:', i);
+    }, 1000);
+  }
+}
+```
+
+
+
+### **3. \**函数返回值中的闭包\****
+
+场景：当一个函数返回一个闭包时，该闭包引用的外部变量在函数调用后仍然存在。
+示例代码：
+
+```
+function createCounter() {
+  let count = 0;
+  return function() {
+    count++;
+    console.log('Count:', count);
+  };
+}
+
+const counter1 = createCounter();
+const counter2 = createCounter();
+
+counter1(); // Count: 1
+counter1(); // Count: 2
+counter2(); // Count: 1
+```
+
+原因：`count` 变量在 `createCounter` 函数作用域内，但闭包（返回的函数）仍然持有对 `count` 的引用。因此，每次调用 `counter1` 或 `counter2`，它们都会更新并打印各自的 `count` 值。
+解决方案：这是闭包的典型用法，不需要改变。但需小心管理好这些引用的生命周期，以防止意外内存泄漏或难以追踪的状态。
+
+### **4. \**嵌套函数中的闭包\****
+
+场景：嵌套函数中的闭包可能会导致变量意外共享，产生错误结果。
+示例代码：
+
+```
+function outer() {
+  let count = 0;
+  
+  function inner() {
+    console.log(count);
+  }
+  
+  count++;
+  return inner;
+}
+
+const fn = outer();
+fn(); // 打印 1
+```
+
+原因：`inner` 函数持有对 `outer` 函数作用域中 `count` 变量的引用。当 `outer` 函数返回后，`count` 的值仍然保存在 `inner` 的闭包中。
+
+## **总结**
+
+闭包是 JavaScript 中强大且常用的特性，但也容易导致陷阱。常见的闭包陷阱通常与变量的作用域、生命周期以及 JavaScript 的异步行为相关。理解这些场景并使用合适的方式（如 `let`、IIFE、函数式编程）来规避陷阱，可以帮助你写出更健壮的代码。

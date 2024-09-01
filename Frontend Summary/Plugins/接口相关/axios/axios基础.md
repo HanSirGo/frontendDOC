@@ -119,6 +119,12 @@ axios.patch(url[, data[, config]])
   },
 
    // `responseType` 表示服务器响应的数据类型，可以是 'arraybuffer', 'blob', 'document', 'json', 'text', 'stream'
+  // 'json': 默认，服务器响应会被解析成JavaScript对象
+  // 'arraybuffer': 服务器响应会被解析成一个ArrayBuffer对象，适合处理二进制数据，如文件下载
+  // 'text': 服务器响应会被解析成字符串
+  // 'document': 服务器响应会被解析成一个HTML文档
+  // 'stream': (仅限Node.js环境) 服务器响应会被处理成一个Stream对象，可以用来处理大文件或者边下载边处理的场景
+  // 'blob': (仅限浏览器环境) 服务器响应会被解析成一个Blob对象，适合文件处理，尤其是大文件或者需要存储到本地的情况
   responseType: 'json', // default
 
   // `responseEncoding` 表示用于解码响应的编码

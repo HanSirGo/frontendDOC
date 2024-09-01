@@ -57,7 +57,7 @@ export function download(filename: string, data: Blob): void {
 
 封装axios，这里面包含了大文件的下载，还有loading，当然你也可以把防抖，节流全部做进去，不过过度封装也会带来很多不必要的麻烦。
 
-```
+```js
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { Message } from "element-ui";
 import { jumpLogin, downloadFile } from "@/utils";
@@ -152,7 +152,7 @@ export const createAxiosByinterceptors = (
 
 utils里面的函数
 
-```
+```js
 src/utils/index.ts
 
 import { Message } from "element-ui";
@@ -290,7 +290,7 @@ fileUpload.onchange = (e)=>{
 
 现在我们写一下后端存储文件的代码，后端是express搭建的，直接用node ./server/index,js 就能启动，代码如下：
 
-```
+```js
 const express = require('express');
 const multer = require('multer');
 const app = express();
@@ -338,7 +338,7 @@ app.listen(port, () => {
 
 所以需要在请求的时候手动设置下才行，设置完以后，发送请求，后端才能识别出来，你发送的是form数据，然后用具体的方式对待你传过来的文件。
 
-```
+```js
 const fileUpload = document.getElementById("fileUpload")
 fileUpload.onchange = (e)=>{
   console.log(222222222222)

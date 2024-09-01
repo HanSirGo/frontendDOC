@@ -66,3 +66,21 @@ ping [ip] // 是否能连通当前的ip地址
 ![1723893547429](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1723893547429.png)
 
 ![1723893561824](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1723893561824.png)
+
+**ipconfig/release**
+
+这个操作相当于把我们的网络的网线拔掉重新插了一遍，也就是刷新了一下网络。
+
+![1725106701669](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725106701669.png)
+
+**ipconfig/renew**
+
+这个命令是帮助我们重新获取DHCP给的地址。
+
+![1725106737569](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725106737569.png)
+
+**ipconfig/flushdns**
+
+这个命令的作用是帮我们刷新本地的DNS解析缓存。
+
+![1725106763209](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725106763209.png)

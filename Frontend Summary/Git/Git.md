@@ -157,6 +157,29 @@ git config --list
 
 ![1712413075815](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712413075815.png)
 
+#### 查看单个配置
+
+你可以通过 git config <key> 来查看Git中当前某个键的值。
+
+```js
+$ git config user.name
+$ hys
+```
+
+#### 获取帮助
+
+```js
+# 查看Git命令的帮助页面
+$ git help <verb>
+$ git <verb> --help
+$ man git-<verb>
+
+# 例如：查看config命令的帮助信息
+$ git help config
+
+# 也可以人工帮助，可以试试Freenode IRC（irc.freenode.net）上的#git或#github频道
+```
+
 #### 设置别名
 
 git config 命令为我们提供了一种创建别名的方法，这种别名通常用于缩短现有的命令或者创建自定义命令。来看一个例子：
@@ -273,7 +296,7 @@ git checkout -- 文件名 还原成修改前的状态
 
 ```js
 git init // 命令用于初始化项目文件夹中的新存储库。
-// 本地初始化(初始化git环境), 这个会生成一个.git目录
+// 本地初始化(初始化git环境), 这个会生成一个.git子目录，这个子目录包含了构成Git仓库骨架的所有必须文件。但此时Git尚未跟踪项目中的任何文件。
 ```
 
 初始化之后，就会创建一个名为`.git`的新子文件夹，其中包含 Git 将用于跟踪项目更改的多个文件和更多子目录：
@@ -307,11 +330,41 @@ doc/**/*.pdf
 
 ##### Git status
 
+查看文件的状态
+
 ```js
 git status // 命令用于检查存储库的状态（例如未跟踪的文件和准备提交的更改） 暂存区的状态
+
+git status -s // 显示更简洁的状态信息
+
+# ??标记 未被跟踪的新文件
+# A标记 已暂存的新文件
+# M标记 已修改的文件
 ```
 
-##### Git查看提交
+git status 命令输出信息太过泛泛，你想知道修改的具体内容，而不仅仅是你更改了哪些文件，这时可以使用 git diff ，git diff 会显示出你具体添加和删除了那些行。git diff的输出是补丁（path）
+
+##### Git add
+
+```js
+git add // 让Git开始跟踪新的文件
+
+git add filename  # 将指定的文件添加到暂存区  
+git add path/     # 将指定的目录添加到暂存区  
+git add .         # 将当前目录所有内容(文件和文件夹)添加到暂存区    
+git add --all     # 将当前目录所有内容(文件和文件夹)添加到暂存区
+```
+
+##### Git rm
+
+```js
+# 将文件移出暂存区
+$ git rm --cached filenamed
+```
+
+
+
+##### Git查看提交日志
 
 ###### Git show
 
@@ -337,6 +390,8 @@ git log --oneline // 将每次commit提交,简化成一行
 
 ```js
 git diff // 命令用于检查当前工作目录和上次提交之间的差异。
+# 要查看尚未添加到暂存区的变更，直接输入不加参数的 git diff 命令
+# 将暂存的变更和上一次提交的内容进行比较 git diff --staged 或者 git diff --cached
 ```
 
 ##### Git pull
@@ -372,6 +427,19 @@ git reset --hard commitid // commitid之后的提交会消失
 git revert commitid
 ```
 
+##### Git reset
+
+```js
+如果你想要完全重做最新的提交，可以使用 git reset 命令。这将撤销你的提交，但不会影响你的工作目录。
+
+# 软重置（--soft）：重置提交，但保留更改在暂存区。
+# 混成重置（--mixed）：重置提交，保留更改在工作目录。
+# 硬重置（--hard）：重置提交，丢弃所有更改。
+
+# 撤销最后一次提交，更改保留在暂存区
+git reset --soft HEAD~1  
+```
+
 #### 分支
 
 ##### Git 创建分支
@@ -382,6 +450,9 @@ git checkout -b <local branchname> // 创建本地分支,并切换到本地分�
 git checkout -b <local branchname> <origin/branchname> // 创建本地分支,并切换到本地分支,并且这这种方法创建的本地分支会和远程分支建立映射关系
 
 git push -u origin <branch> // 将新建的本地分支推送到远程仓库，以在远程仓库添加这个分支
+    
+# 创建并切换到 XXX 分支
+$ git branch -M XXX
 ```
 
 ##### Git 切换分支
@@ -394,6 +465,12 @@ git checkout -b <local branchname> <origin/branchname> // 创建本地分支,并
 git switch 分支; git checkout 分支; // 切换分支
 
 git switch -c 分支; git checkout -b 分支 // 创建分支
+```
+
+##### Git 返回上游分支
+
+```
+$ git checkout -
 ```
 
 ##### Git 重命名分支
@@ -503,6 +580,22 @@ git merge 会让2个分支的提交按照提交时间进行排序，并且会把
 
 git reabse 将dev的当前提交复制到master的最新提交之后，会形成一个线性的分支树
 
+##### Git 合并远程分支
+
+```js
+$ git merge 远程分支名
+#代码冲突后，放弃或者退出流程：#放弃,回到操作前的样子，就像什么都没发生过
+$ gits cherry-pick --abort
+
+#退出,不回到操作前的样子,即保留已经 cherry-pick 成功的 commit，并退出 cherry-pick 流程：
+$ git cherry-pick --quit
+
+#删除本地已合并的分支：
+$ git branch -D [branchName]
+#删除远程分支:
+$ git push origin --delete [branchname]
+```
+
 ##### Git 删除分支
 
 ```js
@@ -556,9 +649,12 @@ $ git branch -a  // 查看所有分支:本地&远程
 $ git branch -r  // 查看所有分支:远程
 $ git branch // 罗列分支,该命令可以列出项目所有的本地分支，显示绿色的分支就是当前分支
 
-查看不到远程dev分支时，可以通过命令：
+# 查看不到远程dev分支时，可以通过命令：
 $ git fetch  // 进行刷新，然后再通过 
 $ git branch -a   // 就可以看到远程分支了。
+
+# 更新远程分支
+git fetch origin或者git remote update origin --prune
 ```
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1712413232226.png" alt="1712413232226" style="zoom:33%;" />
@@ -731,6 +827,8 @@ git stash pop // 与apply类似,但它会在应用stash后立即将其从stash�
 git stash pop [<stash@{n}>] // 删除指定的stash,不指定则删除最近的stash
 git stash apply --index 或者 git stash pop --index // 如果stash包含索引修改(即暂存区的更改),这个选项会使Git尝试将这些更改精确地应用回暂存区,而不仅仅是工作目录
 git stash show [-p | --patch] [<stash@{n}>] //显示指定stash包含的更改详情,如果不指定stash编号,则默认显示最近的stash.加上-p或者--patch参数可以看到差异补丁格式的详细内容
+                               
+git stash drop  // 删除最近的一次stash
 ```
 
 ##### Git提交本地仓库
@@ -746,6 +844,16 @@ git commit --amend -m <message>
 
 git add .
 git commit --amend --no-edit
+
+# 将暂存区的内容提交到本地仓库 （yarn lint:fix   处理eslint格式）$ git commit -m ''
+build:用于修改项目构建系统，例如修改依赖库、外部接口或者升级Node 版本等;
+chore:用于对非业务性代码进行修改，例如修改构建流程或者工具配置等;
+ci: 用于修改持续集成流程，例如修改Travis、Jenkins等工作流配置;
+docs:用于修改文档，例如修改README 文件、API 文档等;
+style: 用于修改代码的样式，例如调整缩进、空格、空行等;
+refactor:用于重构代码，例如修改代码结构、变量名、函数名等但不修改功能逻辑;
+perf: 用于优化性能，例如提升代码的性能、减少内存占用等;
+test: 用于修改测试用例，例如添加、删除、修改代码的测试用例等。
 ```
 
 ##### Git提交信息(commit message)写错了
@@ -843,6 +951,9 @@ $ git commit --amend --only -m 'xxxxxxx'
 ```js
 # 提交到本地仓库
 git commit --amend // 弹出一个操作框(需要会点基本的vim知识: 我们输入i 进行对commit的修改,当我们改完后输入 esc 表示改完了,在输入 :wq 就可以保存了)
+# 如果你想要修改最新的提交，并且这个提交还没有被推送，你可以使用 git commit --amend 命令。这将允许你修改最后一次提交的信息和内容。git add <修改的文件>
+# git commit --amend
+# 这将打开一个编辑器，让你修改提交信息。如果你没有添加新的更改，你可以简单地保存并关闭编辑器。
 ```
 
 ##### Git合并多个commit
@@ -1183,6 +1294,13 @@ git push -u origin <本地分支名>
 
 由于远程库是空的，第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令为git push。
 
+```js
+$ git push -u origin 分支名    //一般新建仓库就有，直接复制   //git push -u origin master   主分支
+
+#如果返回：fatal: 远程 origin 已经存在。  此时只需要将远程配置删除，重新添加即可；
+$ git remote rm origin
+```
+
 #### 修改操作
 
 ##### Git 删除文件
@@ -1512,8 +1630,9 @@ git bisect reset
 
 可以使用以下命令来获取所有标签：
 
-```
+```js
 git tag
+git tag -l # 查看所有tag
 ```
 
 它会列出所有标签的名称：

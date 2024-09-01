@@ -290,6 +290,26 @@ console.log('debugger')
 
 ![1720268719249](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1720268719249.png)
 
+在NetWork中快速找到一个接口：
+
+1.在network的filter中输入接口名称实现快速查找
+
+![1724810139348](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724810139348.png)
+
+还可以再filter中输入请求方法，状态等：
+
+![1724810462135](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724810462135.png)
+
+2.根据response返回来查询接口
+
+![1724809612481](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724809612481.png)
+
+### Disable cache禁用缓存
+
+![1724920211062](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724920211062.png)
+
+当Disable cache勾选上的时候，Connection Start下会多出几行。（DNS Lookup、SSL...）
+
 ## 05、性能面板（Performance）
 
 先录制，后分析，分析网络、CPU、内存、渲染FPS帧率，用于定位、解决页面性能问题。
@@ -305,6 +325,96 @@ console.log('debugger')
 **🔸Lighthouse**，这个就很厉害了，对页面进行综合分析，包括性能、PWA（Progressive WebApp，渐进式Web应用）、SEO、无障碍访问等，分析完后产出报告，给出得分，还给出了页面改进建议。
 
 ![1720268756242](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1720268756242.png)
+
+## 常用Performance API：
+
+performance.timing可以获取网页运行过程中的每个时间点对应的时间戳（绝对时间，ms），但是即将废弃
+
+![1724921425200](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724921425200.png)
+
+performance.getEntries()，以对象数组的方式返回所有资源的数据，包括css、img、script、xmlhttprequest、link...
+
+![1724921944034](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724921944034.png)
+
+performance.getEntriesByType(:string),和上面的getEntries方法类似，不过是多了一层类型的筛选，常见性能类型：navigation（页面导航）、resource（资源加载）、paint（绘制指标）...
+
+```js
+/* 需要定时轮询，才能持续获取性能指标 */
+
+performance.getEntriesByType('navigation')
+performance.getEntriesByType('resource')
+performance.getEntriesByType('paint')
+```
+
+performance.getEntriesByName(name:string, type?: string) 同理，和上面方法类似，多了一层name的筛选，也可以传第二个参数类型的筛选
+
+```js
+/* 需要定时轮询，才能持续获取性能指标 */
+
+performance.getEntriesByName('http://xxx.com/developer/api/xxx')
+```
+
+performance.now() 返回当前时间与performance.timing.navigationStart的时间差
+
+```js
+console.log(performance.now())
+// 584333324.8371728
+```
+
+PerformanceObserver（观察者模式）主要用于监测性能度量事件
+
+```js
+# 写法一
+// 直接在 PerformanceObserver() 入参匿名回调函数，成功new了一个PerformanceObserver类，名为observer的对象
+var observer = new PerformanceObserver(function (list,obj){
+    var entries = list.getEntries()
+    for( var i=0;i<entries.length;i++){
+        // 处理navigation和resource事件
+    }
+    
+})
+// 调用observer对象的observe()方法
+observer.observe({
+    entryTypes: [ 'navigation', 'resource' ]
+})
+
+# 写法二
+// 预先声明回调函数 perf_observer
+function perf_observer(list, observer) {
+    // 处理navigation事件
+}
+// 再将其传入 PerformanceObserver()，成功new一个PerformanceObserver类，名为observer2的对象
+var observer2 = new PerformanceObserver(perf_observer)
+// 调用observer2对象的observe()方法
+observer2.observe({
+     entryTypes: [ 'navigation' ]
+})
+```
+
+实例化PerformanceObserver对象，observe方法的entryTypes主要性能类型有哪些？
+
+```js
+console.log(PerformanceObserver.supportenEntryTypes)
+/*
+	['element','event','first-input','largest-contentful-paint','layout-shift','longtask','mark','measure','navigation','paint','resource','visiblity-state'
+*/
+```
+
+| element                  | 元素加载时间，实例项是PerformanceElementTiming对象           |
+| ------------------------ | ------------------------------------------------------------ |
+| event                    | 事件延迟，实例项是PerformanceEventTiming对象                 |
+| first-input              | 用户第一次与网站交互（即点击链接、点击按钮或者使用自定义的javascript控件时），到浏览器实际能够响应该交互的时间，称之为First input delay-FID |
+| largest-contentful-paint | 屏幕上触发的最大绘制元素，实例项是LargestContentfulPaint对象 |
+| layout-shift             |                                                              |
+| longtask                 |                                                              |
+| mark                     |                                                              |
+| measure                  |                                                              |
+| navigation               |                                                              |
+| paint                    |                                                              |
+| resource                 |                                                              |
+| visiblity-state          |                                                              |
+
+
 
 ## 参考资料
 

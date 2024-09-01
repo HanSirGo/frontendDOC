@@ -147,6 +147,75 @@ const rules = reactive({
 })
 ```
 
+##### 阻止点击label触发表单控件的事件
+
+```js
+# 查询表单和新建表单有多个字段相同，所以做成一个公共的组件，出现问题的是查询和新建页面同时展示，点击新建的表单中的label，触发控件事件的却是查询页面，所以要 阻止点击label触发表单控件的事件
+
+# element-plus
+:deep(.el-form-item__label) {
+    pointer-events:none;
+}
+```
+
+##### DatePicker禁用日期
+
+```vue
+<template>
+...
+	<el-date-picker 
+     	type="date" 
+  		format="yyyy 年 MM 月 dd 日" 
+        value-format="yyyy-MM-dd"
+        placeholder="选择日期"
+        :picker-options="pickerOptions"
+    >
+    </el-date-picker>
+...
+</template>
+
+<script>
+export default {
+    props:['accountingDate'],
+    data(){
+        return {
+            pickerOptions:{
+                disabledDate(time){
+                    return time.getTime()<new Date(this.accountingDate).getTime()
+                    // 这样会报错，说 accountingDate not found
+                    // 我们可以使用 watch监听accountingDate，给pickerOptions重新赋值
+                }
+            }
+        }
+    }
+}
+</script>
+
+<script>
+export default {
+    props:['accountingDate'],
+    data(){
+        return {
+            pickerOptions:{ }
+        }
+    },
+    watch:{
+        accountingDate:{
+            handler(value){
+                if(value) {
+                   this.pickerOptions = { 
+                       disabledDate(time){
+                            return time.getTime()<new Date(this.accountingDate).getTime()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+</script>
+```
+
 ## Table
 
 ##### 修改表头样式

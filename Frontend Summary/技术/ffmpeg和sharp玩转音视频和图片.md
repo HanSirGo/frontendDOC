@@ -167,3 +167,101 @@ fs.readdir(sourceDirectory, (err, files) => {
 ![1710058806465](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1710058806465.png)
 
 水印也被加上去了。
+
+
+
+# FFmpeg
+
+FFmpeg 是一个强大的开源多媒体框架，能够处理音频、视频和其他多媒体文件的录制、转换和流式传输。它支持几乎所有的音频和视频格式，并提供了强大的命令行工具和库。
+
+### 基本使用
+
+以下是 FFmpeg 的一些基本使用示例：
+
+1、 **查看媒体文件信息**：
+
+```
+   ffmpeg -i input.mp4
+```
+
+2、 **转换视频格式**：将 MP4 文件转换为 AVI 格式：
+
+```
+   ffmpeg -i input.mp4 output.avi
+```
+
+3、 **提取音频**：从视频中提取音频并保存为 MP3 格式：
+
+```
+   ffmpeg -i input.mp4 -q:a 0 -map a output.mp3
+```
+
+4、 **压缩视频**：将视频压缩为较小的文件：
+
+```
+   ffmpeg -i input.mp4 -vcodec libx264 -crf 23 output.mp4
+```
+
+5、 **剪切视频**：从视频中提取特定时间段：
+
+```
+   ffmpeg -i input.mp4 -ss 00:00:30 -to 00:01:00 -c copy output.mp4
+```
+
+6、 **合并视频**：使用文件列表合并多个视频文件：
+
+```
+ # 创建一个文件 list.txt，内容如下：   # file 'file1.mp4'   # file 'file2.mp4'   ffmpeg -f concat -safe 0 -i list.txt -c copy output.mp4
+```
+
+7、 **添加水印**：在视频上添加图片水印：
+
+```
+   ffmpeg -i input.mp4 -i watermark.png -filter_complex "overlay=10:10" output.mp4
+```
+
+8、 **转换为 GIF**：将视频转换为 GIF 动画：
+
+```
+   ffmpeg -i input.mp4 -vf "fps=10,scale=320:-1:flags=lanczos" -c:v gif output.gif
+```
+
+### 常用参数说明
+
+•`-i`：指定输入文件。•`-c`：指定编解码器。•`-vf`：应用视频过滤器。•`-q:a`：音频质量（0 为最佳质量，最高为 51）。•`-ss` 和 `-to`：指定剪切的起始和结束时间。•`-f`：指定格式。
+
+### 安装 FFmpeg
+
+在不同操作系统上安装 FFmpeg 的方法：
+
+•**Windows**：可以从 FFmpeg 官网[1] 下载预编译的二进制文件，解压后添加到系统 PATH。•**macOS**：使用 Homebrew 安装：
+
+```
+brew install ffmpeg
+```
+
+•**Linux**：使用包管理器安装（如 apt、yum 等）：
+
+```
+sudo apt update
+sudo apt install ffmpeg
+```
+
+### 结论
+
+FFmpeg 是一个功能强大的工具，适用于各种多媒体处理任务。通过掌握基本命令和参数，用户可以高效地处理音视频文件。
+
+如果你不喜欢命令方式处理文件，那么推荐大家使用 EZGIF 网站，也同样可以处理 GIF 文件。
+
+### EZGIF
+
+EZGIF[2] 是一个在线工具网站，专注于 GIF 动画的创建和编辑。它提供了一系列功能，允许用户轻松地处理 GIF 文件。以下是 EZGIF 的主要特点和功能：
+
+1.**GIF 创建**：用户可以通过上传图片或视频文件来创建 GIF 动画。支持多种格式的图片，如 JPG、PNG、WEBP 等。2.**GIF 编辑**：提供多种编辑功能，包括裁剪、调整大小、旋转、添加文本、调整速度等。用户可以对现有的 GIF 进行修改和优化。3.**GIF 转换**：可以将视频文件（如 MP4、WEBM 等）转换为 GIF，或将 GIF 转换为其他格式的图片。4.**GIF 压缩**：提供压缩工具，帮助用户减小 GIF 文件的大小，以便于分享和存储。5.**GIF 分割和合并**：用户可以将 GIF 动画分割成单独的帧，或将多个 GIF 合并为一个。6.**无水印**：EZGIF 提供的工具通常不带水印，用户可以自由使用。7.**简单易用**：界面直观，操作简单，适合各种水平的用户。
+
+总的来说，EZGIF 是一个功能强大且易于使用的在线工具，适合需要处理 GIF 动画的用户。
+
+### References
+
+`[1]` FFmpeg 官网: *https://ffmpeg.org/download.html*
+`[2]` EZGIF: *https://ezgif.com/*

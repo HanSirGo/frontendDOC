@@ -58,25 +58,18 @@ vue add 除了会 npm install 之外，还会帮你配置好一个范例文件�
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps34.jpg) 
 
+```bash
 .git 链接的是尤雨溪的仓库，删除 
-
 node_modules 存放第三方包的目录 
-
 public 站点目录 
-
 src 开发目录 
-
 .gitignore git忽视的配置 
-
 babel.config.js 高级语法降级的配置 
-
 package.json 包管理文件 
-
 package-lock.json 对包的版本进行锁定 
-
 README.md  
-
 vue.config.js 项目配置 
+```
 
 ##### (1) **Public/asset**
 
@@ -84,131 +77,82 @@ vue.config.js 项目配置
 
 ##### (2) **Package.json项目依赖**
 
+```json
 {
-
   "name": "ruoyi",
-
   "version": "3.8.1",
-
   "description": "东兴市智慧化管理平台",
-
   "author": "新助力",
-
   "license": "MIT",
-
   "scripts": {
-
 ​    "dev": "vue-cli-service serve",
-
 ​    "build:prod": "vue-cli-service build",
-
 ​    "build:stage": "vue-cli-service build --mode staging",
-
 ​    "preview": "node build/index.js --preview",
-
 ​    "lint": "eslint --ext .js,.vue src"
-
   },
-
   "husky": { },
-
   "lint-staged": { },
-
   "keywords": [  ],
-
   "repository": { },
-
   "dependencies": { },  //生产环境 -S --save
-
   "devDependencies": { }, //开发环境 -D --dev
-
   "engines": { },
-
   "browserslist": [ ]
-
 }
 
- 
-
-Script-----脚本命令：
-
-npm run xxx 运行指令xxx;
-
-如npm run dev 运行的就是 "vue-cli-service serve"
-
---mode 指 模式
-
-Build 打包 不同的模式 后文件内容是不同的，生产模式打包，没有注释等
+// Script-----脚本命令：
+// npm run xxx 运行指令xxx;
+// 如npm run dev 运行的就是 "vue-cli-service serve"
+// --mode 指 模式
+// Build 打包 不同的模式 后文件内容是不同的，生产模式打包，没有注释等
+```
 
 **Ps：**
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps36.png)
 
+```json
+{
  "husky": {
-
 ​    "hooks": {
-
 ​      "pre-commit": "lint-staged"
-
 ​    }
-
   },
 
- 
-
 "lint-staged": {
-
 ​    "src/**/*.{js,vue}": [
-
 ​      "eslint --fix",
-
 ​      "git add"
-
 ​    ]
-
   },
 
 "keywords": [
-
 ​    "vue",
-
 ​    "admin",
-
 ​    "dashboard",
-
 ​    "element-ui",
-
 ​    "boilerplate",
-
 ​    "admin-template",
-
 ​    "management-system"
-
   ],
 
 "repository": {
-
 ​    "type": "git",
-
 ​    "url": "https://gitee.com/y_project/RuoYi-Vue.git"
-
   },
 
 "engines": {
-
 ​    "node": ">=8.9",
-
 ​    "npm": ">= 3.0.0"
-
   },
 
 "browserslist": [
-
 ​    "> 1%",
-
 ​    "last 2 versions"
-
   ]
+}
+```
 
  
 
@@ -228,77 +172,68 @@ package.json文件只能锁定大版本，也就是版本号的第一位，并�
 
 ##### (4) **package-lock.json与package.json区别**
 
-package.json 
-
- 
+```js
+# package.json 
 
 生成方式：执行 npm init 命令。
-
 主要作用：描述项目及项目所依赖的模块信息。
 
- 
-
- 
-
-package-lock.json  锁定版本，防止小版本熬制错误
-
- 
+# package-lock.json  锁定版本，防止小版本熬制错误
 
 生成方式：从 npm 5 版本之后只要使用 npm install 命令下载，就会自动生成 package-lock.json 文件。
+```
+
+> **主要作用：**
+>
+> 1）描述 node_modules 文件中所有模块的版本信息，模块来源及依赖的小版本信息。
+>
+> 2）当版本升级，使用 npm install 命令时，会安装 package.json 中指定的大版本的最新版本。
+>
+> 如 package.json 中指定版本"dependencies": { "webpack": "^2.0.0" }，
+>
+> 则 package-lock.json 会按照 {"webpack": "2.7.0"} 版本升级。
+>
+> 在保证大版本号前提下的最新版本。
+>
+> webpack "2.7.0" 是 "2.x.x" 的最高版本。 
 
  
 
-主要作用：
-
-1）描述 node_modules 文件中所有模块的版本信息，模块来源及依赖的小版本信息。
-
-2）当版本升级，使用 npm install 命令时，会安装 package.json 中指定的大版本的最新版本。
-
-如 package.json 中指定版本"dependencies": { "webpack": "^2.0.0" }，
-
-则 package-lock.json 会按照 {"webpack": "2.7.0"} 版本升级。
-
-在保证大版本号前提下的最新版本。
-
-webpack "2.7.0" 是 "2.x.x" 的最高版本。
-
- 
-
-区别：
-
-当项目中已有 package-lock.json 文件，
-
-在安装项目依赖时，将以该文件为主进行解析安装指定版本依赖包，
-
-而不是使用 package.json 来解析和安装模块。
-
-因为 package-lock 为每个模块及其每个依赖项指定了版本，位置和完整性哈希，
-
-所以它每次创建的安装都是相同的。
-
-无论你使用什么设备，或者将来安装它都无关紧要，每次都应该给你相同的结果。
+> **区别：**
+>
+> 当项目中已有 package-lock.json 文件，
+>
+> 在安装项目依赖时，将以该文件为主进行解析安装指定版本依赖包，
+>
+> 而不是使用 package.json 来解析和安装模块。
+>
+> 因为 package-lock 为每个模块及其每个依赖项指定了版本，位置和完整性哈希，
+>
+> 所以它每次创建的安装都是相同的。
+>
+> 无论你使用什么设备，或者将来安装它都无关紧要，每次都应该给你相同的结果。
+>
 
  
 
-注意 cnpm 不支持 package-lock
-
-使用 cnpm install 时候，并不会生成 package-lock.json 文件。
-
-cnpm install 的时候，就算你项目中有 package-lock.json 文件，cnpm 也不会识别，
-
-仍会根据 package.json 来安装。所以这就是为什么之前你用 npm 安装产生了 package-lock.json，
-
-后面的人用 cnpm 来安装，可能会跟你安装的依赖包不一致。
-
- 
-
-因此，尽量不要直接使用 cnpm install 安装项目依赖包。
-
-但是为了解决直接使用 npm install 速度慢的问题，**可以设置 npm 代理解决**。
-
- 
-
-https://blog.csdn.net/qianyu6200430/article/details
+> **注意 cnpm 不支持 package-lock**
+>
+> 使用 cnpm install 时候，并不会生成 package-lock.json 文件。
+>
+> cnpm install 的时候，就算你项目中有 package-lock.json 文件，cnpm 也不会识别，
+>
+> 仍会根据 package.json 来安装。所以这就是为什么之前你用 npm 安装产生了 package-lock.json，
+>
+> 后面的人用 cnpm 来安装，可能会跟你安装的依赖包不一致。
+>
+>  
+>
+> 因此，尽量不要直接使用 cnpm install 安装项目依赖包。
+>
+> 但是为了解决直接使用 npm install 速度慢的问题，**可以设置 npm 代理解决**。
+>
+> https://blog.csdn.net/qianyu6200430/article/details
+>
 
  
 
@@ -320,20 +255,18 @@ lintOnSave:false
 
 用 参数 --mode 来区分不同环境指令 https://cli.vuejs.org/zh/guide/mode-and-env.html 
 
+```json
  "scripts": { 
-
 ​    "serve": "vue-cli-service serve --mode development", //开发环境 
-
 ​    "test":"vue-cli-service serve --mode test",//测试环境 
-
 ​    "build": "vue-cli-service build --mode production",//生产环境 
-
 ​    "lint": "vue-cli-service lint" 
-
   } 
+```
 
 ##### (2) **不同环境api的配置**
 
+```js
 vue-cli 中的指南  模式和环境变量 
 
 \#表示注释  环境变量就是常量 
@@ -343,46 +276,31 @@ vue-cli 中的指南  模式和环境变量
 \#测试环境变量  .env.test 
 
 \#生产环境变量  .env.production 
-
 文件与src同级 
-
 变量 以 VUE_APP_ 开头  
-
 例如： 开发环境变量 VUE_APP_API = 'http://127.0.0.1:3000' 
-
 ​      测试环境变量 VUE_APP_API = 'http://127.0.0.1:5000' 
 
- 
+# 在vue.config.js中 console.log(process.env) (可查看NODE_ENV 运行环境） 
+# console.log(process.env.VUE_APP_API) (可查看变量的值） 
 
-在vue.config.js中 console.log(process.env) (可查看NODE_ENV 运行环境） 
 
-​                   console.log(process.env.VUE_APP_API) (可查看变量的值） 
-
- devServer:{ 
-
+devServer:{ 
 ​    proxy:{ 
-
 ​      '/api':{ 
-
 ​        target:process.env.VUE_APP_API, 
-
 ​        changeOrigin:true, 
-
 ​        pathRewrite:{ 
-
 ​          '/api':"" 
-
 ​        } 
-
 ​      } 
-
 ​    } 
-
   }   
 
  运行这两服务器，axios.get('/api') 
 
  然后 npm run serve  /  npm run test  就会打印出来 
+```
 
 ### style
 
@@ -416,53 +334,42 @@ npm i node-sass sass-loader style-loader -D
 
 #### 3. **Reset style** 
 
+```css
 //assets/style/index.css  在main.js 中引入 
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video{ margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; font-weight: normal; vertical-align: baseline; } /* HTML5 display-role reset for older browsers */ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section{ display: block; } ol, ul, li{ list-style: none; } blockquote, q{ quotes: none; } blockquote:before, blockquote:after, q:before, q:after{ content: ''; content: none; } table{ border-collapse: collapse; border-spacing: 0; } /* custom */ a{ color: #7e8c8d; text-decoration: none; -webkit-backface-visibility: hidden; } ::-webkit-scrollbar{ width: 5px; height: 5px; } ::-webkit-scrollbar-track-piece{ background-color: rgba(0, 0, 0, 0.2); -webkit-border-radius: 6px; } ::-webkit-scrollbar-thumb:vertical{ height: 5px; background-color: rgba(125, 125, 125, 0.7); -webkit-border-radius: 6px; } ::-webkit-scrollbar-thumb:horizontal{ width: 5px; background-color: rgba(125, 125, 125, 0.7); -webkit-border-radius: 6px; } html, body{ width: 100%; font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", "微软雅黑", sans-serif; } body{ line-height: 1; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); } html{ overflow-y: scroll; } /*清除浮动*/ .clearfix:before, .clearfix:after{ content: " "; display: inline-block; height: 0; clear: both; visibility: hidden; } .clearfix{ *zoom: 1; } /*隐藏*/ .dn{ display: none; }
+```
 
 ### 图片、图标引入
 
 #### 1. **图片引入**
 
-第一种 
-
-​    data(){ 
-
+```js
+# 第一种 
+  data(){ 
 ​        return{ 
-
 ​          imgsrc:require('../../../assets/huawei_logo.png') 
-
 ​        } 
-
 ​      } 
 
 <img :src="imgsrc" alt="" class="logo">
+    
 
- 
-
-第二种 
+# 第二种 
 
 ​    import uawei_logo from '../../../assets/huawei_logo.png'; 
-
 ​    data(){ 
-
 ​        return{ 
-
 ​          imgsrc:uawei_logo 
-
 ​        } 
-
 ​      } 
 
    <img :src="imgsrc" alt="" class="logo">
 
- 
-
- 第三种 @/ + src 
+# 第三种 @/ + src 
 
      <img src="@/assets/hwcloud-promotion-04-p.jpg" alt="">
-
- 
+```
 
 #### 2. **图标引入**
 
@@ -478,6 +385,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 
 #### 1. **解决vue路由重复导航的错误**
 
+```js
 // 获取原型对象上的push函数 
 
 const originalPush=VueRouter.prototype.push 
@@ -489,41 +397,28 @@ VueRouter.prototype.push=function(location){
   return originalPush.call(this,location).catch(err=>err) 
 
 } 
+```
 
 #### 2. **vue前端** **跨域解决方案** 
 
+```js
 旧版 ：建一个 vue.config.js 
 
 module.exports={ 
-
-... 
-
-devServer:{ 
-
-host:"localhost",//本地服务 
-
-port:8080, //本地服务 
-
-proxy:{ //代理 
-
-"/api":{ 
-
-target:"http://127.0.0.1:3000/",//后台的接口 
-
-changeOrigin:true, //允许跨域 
-
-pathRewrite:{ //重写路径 
-
-"^/api":"/" 
-
-} 
-
-} 
-
-} 
-
-}
-
+    ... 
+    devServer:{ 
+        host:"localhost",//本地服务 
+        port:8080, //本地服务 
+        proxy:{ //代理 
+            "/api":{ 
+                target:"http://127.0.0.1:3000/",//后台的接口 
+                changeOrigin:true, //允许跨域 
+                pathRewrite:{ //重写路径 
+                	"^/api":"/" 
+                } 
+            } 
+        } 
+    }
 }
 
 @vue/cli 5.0  vue.config.js 
@@ -531,36 +426,23 @@ pathRewrite:{ //重写路径
 const { defineConfig } = require("@vue/cli-service"); 
 
 module.exports = defineConfig({ 
-
   transpileDependencies: true, 
-
   lintOnSave:false,//关闭lint 检查 
-
   devServer: { 
-
 ​    proxy: {//代理 
-
 ​      "/api":{//代理后台接口的别名 
-
 ​        target:"http://127.0.0.1:2000/",//访问的后台接口 
-
 ​        changeOrigin:true,//允许跨域 
-
 ​        pathRewrite:{//重写路径 
-
 ​          '/api':"" 
-
 ​        } 
-
 ​      } 
-
 ​    } 
-
   } 
-
 }); 
 
 请求参数  axios.get('/api') 
+```
 
 ### Mock
 
@@ -570,123 +452,110 @@ mock 的意思是模拟，也就是模拟接口返回的信息，用已有的信
 
 #### 2. **使用**
 
+```js
 npm i mockjs 
-
- 
 
 // 使用 Mock 
 
-**var Mock = require('mockjs')** 
-
- 
+var Mock = require('mockjs')
 
 **Mock.mock()** 
 
 **Mock.mock( rurl?, rtype?, template|function( options ) )** 
 
-\1. **Mock.mock( template )** 根据数据模板生成模拟数据。 
+# \1. **Mock.mock( template )** 根据数据模板生成模拟数据。 
 
 ​    Mock.mock({ 
-
 ​      name:"zhangsan", 
-
 ​      age:18 
-
 ​    }) 
 
-**2.Mock.mock( rurl, template )**当拦截到匹配rurl 的 Ajax 请求时，将根据数据模板template 生成模拟数据，并作为响应数据返回。 
+# **2.Mock.mock( rurl, template )**当拦截到匹配rurl 的 Ajax 请求时，将根据数据模板template 生成模拟数据，并作为响应数据返回。 
 
 ​    //需要配置环境条件(在 main.js中) 
-
 ​    if(process.env.NODE_ENV==='development'){ 
-
 ​      //如果 是 开发环境，那么 就会拦截ajax请求 
-
 ​        require('./mock/index')//mock/index.js  是统一管理所有的mock 
-
 ​    }     
 
 ​    //home页面的请求 
-
 ​    axios.get('/api/home').then(res=>console.log(res)) 
 
 ​    //home页面的mock 
-
 ​    let Mock = require('mockjs'); 
-
 ​    Mock.mock('/api/about',['z','l','w']) 
 
 注意：请求路径 与 拦截路径 要一致 
 
-**3.Mock.mock( rurl, rtype, template )** 
+# **3.Mock.mock( rurl, rtype, template )** 
 
-**4. Mock.mock( rurl, rtype, fonction(config){return config})** 对数据进行操作 
+# **4. Mock.mock( rurl, rtype, fonction(config){return config})** 对数据进行操作 
 
 ​    axios.delete('/api/delete/'+id)    
 
 ​    delete 适合用 正则 
 
 ​    Mock.mock(/\/api\/delete\/\d/,'delete',function(obj){} 
+```
 
 #### 3. **引入mockjs 模拟接口**
 
+```js
 npm i mockjs 
 
 //src/mock/index.js 
 
 let Mock = require('mockjs') 
-
 let arrs = ['王赛军','小全'] 
-
 Mock.mock('/get','get',arrs) 
 
 //main.js 
 
 if(process.env.NODE_ENV==='development'){ 
-
   require('./mock') 
-
 } 
+```
 
 #### 4. **数据模板定义规范**
 
-**网址**：[https://github.com/nuysoft/Mock/wiki/Syntax-Specification#数据模板定义规范-dtd"](https://github.com/nuysoft/Mock/wiki/Syntax-Specification#数据模板定义规范-dtd\)
-
-数据模板中的每个属性由 3 部分构成：属性名、生成规则、属性值：
-
-// **属性名   name**
-
-// **生成规则 rule**
-
-// **属性值   value**
-
-**'name****属性名** **|** **rule****生成规则****': value****属性值****（****rule****）**
-
-· 属性名 和 生成规则 之间用**竖线 | 分隔**。
-
-· 生成规则 是可选的。
-
-· 生成规则 有 7 种格式： 
-
-\1. 'name|min-max': value
-
-\2. 'name|count': value
-
-\3. 'name|min-max.dmin-dmax': value
-
-\4. 'name|min-max.dcount': value
-
-\5. 'name|count.dmin-dmax': value
-
-\6. 'name|count.dcount': value
-
-\7. 'name|+step': value
-
-**·** **生成规则 的 含义 需要依赖 属性值的类型 才能确定。** **属性值value决定了有哪些生成规则**
-
-· 属性值 中可以含有 @占位符。
-
-· 属性值 还指定了最终值的初始值和类型。
+> **网址**：[https://github.com/nuysoft/Mock/wiki/Syntax-Specification#数据模板定义规范-dtd"](https://github.com/nuysoft/Mock/wiki/Syntax-Specification#数据模板定义规范-dtd\)
+>
+> 数据模板中的每个属性由 3 部分构成：属性名、生成规则、属性值：
+>
+> // **属性名   name**
+>
+> // **生成规则 rule**
+>
+> // **属性值   value**
+>
+> **'name****属性名** **|** **rule****生成规则****': value****属性值****（****rule****）**
+>
+> · 属性名 和 生成规则 之间用**竖线 | 分隔**。
+>
+> · 生成规则 是可选的。
+>
+> · 生成规则 有 7 种格式： 
+>
+> \1. 'name|min-max': value
+>
+> \2. 'name|count': value
+>
+> \3. 'name|min-max.dmin-dmax': value
+>
+> \4. 'name|min-max.dcount': value
+>
+> \5. 'name|count.dmin-dmax': value
+>
+> \6. 'name|count.dcount': value
+>
+> \7. 'name|+step': value
+>
+> **·** **生成规则 的 含义 需要依赖 属性值的类型 才能确定。** **属性值value决定了有哪些生成规则**
+>
+> · 属性值 中可以含有 @占位符。
+>
+> · 属性值 还指定了最终值的初始值和类型。
+>
 
 ##### (1) **属性值是字符串 String**
 
@@ -776,25 +645,22 @@ if(process.env.NODE_ENV==='development'){
 
 根据正则表达式 regexp 反向生成可以匹配它的字符串。用于生成自定义格式的字符串。
 
+```
 Mock.mock({
-
 ​    'regexp1': /[a-z][A-Z][0-9]/,
-
 ​    'regexp2': /\w\W\s\S\d\D/,
-
-'regexp3': /\d{5,10}/
+	 'regexp3': /\d{5,10}/
 
 })
 
 // =>{
-
 ​    "regexp1": "pJ7",
-
 ​    "regexp2": "F)\fp1G",
-
-"regexp3": "561659409"
-
+	 "regexp3": "561659409"
 }
+```
+
+
 
 ### B（business）端项目
 
@@ -806,17 +672,16 @@ Mock.mock({
 
 **1)** **全局引入**
 
+```js
 安装 npm i element-ui  
 
-main.js 
+# main.js 
 
 ​    import ElementUI from 'element-ui' 
-
 ​    import 'element-ui/lib/theme-chalk/index.css' 
 
-​     
-
 ​    Vue.use(ElementUI)  全局引入后可随意使用
+```
 
 **2)** **按需引入 (也可以全部引入)**
 
@@ -852,46 +717,32 @@ npm install babel-plugin-component -D
 
 然后，将babel.config.js文件修改为： 
 
- 
-
+```js
 module.exports = { 
 
-presets: [ 
-
-'@vue/cli-plugin-babel/preset', 
-
-[ 
-
-"@babel/preset-env", { modules: false } 
-
-] 
-
-], 
-
-"plugins": [ 
-
-[ 
-
-"component", 
-
-{ 
-
-"libraryName": "element-ui", 
-
-"styleLibraryName": "theme-chalk" 
-
-} 
-
-] 
-
-] 
-
+    presets: [ 
+    '@vue/cli-plugin-babel/preset', 
+        [ 
+        	"@babel/preset-env", { modules: false } 
+        ] 
+    ], 
+    "plugins": [ 
+        [ 
+            "component", 
+            { 
+                "libraryName": "element-ui", 
+                "styleLibraryName": "theme-chalk" 
+            } 
+        ] 
+    ] 
 }
+```
 
 **通常我们会在src目录下新建一个element-ui文件夹 里面创建一个index.js文件** 
 
 在文件中导入你需要的组件并使用 
 
+```js
 import Vue from 'vue' 
 
 import { Button, Select } from 'element-ui' 
@@ -911,8 +762,7 @@ Vue.use(Select)
 import './element-ui/index.js' 
 
 用哪个组件就看哪个组件的说明文档。
-
- 
+```
 
 易错点
 
@@ -966,6 +816,7 @@ rules 对form表单进行正则校验的
 
 **1.** **index.html**
 
+```
 <!-- 生产文件线上打开-->
 
 <script src=”/js/jsonfile.js”></script> ----->注释掉
@@ -974,7 +825,8 @@ rules 对form表单进行正则校验的
 
 <script type=”systemjs-importmap” src=”http://10.10.100.163:8083/testuse.json”></script> 将ip改为本地ip 
 
- 
+```
+
 
 **2.** **public/nginx/testuse.json**
 
@@ -1010,6 +862,7 @@ npm run spa-serve
 
 ##### (6) **Axios封装**
 
+```js
 import axios from ‘axios’
 
 import { Message } from ‘element-ui
@@ -1237,11 +1090,11 @@ if(!window.navigator.online) {
  
 
 export default _axios
-
- 
+```
 
 **// 要用到 axios 的地方 引入 上边的 文件 （**每一个menu 都有多个请求**）**
 
+```js
 import _axios from ‘xxxx’
 
 const account = {
@@ -1255,46 +1108,32 @@ const account = {
 }
 
 export default account
-
- 
+```
 
 **// 汇合多个 menu** 
 
+```js
 import account from ‘xxx/account’
 
 import account1 from ‘xxx/account1’
 
 ...
 
- 
-
 export default {
-
   account,
-
   account1,
-
   ...
-
 }
 
- 
-
 // main.js
-
 import Vue from ‘vue’
-
 // 引入 所有 menu 中的接口
-
 import api from ‘../xx/xx’
-
- 
 
 // 挂载 到 vue实例上
 
 Vue.prototype.$basisApi = api
-
- 
+```
 
 ##### (7) **开发技术总结**
 
@@ -1342,861 +1181,504 @@ This.$nextTick( () => { this.form = this.$options.data().form } )
 
 **引用webpack中的require.context()**	
 
+```js
 const requestComponent = require.context({ 
-
-‘@/components/Transaction/TransactionForm’, 
-
-false,
-
-/\w+\.vue$/
-
- })
+    ‘@/components/Transaction/TransactionForm’, 
+    false,
+    /\w+\.vue$/
+     })
 
 const componentsObj = {}
 
 requestComponent .keys().forEach(fileName => {
-
   let name = fileName.split(‘/’).pop().replace(/\.\w+$/, ‘’)
-
   const componentConfig = requestComponent(name)
-
   componentsObj[name] = componentConfig .default || componentConfig 
-
 })
 
- 
-
 export default {
-
   components: Object.assign(
-
-  {},
-
-  componentsObj,
-
-  { ImportMessage: ImportMessage },
-
-),
-
+      {},
+      componentsObj,
+      { ImportMessage: ImportMessage },
+    ),
 }
+```
 
  
 
 **vuex之多个module引入.js文件**
 
- 
-
+```js
 import Vue from 'vue';
-
 import Vuex from 'vuex';
-
 import getters from './getters';
-
- 
 
 Vue.use( Vuex );
 
- 
-
 // https://webpack.js.org/guides/dependency-management/#requirecontext
-
 const modulesFiles = require.context( './modules', true, /\.js$/ );
 
- 
-
 // you do not need `import app from './modules/app'`
-
 // it will auto require all vuex module from modules file
-
 const modules = modulesFiles.keys().reduce( ( modules, modulePath ) => {
-
   // set './app.js' => 'app'
-
   const moduleName = modulePath.replace( /^\.\/(.*)\.\w+$/, '$1' );
-
   const value = modulesFiles( modulePath );
-
   modules[moduleName] = value.default;
-
   return modules;
-
 }, {} );
 
- 
-
 const store = new Vuex.Store( {
-
   modules,
-
   getters
-
 } );
 
  
-
 export default store
-
- 
+```
 
 **页面需要导入多个组件时** [**require.context()** ](https://www.jianshu.com/p/f918617cde4e)
 
- 
-
+```js
 import aaa from '@/components/login/aaa'
-
 import bbb from '@/components/login/bbb'
-
 import ccc from '@/components/login/ccc'
-
 import ddd from '@/components/login/ddd'
 
 components:{
-
 ​    aaa,
-
 ​    bbb,
-
 ​    ccc,
-
 ​    ddd,
-
 }
 
 \-------------------------------------
 
 const path = require('path')
-
 const files = require.context('@/components/login', false, /\.vue$/)
-
 const modules = {}
-
 files.keys().forEach(key => {
-
   const name = path.basename(key, '.vue') // 提取出用 '/' 隔开的path的最后一部分,path.basename(p, [ext])。 p要处理的path,ext要过滤的字符
-
   modules[name] = files(key).default || files(key)
-
 })
 
-components:modules
-
- 
+components:modules 
+```
 
 ###### ⑦　**History模式的跳转**
 
+```js
 window.open(`${window.location.origin}/ibor/dealquery/${DealObkectType[typeMapping[prodType]]}?params=${JSON.stringify(params)}`)
+```
 
 ###### ⑧　**signalR 与 进度条 结合使用**
 
+```vue
 npm i @microsoft/signalr
 
  
-
 import * as signalR from ‘@microsoft/signalr’
 
 import URL form '....'
 
- 
-
 import { isThisTypeNode } from "typescript"
 
- 
-
 export default {
-
   SR: {},
-
   // 初始化连接
 
   initSR: function() {
-
 ​    // let that = this
-
 ​    if(!localStorage.LoginData) return
-
 ​    let userInfo = JSON.parse(localStorage.LoginData)
-
 ​    let url = URL
 
 ​    // 1. 初始化连接
-
 ​    this.SR = new signalR.HubConnectionBuilder()
-
 ​      .withUrl(`${url}`,{
-
 ​        accessTokenFactory: () => encodeURI(`${JSON.parse(localStorage.LoginData).accessToken}`)
-
 ​      })
-
 ​      .withAutomaticReconnect()
-
 ​      .configureLogging(signalR.LogLevel.Information)
-
 ​      .build()
-
 ​    // 2. 携带参数
-
 ​    this.SR.qs = { enc_auth_token: encodeURL(userInfo.accessToken) }
-
 ​    console.log('init', this.SR)
-
   },
 
   // 发送消息
-
   sendMsg: function({ mode, type, content}) {
-
 ​    let ID = JSON.parse(sesstionStorage.getItem('jurisdictionData')).ID
-
 ​    console.log('ID', ID)
-
 ​    let data = {
-
 ​      PageNo: ID,
-
 ​      FunctionSubModule: mode,
-
 ​      FunctionSubType: type,
-
 ​    }
-
 ​    if(!!content) {
-
 ​      data.DataContent = content
-
 ​    }
-
 ​    let that = this
-
 ​    try {
-
 ​      console.log('current state: ', that,SR.state)
-
 ​      if(that.SR.state === 'Connected') {
-
 ​        that.SR.invoke('RcvRequest', data)
-
 ​      } else {
-
 ​        that.SR.start().then(() => {
-
 ​          that.SR.invoke('RcvRequest', data)
-
 ​        })
-
 ​      }
-
 ​    } catch (error) {
-
 ​      console.log('send error: ', error)
-
 ​    }
-
   },
-
   // 接收信息
-
   receiveMsg: function(cb) {
-
 ​    let that = this
-
 ​    that.SR.on('PublishNotification', cb)
-
   },
-
   // 停止连接
-
   stopSR: function() {
-
 ​    let that = this
-
 ​    try {
-
 ​      that.SR.stop()
-
 ​      console.log('signalR退出成功')
-
 ​    } catch (error) {
-
 ​      console.log('stop', error)
-
 ​    }
-
   }
-
 }
-
- 
+```
 
 使用
 
+```vue
 <el-dialog>
 
-  <el-progress :percentage=”parcent” :show-text=”true”></el-progress>
-
-​      <span>{{ progressMsg }}</span>
-
-​      <ImportMessage :data=”fileInfoData” :msgFlag=”msgFlag”></ImportMessage >
+  <el-progress :percentage="parcent" :show-text="true"></el-progress>
+  <span>{{ progressMsg }}</span>
+  <ImportMessage :data="fileInfoData" :msgFlag="msgFlag"></ImportMessage >
 
 </el-dialog>
 
- 
+```
 
+```vue
 import ImportMessage from ‘xxxxx’ 
 
 import signal from ‘@/utils/signalR’
 
- 
-
 //触发signal的事件
-
 fn(){
-
   this.$confirm('Delete These Data?', 'Notification', {
-
 ​    cancelButtonText: 'Cancel',
-
 ​    cancelButtonClass: 'cancelBGC',
-
 ​    confirmButtonText: 'OK',
-
 ​    confirmButtonClass: 'confirmBGC',
-
 ​    type: 'warning',
-
   })
-
 ​    .then(()=>{
-
 ​      // ... 触发
-
 ​      this.jumpValue ='Delete'
-
 ​      this.msgFlag = false
-
 ​      let param = {
-
 ​        Deals: row.Deals,
-
 ​        ReceiptType: 'DealGroupManagement',
-
 ​      }
-
 ​      this.handleUpdate({
-
 ​        content: param,
-
 ​        mode: 'FileOpration',
-
 ​        type: 'Delete',
-
 ​      })
-
 ​    })
-
 ​    .catch(()=>{
-
 ​      console.log('取消')
-
 ​    })
-
 },
 
 async initSR(data) {
-
   //连接
-
   signal.initSR()
-
   this.sendMsg(data)
-
 },
 
 // 发送消息
-
 sendMsg(data) {
-
   signal.sengMsg(data)
-
 },
 
 // 接收消息
-
 receiveMsg(data) {
-
   signal.receiveMsg( res => {
-
 ​    if(res.errorCode === 20000 || res.errorCode === 20001) {
-
 ​      switch (data.type) {
-
 ​        case 'ContinueProcess':
-
 ​          if(res.errorCode === 20001) {
-
 ​            this.$notify.success({
-
 ​              title:'success',
-
 ​              dangeroudlyUseHTMLString: true,
-
 ​              message: res.dataObj && res.dataObj !== '' ? `<p>${res.dataObj}</p>` : `<p>${this.jumpValue} Success</p>`,
-
 ​              duration: 3000,
-
 ​              customClass: 'notify-success',
-
 ​            })
-
 ​            this.saveFlag = true // 表示数据提交成功，可以直接关闭页面
-
 ​            // ...其他操作
-
 ​          }
-
 ​          if(res.currentStatus === 'Error') {
-
 ​            // ...其他操作
-
 ​          }
-
 ​          break;
-
 ​        case 'ProcessFileContent':
-
 ​        case 'DealGroup':
-
 ​        case 'Jump':
-
 ​        case 'Delete':
-
 ​          this.percent = res.currentValue
-
 ​          this.progressMsg = res.message
-
 ​          this.progressData = res
-
 ​          if(res.dataObj) {
-
 ​            this.fileInfoData = JSON.parse(JSON.stringify(res.res.dataObj))
-
 ​          }
-
 ​          if( (res.errorCode === 20000 && res.currentStatus === 'Done')|| res.currentStatus === 'Error') {
-
 ​            // ...
-
 ​          }
-
 ​          break;      
-
 ​        default:
-
 ​          this.$notify({
-
 ​            type: res.currentStatus === 'Error' ? 'error' : 'Success',
-
 ​            message: res.message,
-
 ​            duration: res.currentStatus === 'Error' ? 0 : 3000,
-
 ​            onClose: function () {
-
 ​              // ...
-
 ​            }
-
 ​          })
-
 ​          break;
-
 ​      }
-
 ​    } else {
-
 ​      this.jumpValue = ''
-
 ​      this.$notify.error({
-
 ​        title: 'Error',
-
 ​        message: res.message,
-
 ​        duration: 0,
-
 ​        customClass: 'notify-error',
-
 ​        onClose: function () {
-
 ​          // ...
-
 ​        }
-
 ​      })
-
 ​    }
-
   })
-
 },
 
 // 停止连接
-
 stopSignal() {
-
   signal.stopSR()
-
 },
 
 handleUpdate(data) {
-
   //...显示进度条弹窗
-
   this.initSR(data)
-
   this.receiveMsg(data)
-
 },
 
 // 弹窗关闭时
-
 handleImportClose(){
-
   this.stopSignal()
-
 }
+```
+
+
 
 ###### ⑨　**将table数据导出 excel**
 
 插件 xlsx xlsx-style
 
- 
-
+```js
 import xlsx from ‘xlsx
 
- 
-
 downXlsx(selectdata) {
-
   const loading = this.$loading({
-
 ​    lock: true,
-
 ​    text: 'Loading',
-
 ​    spinner: 'el-icon-loading',
-
 ​    background: 'rgba(0, 0, 0, 0.7)',
-
   })
-
  // 创建表格
-
   let sheet = xlsx.utils.json_to_sheet(selectdata),
-
    book = xlsx.utils.book_new()
-
   xlsx.utils.book_append_sheet(book, sheet, 'sheet1')
-
   xlsx.writeFile(book, `export${new Date().getTime()}.xlsx`)
-
   loading.close()
-
 }
-
- 
+```
 
 ###### ⑩　**数据较多，使用自定义指令，上划加载**
 
+```vue
 <el-select
-
   v-if=”f.type==’select’&&f.label===’Inventory Date’”
-
   v-model=”dataForm[f.key]”
-
   v-elSelectLoadmore=”loadmore”
-
   :loading=”true”
-
   clearable
-
   filterable
-
 \>
 
   <el-option
-
 ​    v-for=”(o,index) in f.option”
-
 ​    :key=”f.optionKey?o[f.optionKey]:0+index”
-
 ​    :label=”f.optionKey?o[f.optionKey]:o”
-
 ​    :value=”f.optionKey?o.[f.optionKey]:o”
-
    \></el-option>
 
 </el-select>
 
- 
-
 data() {
-
   return {
-
 ​    pageIndex:1,//当前第几页
-
 ​    pageSize:20,//每次获取几条数据
-
 ​    TotalCount:0,//总数据数量
-
 ​    selectLoading:false,//加载
-
+  }
 }
-
-}
-
- 
 
 directives: {
-
   ‘elSelectLoadmore’: {
-
-  bind(el, binding) {
-
-  const SELECTWRAP_DOM = el.querySelector(“.el-select-dropdown .el-select-dropdown__wrap”)
-
-  SELECTWRAP_DOM.addEventListener(“scroll”, function() {
-
-  const condition = this.scrollHeight - this.scrollTop <= this.clientHeight
-
-  if(condition) {
-
-  console.log(‘=======触底加载=========’)
-
-  binding.value()
-
+      bind(el, binding) {
+          const SELECTWRAP_DOM = el.querySelector(“.el-select-dropdown .el-select-dropdown__wrap”)
+          SELECTWRAP_DOM.addEventListener(“scroll”, function() {
+              const condition = this.scrollHeight - this.scrollTop <= this.clientHeight
+              if(condition) {
+                  console.log(‘=======触底加载=========’)
+                  binding.value()
+                }
+            }
+        }
+    }
 }
-
-}
-
-}
-
-}
-
-}
-
- 
 
 mounted() {
-
   //初始化 inventoryDate
-
   this.getInventoryDate()
-
 }
-
- 
 
 methods: {
-
   // 下拉 懒加载
-
   async loadmore() {
-
 ​    if(this.TotalCount>this.formInput.InventoryDate.option.length) {
+      await this.getInventoryDate()
+    }
+  },
 
-  await this.getInventoryDate()
-
-}
-
-},
-
-getInvemtoryDate() {
-
-  this.selectLoading = true
-
-  ...请求数据
-
+    getInvemtoryDate() {
+      this.selectLoading = true
+      ...请求数据
+    }
 }
 
 }
-
-}
+```
 
 ###### ⑪　**自定义指令：弹窗宽度拖大拖小**
 
+```
 // v-dialogDragWidth 拖大拖小
 
 Vue.directive('dialogDragWidth', {
-
   bind(el, binding, vnode, oldVnode) {
-
 ​    const dragDom = binding.value.$el.querySelector('.el-dialog')
-
 ​    el.onmousedown = e => {
-
 ​      // 鼠标按下，计算当前元素距离可视区的距离
-
 ​      const disX = e.clientX - el.offsetLeft
-
 ​      document.onmousemove = e => {
-
 ​        e.prevwntDefault() // 移动时禁止默认事件
-
- 
-
 ​        // 通过事件委托，计算移动距离
-
 ​        const l = e.clientX - disX
-
 ​        dragDom.style.width = `${l}px`
-
 ​      }
-
 ​      document.onmouseup = e => {
-
 ​        document.onmousemove = null
-
 ​        document.onmouseup = null
-
 ​      }
-
 ​    }
-
   }
-
 })
+```
 
 ###### ⑫　**自定义指令：拖拽**
 
+```
 // v-dialogDrag 拖拽
 
 Vue.directive('dialogDrag', {
-
   bind(el, binding, vnode, oldVnode) {
-
 ​    const dialogHeaderEl = el.querySelector('.el-dialog__header')
-
 ​    const dragDom = el.querySelector('.el-dialog')
-
 ​    dialogHeaderEl.style.cursor = 'move'
-
 ​    // 获取原有属性 ie dom元素.currentStyle 
-
 ​    // 火狐 谷歌 window.getComputedStyle(dom元素, null)
-
 ​    const sty = dragDom.currentStyle || window.getComputedStyle(dragDom, null)
-
 ​    dialogHeaderEl.onmousedown = e => {
-
 ​      const disX = e.clientX - dialogHeaderEl.offsetLeft
-
 ​      const disY = e.clientY - dialogHeaderEl.offsetTop
-
 ​      // 获取到的值 带 px 正则匹配替换
-
 ​      let styL, styT
-
 ​      // 注意在ie中 第一次获取到的值为组件自带 50% 移动之后赋值为px
-
 ​      if(sty.left.inCludes('%')) {
-
 ​        styL = +document.body.clientWidth * (+sty.left.replace(/\%/g, '') / 100)
-
 ​        styT = +document.body.clientHeight * (+sty.top.replace(/\%/g, '') / 100)
-
 ​      } else {
-
 ​        styL = +sty.left.replace(/\%/g, '')
-
 ​        styT = +sty.top.replace(/\%/g, '')
-
 ​      }
-
 ​      document.onmousemove = e => {
-
 ​        // 通过事件委托，计算移动的距离
-
 ​        const l = e.clientX - disX
-
 ​        const t = e.clientY - disY
-
 ​        // 移动当前元素
-
 ​        dragDom.style.left = `${l + styL}px`
-
 ​        dragDom.style.top = `${t + styT}px`
-
 ​        // 将此时的位置传出去
-
 ​        // binding.value({x:e.pageX,y:e.pageY})
-
 ​      }
-
 ​      document.onmouseup = e => {
-
 ​        document.onmousemove = null
-
 ​        document.onmouseup = null
-
 ​      }
-
 ​    }
-
   }
-
 })
+```
 
 ###### ⑬　**el-table 禁用某一项数据的勾选**
 
+```js
 <el-table>
-
   <el-table-column
-
 ​    type="selection"
-
 ​    width="55"
-
 ​    align="center"
-
-​    **:selectable="selectabled"**
-
+​    :selectable="selectabled"  // 
   />
-
   <el-table-column
-
 ​    v-for="(item,index) in xx"
-
 ​    :prop="item.prop"
-
 ​    :label="item.label"
-
 ​    :key="index"
-
   \>
-
-​    **<template slot-scope="scope">****{{ scope.row }}****</template>**
-
+​    <template slot-scope="scope">{{ scope.row }}</template>
   </el-table-column>
-
 </el-table>
-
  
-
-**selectabled**(row, index) {
-
+selectabled (row, index) {
   if(row.attr===0) {
-
 ​    return false
-
   } else {
-
 ​    return true
-
   }
-
 }
+```
+
+
 
 ###### ⑭　**接口请求，避免从缓存中拿数据**
 
@@ -2206,9 +1688,10 @@ Vue.directive('dialogDrag', {
 
 ###### ⑮　**获取元素的宽高**
 
+```js
 Element.getBoundingClientRect()
 
-**元素有误滚动条都无影响，获取的是元素占页面的空间**
+# **元素有误滚动条都无影响，获取的是元素占页面的空间**
 
 Element.getBoundingClientRect().left		/*距视口左上角*/	左边框到视口
 
@@ -2225,6 +1708,7 @@ Element.getBoundingClientRect().y		/*距视口左上角*/	左上角到视口顶�
 Element.getBoundingClientRect().width	/*自身占据的空间*/
 
 Element.getBoundingClientRect().height	/*自身占据的空间*/
+```
 
 ##### (8) **Form表单常见问题**
 
@@ -2244,60 +1728,47 @@ this.$forceUpdate()
 
 ###### ④　**select 的label与 value**
 
-<el-select v-model=”formdata.ex”>
-
+```
+<el-select v-model="formdata.ex">
    <el-option
-
 ​     v-for=”item in options”
-
 ​     :key=”item.value”
-
 ​     :label=”item.key”   ---------change时，我们看到的是label
-
 ​     :value=”item.value” ------------change时，值为item.value
-
   \></el-option>
-
 </el-select>
 
- 
-
 options: [
-
   {
-
-  key: ‘Y’,
-
-  value: ‘Trading form’,
-
-},
-
+      key: ‘Y’,
+      value: ‘Trading form’,
+    },
   {
-
-  key: ‘N’,
-
-  value: ‘N’,
-
-}
-
+      key: ‘N’,
+      value: ‘N’,
+    }
 ]
+```
+
+
 
 ###### ⑤　**当一个 form 元素中只有一个输入框时，在该输入框中按下回车应提交该表单**
 
-如果希望阻止这一默认行为，可以在 <form> 标签上添加 @submit.native.prevent。
+> 如果希望阻止这一默认行为，可以在 <form> 标签上添加 @submit.native.prevent。
+>
 
 ###### ⑥　**某些输入框（选择框）必填未填时,单独调用该框的校验规则**
 
+```
 if( !this.formData.tradeDate ) {
-
   // 调用该框的校验规则
-
   this.$refs.ruleForm.validateField(‘TradeDate’)
-
 }
+```
 
 ###### ⑦　**关闭input框的自动填充功能**
 
+```
 浏览器有历史记录功能，形成历史输入记录下拉框
 
 // 获取input 元素
@@ -2311,6 +1782,7 @@ const input = document.querySelector(‘xxx’)
 //FF ：disableautocomplete
 
 Input.setAttribute(‘autocomplete’, ‘off’)
+```
 
 ###### ⑧　**校验功能没有触发**
 
@@ -2326,38 +1798,31 @@ Input.setAttribute(‘autocomplete’, ‘off’)
 
 ###### ⑫　**调用表单的整体校验**
 
+```
 this.$refs[formName][0].ruleFormRefs()
 
- 
-
 // 需要在表单组件内定义该方法
-
 ruleFormRefs() {
-
   let flag = null
-
   this.$refs[componentName].validate( valid => {
-
-  if(valid) {
-
-  flag = true
-
-} else {
-
-  flag = false
-
-}
-
-})
-
-Return flag
+      if(valid) {
+          flag = true
+        } else {
+          flag = false
+        }
+    })
+	Return flag
 
 }
+```
+
+
 
 #### 2. **开发难点**
 
 ##### (1) **需要项目打包时生成一个文件，然后引入**
 
+```
 "scripts": {
 
 ​    "commit": "czg",
@@ -2371,6 +1836,7 @@ Return flag
 ​    "build": "cd ./node_modules/pdfmake && node build-vfs.js ../../src/assets/fonts && cd ../../ && cross-env NODE_ENV=production vite build && esno ./build/script/postBuild.ts",
 
 }
+```
 
 ##### (2) **vuex数据持久化**
 
@@ -2398,205 +1864,129 @@ eg:假如ab两个组件都在用本地存储，你改变了a组件里的数据�
 
 ###### ②　**方案****2****：vuex-persistedstate**
 
+```
 yarn add vuex-persistedstate
-
 // 或
-
 npm install --save vuex-persistedstate
 
- 
-
 import Vuex from "vuex";
-
 // 引入插件
-
 import createPersistedState from "vuex-persistedstate";
-
- 
 
 Vue.use(Vuex);
 
- 
-
 const state = {};
-
 const mutations = {};
-
 const actions = {};
 
- 
-
 const store = new Vuex.Store({
-
 ​	state,
-
 ​	mutations,
-
 ​	actions,
-
   /* vuex数据持久化配置 */
-
 ​	plugins: [
-
 ​		createPersistedState({
-
 ​      // 存储方式：localStorage、sessionStorage、cookies
-
 ​			storage: window.sessionStorage,
-
 ​      // 存储的 key 的key值
-
 ​			key: "store",
-
 ​			render(state) {
-
 ​        // 要存储的数据：本项目采用es6扩展运算符的方式存储了state中所有的数据
-
 ​				return { ...state };
-
 ​			}
-
 ​		})
-
 ​	]
-
 });
 
- 
-
 export default store;
-
- 
+```
 
 vuex中module数据的持久化存储
 
- 
-
+```
 /* module.js */
 
 export const dataStore = {
-
   state: {
-
 ​    data: []
-
   }
-
 }
-
- 
 
 /* store.js */
 
 import { dataStore } from './module'
-
  
-
 const dataState = createPersistedState({
-
   paths: ['data']
-
 });
 
- 
-
 export new Vuex.Store({
-
   modules: {
-
 ​    dataStore
-
   },
-
   plugins: [dataState]
 
 }); 
+```
 
- 
-
-注意事项：
-
- 
-
-storage为存储方式，可选值为localStorage、sessionStorage和cookies；
-
-localStorage和sessionStorage两种存储方式可以采用上述代码中的写法，若想采用cookies坐位数据存储方式，则需要另外一种写法；
-
-render接收一个函数，返回值为一个对象；返回的对象中的键值对既是要持久化存储的数据；
-
-若想持久化存储部分数据，请在return的对象中采用key：value键值对的方式进行数据存储，render函数中的参数
-
-![1709177297149](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709177297149.png)
+> **注意事项：**
+>
+> storage为存储方式，可选值为localStorage、sessionStorage和cookies；
+>
+> localStorage和sessionStorage两种存储方式可以采用上述代码中的写法，若想采用cookies坐位数据存储方式，则需要另外一种写法；
+>
+> render接收一个函数，返回值为一个对象；返回的对象中的键值对既是要持久化存储的数据；
+>
+> 若想持久化存储部分数据，请在return的对象中采用key：value键值对的方式进行数据存储，render函数中的参数
+>
+> ![1709177297149](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709177297149.png)
+>
 
 ###### ①　**方案****3****：vuex-persist**
 
+```
 yarn add vuex-persist
-
 // 或
-
 npm install --save vuex-persist
-
- 
 
 import Vuex from "vuex";
 
 // 引入插件
-
 import VuexPersistence from "vuex-persist";
-
- 
 
 Vue.use(Vuex);
 
 //  初始化
 
 const state = {
-
 ​	userName:'admin'
-
 };
-
 const mutations = {};
-
 const actions = {};
 
 // 创建实例
-
 const vuexPersisted = new VuexPersistence({
-
-​	storage: window.sessionStorage,
-
-  render:state=>({
-
-  	userName:state.userName
-
-​    // 或
-
-​    ...state
-
-  })
-
+	storage: window.sessionStorage,
+    render:state=>({
+    	userName:state.userName
+       // 或
+        ...state
+    })
 });
 
  
 
 const store = new Vuex.Store({
-
-​	state,
-
-  actions,
-
-  mutations,
-
-  // 数据持久化设置
-
-  plugins:[vuexPersisted]
-
+	state,
+    actions,
+    mutations,
+    // 数据持久化设置
+    plugins:[vuexPersisted]
 });
 
- 
 
 export default store;
+```
 
 ### C（consumer）端项目
 
@@ -2628,6 +2018,7 @@ export default store;
 
 在拼多多 项目中，在跳转到 聊天和个人中心页面时，需要判断 本地存储中是否有token ，有token就跳转到该页面，没有就跳转到login页面。需要在 路由守卫中判断 beforeEnter 
 
+```
 beforeEnter(to,from,next){ 
 
 ​      console.log(to,from); 
@@ -2648,7 +2039,10 @@ beforeEnter(to,from,next){
 
 ​    } 
 
-**问题：没有token ，跳转 login时，会报错 重定向问题** 
+**问题：
+```
+
+没有token ，跳转 login时，会报错 重定向问题** 
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps40.jpg) 
 
@@ -2678,31 +2072,32 @@ Router.prototype.push = function push(location) {
 
 ##### (3) **设置滚动条** 
 
-overflow:scroll /* x y 方向都会*/ 
-
-或者 
-
-overflow-x:scroll /*只是x方向*/ 
-
-或者 
-
-overflow-y:scroll  /*只是y方向*/ 
-
-使用scrollbar属性设置滚动条样式 
-
-::-webkit-scrollbar 滚动条整体部分 
-
-::-webkit-scrollbar-button 滚动条两端的按钮 
-
-::-webkit-scrollbar-track 外层轨道 
-
-::-webkit-scrollbar-track-piece 内层轨道，滚动条中间部分（除去） 
-
-::-webkit-scrollbar-thumb 滚动条里面可以拖动的那个 
-
-::-webkit-scrollbar-corner 边角 
-
-::-webkit-resizer 定义右下角拖动块的样式 
+> overflow:scroll /* x y 方向都会*/ 
+>
+> 或者 
+>
+> overflow-x:scroll /*只是x方向*/ 
+>
+> 或者 
+>
+> overflow-y:scroll  /*只是y方向*/ 
+>
+> 使用scrollbar属性设置滚动条样式 
+>
+> ::-webkit-scrollbar 滚动条整体部分 
+>
+> ::-webkit-scrollbar-button 滚动条两端的按钮 
+>
+> ::-webkit-scrollbar-track 外层轨道 
+>
+> ::-webkit-scrollbar-track-piece 内层轨道，滚动条中间部分（除去） 
+>
+> ::-webkit-scrollbar-thumb 滚动条里面可以拖动的那个 
+>
+> ::-webkit-scrollbar-corner 边角 
+>
+> ::-webkit-resizer 定义右下角拖动块的样式 
+>
 
 ##### (4) **右侧下拉了一段距离，左侧点击，右侧要回到起始点**
 
@@ -2748,9 +2143,9 @@ Vue.use(Lazyload, {
 
  
 
+```
 let elementResizeDetectorMaker = require("element-resize-detector");
 
- 
 
 mounted(){
 
@@ -2785,6 +2180,7 @@ methods(){
 }
 
 }
+```
 
 //监听元素变化
 
@@ -2792,81 +2188,47 @@ PS：如果在改变宽度过程中存在动画效果，此时我们可以使用
 
 节流与防抖代码见：https://blog.csdn.net/Ag_wenbi/article/details/106879625
 
+```
 <template>
-
     <div class="page">
-
         <div id="bar" class="echarts"></div>
-
 ​    </div>
-
 </template>
 
- 
-
 <script>
-
 ​    let elementResizeDetectorMaker = require("element-resize-detector");
-
 ​    import {debounce} from 'utils.js';
-
 ​    export default {
-
 ​        name:'page',
-
 ​        mounted(){
-
 ​            let erd = elementResizeDetectorMaker();
-
 ​            let that = this;
-
 ​            erd.listenTo(document.getElementById("bar"), debounce(this.resizeFunc))
-
 ​        },
-
 ​        methods:{
-
 ​            resizeFunc(element){
-
 ​                console.log(element);//element元素信息
-
 ​                that.$nextTick(function () {
-
 ​                    //使echarts尺寸重置
-
 ​                    that.myEcharts.resize();
-
 ​                })
-
 ​            }
-
 ​        }
-
 ​    }
 
 </script>
 
- 
-
 <style lang="scss" scoped>
-
 .page{
-
 ​    width:100%;
-
 ​    height:100%;
-
 ​    .echarts{
-
 ​        width:100%;
-
 ​        height:100%;
-
 ​    }
-
 }
-
 </style>
+```
 
  
 
@@ -2874,42 +2236,31 @@ PS：如果在改变宽度过程中存在动画效果，此时我们可以使用
 
 **better-scroll**  
 
+```
 npm i better-scroll -S 
-
-https://better-scroll.github.io/docs/zh-CN/ 
-
-https://github.com/ustbhuangyi/better-scroll/blob/master/README_zh-CN.md 
+# https://better-scroll.github.io/docs/zh-CN/ 
+# https://github.com/ustbhuangyi/better-scroll/blob/master/README_zh-CN.md 
 
 //组件中 
 
 import BScroll from 'better-scroll' 
 
- 
-
 mounted () {  this.$nextTick(() => { this.scroll = new BScroll(this.$refs.wrapper, {}) }) } 
 
 // template 
-
 <div  class="wrapper"
  style="height: 200px; border: 1px solid #f00;overflow:hidden"
  ref="wrapper"
  >
-
   <div class="content">
-
 ​    <ul> 
-
 ​      <li>1</li> 
-
 ​      ... 
-
 ​      <li>10</li> 
-
 ​    </ul> 
-
   </div> 
-
 </div> 
+```
 
 ###### ①　**解决vue v-for渲染的异步请求数据无法使用better-scroll插件滚动问题**
 
@@ -2929,19 +2280,18 @@ watch: {
 
 ![1709177404235](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1709177404235.png)
 
+```
 <v-tabber v-model=”activeName” @change=”onChange”></v-tabber>
 
 new Vue({
-
-props:[‘activename’],
-
-data(){
-
-return { activeName:this.activename }
-
-}
-
+    props:[‘activename’],
+    data(){
+    	return { activeName:this.activename }
+    }
 })
+```
+
+
 
 ##### (1) **重复key检测，可能造成更新错误**
 
@@ -3902,24 +3252,27 @@ click:true  //解决 每项的点击事件不起作用的问题
 
 https://www.npmjs.com/package/json-server  
 
+```
 npm i json-server -g 
 
 json-server -v 
 
- 
 
 创建 data文件夹 -> 建 文件 db.json  
 
 { "user": [ 
-
 ​    {  "id": 0, "name": "张三" }, 
-
-​    { "id": 1,  "name": "李四" } } 
+​    { "id": 1,  "name": "李四" } ]
+} 
 
 命令：  json-server db.json 监听数据 json-server --watch db.json 
+```
+
+
 
 #### 2. **开启一个后台服务器（接口）**
 
+```js
 const http = require('http'); 
 
 const hostname = '127.0.0.1'; 
@@ -3946,11 +3299,11 @@ server.listen(port, hostname, () => {
 
 });
 
-express
+# express
 
-npm init
+# npm init
 
-npm i express
+# npm i express
 
 // server.js
 
@@ -3987,6 +3340,9 @@ app.listen(5000,err=>{
   if(!err) console.log(‘服务器启动成功了，请求地址为http://localhost:5000/students’)
 
 })
+```
+
+
 
 ### 协同开发
 
@@ -4102,10 +3458,7 @@ https://gitee.com/hlmd/PostmanCn/releases汉化网址
 
 前端解决：修改then里的逻辑，（因为数据格式不对，then中的逻辑会报错，加一个判断）
 
- 
-
- 
-
+```
 http.post(API_URL.selectSaleStock(this.ApiServerEnv), params)
 
 ​                .then(res => {
@@ -4157,6 +3510,7 @@ http.post(API_URL.selectSaleStock(this.ApiServerEnv), params)
 ​                    // this.tableData = mockTableData
 
 ​                })
+```
 
 后端解决：返回数据 data:[] 而不是 null
 
@@ -4164,6 +3518,7 @@ http.post(API_URL.selectSaleStock(this.ApiServerEnv), params)
 
 例子2：
 
+```
 axios.interceptors.response.use(
 
   response => {
@@ -4195,6 +3550,7 @@ if (res.code !== 'ok') {
 ​    }
 
 }
+```
 
 原因：
 
@@ -4206,11 +3562,13 @@ if (res.code !== 'ok') {
 
 因为二进制数据流，直接返回的就是二进制数据流，不包含res.code。所以会进入 上面代码的if
 
+```
 if (response.headers[‘content-type’].search(‘octet-stream’) > -1) {
 
 return response;
 
 }
+```
 
 这句话会判断后端返回的http中的header ： ‘content-type’ 信息 ，是否包含特殊标识，
 
@@ -4228,20 +3586,17 @@ return response;
 
 所以通常请求的headers里要设置content-type:application/json
 
- 
-
+```
 headers: {
 
 ​    "Content-Type": "application/json",
 
 }
-
- 
+```
 
 一般来说这么做是没有问题的,但是就怕忘了设置header,又多此一举的改变了body中数据的类型:
 
- 
-
+```
 fetch('url', {
 
 ​    method: 'POST',
@@ -4253,8 +3608,7 @@ fetch('url', {
 ​    }),
 
 })
-
- 
+```
 
 就是这么多此一举,
 
@@ -4274,8 +3628,7 @@ fetch('url', {
 
 如果没有设置header的conten-type, 在body中传递了对象
 
- 
-
+```
 fetch('url', {
 
 ​    method: 'POST',
@@ -4287,17 +3640,13 @@ fetch('url', {
 ​    },
 
 })
-
- 
+```
 
 浏览器会自动将content-type改成application/json,
 
- 
-
 如果是用了formdata
 
- 
-
+```
 const body = new FormData()
 
 body.append('xxx', 'xxx')
@@ -4309,8 +3658,7 @@ fetch('url', {
 ​    body,
 
 })
-
- 
+```
 
 浏览器也可以很好的识别出请求的content-type,
 

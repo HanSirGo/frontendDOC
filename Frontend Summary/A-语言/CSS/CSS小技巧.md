@@ -848,3 +848,56 @@ body {
 
 通过 `@media (prefers-color-scheme: dark) {}` 媒体查询，在黑夜模式下，展示不同的 `accent-color`。
 
+### shape-outside
+
+外部形状控制。使用 `shape-outside` 属性控制定义文本如何环绕 HTML 元素。此属性对于浮动元素特别有用。定义的形状决定了文本围绕该元素的流动，使文本能够平滑地环绕非矩形形状。
+
+![1725110777498](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110777498.png)
+
+### scroll-snap-type
+
+滚动捕捉类型。使用 `scroll-snap-type` 属性用于在滚动容器内实现对齐点之间的平滑过渡。此功能可确保用户滚动浏览页面时内容部分整齐对齐，从而提供更结构化的用户体验。此scroll-snap-type属性控制沿水平轴或垂直轴的滚动，并定义如何接合对齐点。
+
+![1725110806119](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110806119.png)
+
+### image-rendering
+
+图像渲染。使用 `image-rendering` 性用于确定应如何呈现图像。它告诉浏览器在缩放或调整图像大小时应使用哪种算法。此属性对于 Web 开发人员在放大或缩小图像时保持质量特别有用。
+
+![1725110833813](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110833813.png)
+
+### mix-blend-mode
+
+混合模式。使用 `mix-blend-mode` 可以用来混合两个或多个图层的颜色。此属性将一个图层的颜色与其下方的图层的颜色混合，在屏幕上创建不同的视觉效果。它在处理背景、重叠元素和图像时特别有用。
+
+![1725110857709](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110857709.png)
+
+### background-clip
+
+背景剪辑。使用 `background-clip` 属性决定如何剪裁背景。此属性控制背景是否延伸到内容框的边缘，或者是否被剪裁到内边距和边框区域。
+
+![1725110879353](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110879353.png)
+
+### backdrop-filter
+
+背景滤镜。使用 `backdrop-filter` 属性允许我们对元素后面的内容应用各种效果。它通常用于模糊背景、更改背景颜色或添加阴影
+
+![1725110915147](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110915147.png)
+
+### backface-visibility
+
+背面可见性。使用 `backface-visibility` 属性决定元素在 3D 空间中旋转时其背面是否可见。如果背面不可见，浏览器就不会渲染它，从而提高性能
+
+![1725110961507](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725110961507.png)
+
+### text-emphasis
+
+文本强调。使用 `text-emphasis` 属性于强调文本块中的某些字符。
+
+![1725111175143](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725111175143.png)
+
+### user-select
+
+禁止用户选择。使用 `user-select` 来管理用户是否可选择文本的事件。指定为 `none` 将无法选择
+
+![1725111206476](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725111206476.png)

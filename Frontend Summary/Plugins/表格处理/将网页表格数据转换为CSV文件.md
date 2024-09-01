@@ -8,7 +8,7 @@
 
 首先，我们来看一下完整的代码片段，然后再进行分段介绍。
 
-```
+```js
 function extractTableData(tableId) {
   const table = document.getElementById(tableId);
   const data = [];
@@ -56,7 +56,7 @@ exportTableToCsv('myTableId', 'exported_data.csv');
 
 首先，我们需要通过 `document.getElementById` 选择目标表格。然后，我们使用 `for...of` 循环遍历每一行 (`<tr>`) 和每一个单元格 (`<td>`)，提取其中的文本内容并去除多余的空格。
 
-```
+```js
 function extractTableData(tableId) {
   const table = document.getElementById(tableId);
   const data = [];
@@ -104,7 +104,7 @@ function createDownloadLink(csvContent) {
 
 最后，我们创建一个新的锚点 (`<a>`) 元素，并将其 `href` 属性设置为临时URL，`download` 属性设置为我们想要的文件名（例如，"exported_data.csv"）。然后，模拟点击事件以启动下载。
 
-```
+```js
 function triggerDownload(url, filename) {
   const link = document.createElement('a');
   link.href = url;
@@ -120,7 +120,7 @@ function triggerDownload(url, filename) {
 
 最后，我们将上述步骤整合到一个函数中，便于调用。
 
-```
+```js
 function exportTableToCsv(tableId, filename) {
   const tableData = extractTableData(tableId);
   const csvContent = buildCsvString(tableData);
