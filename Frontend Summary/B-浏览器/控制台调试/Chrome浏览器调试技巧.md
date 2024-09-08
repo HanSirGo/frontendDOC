@@ -296,13 +296,17 @@ console.log('debugger')
 
 ![1724810139348](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724810139348.png)
 
-还可以再filter中输入请求方法，状态等：
+还可以再filter中输入请求方法，状态等：（**选中输入框，按Ctrl+空格 可以将所有的filter选项展示出来；输入-取反**）
 
 ![1724810462135](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724810462135.png)
 
 2.根据response返回来查询接口
 
 ![1724809612481](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1724809612481.png)
+
+3.既不想选All，还想多个展示可以使用 Ctrl+鼠标，想展示那个，鼠标点击那个。
+
+![1725589440559](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1725589440559.png)
 
 ### Disable cache禁用缓存
 
@@ -405,16 +409,24 @@ console.log(PerformanceObserver.supportenEntryTypes)
 | event                    | 事件延迟，实例项是PerformanceEventTiming对象                 |
 | first-input              | 用户第一次与网站交互（即点击链接、点击按钮或者使用自定义的javascript控件时），到浏览器实际能够响应该交互的时间，称之为First input delay-FID |
 | largest-contentful-paint | 屏幕上触发的最大绘制元素，实例项是LargestContentfulPaint对象 |
-| layout-shift             |                                                              |
-| longtask                 |                                                              |
-| mark                     |                                                              |
-| measure                  |                                                              |
-| navigation               |                                                              |
-| paint                    |                                                              |
-| resource                 |                                                              |
-| visiblity-state          |                                                              |
+| layout-shift             | 元素移动时的布局稳定性，实例项是LayoutShift对象              |
+| long-animation-framr     | 长动画关键帧                                                 |
+| longtask                 | 长任务实例，归属于PerformanceLongTaskTiming对象              |
+| mark                     | 用户自定义的性能标记，实例项是PerformanceMark对象            |
+| measure                  | 用户自定义的性能测量，实例项是PerformanceMeasure对象         |
+| navigation               | 页面导航出去的时间，实例项是PerformancePaintTiming对象       |
+| paint                    | 页面加载时内容渲染的关键时刻（第一次绘制，第一次有内容的绘制，实例项是PerformancePaintTiming对象） |
+| resource                 | 页面中资源加载时间信息，实例项是PerformanceRourceTimming对象 |
+| visiblity-state          | 页面可见性状态更改的事件，即选项卡何时从前台更改为后台，反之亦然。实例项是VisibilityStateEntry对象 |
+| soft-navigation          | -                                                            |
 
+### 首次绘制（First Paint）和首次内容绘制（First Contentful Paint）
 
+> 首次绘制（FP）和首次内容绘制（FPC）。在浏览器导航并渲染出像素点后，这些性能指标立即被标记。这些点对于用户而言十分重要，直呼感官体验
+>
+> FP 首次渲染的时间点。FP和FCP有点像，但是FP一定先于FCP发生，例如一个页面加载时，第一个DOM还没绘制完成，但是可能这时页面的背景颜色已经出来了，这时FP指标就被记录下来了。而FCP会在页面绘制完第一个DOM内容后记录。
+>
+> FCP，首次绘制内容的时间，指页面从开始加载到页面内容的任何部分在屏幕上完成渲染的时间。
 
 ## 参考资料
 

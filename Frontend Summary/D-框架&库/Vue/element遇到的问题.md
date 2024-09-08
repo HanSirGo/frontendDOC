@@ -160,6 +160,72 @@ const rules = reactive({
 
 ##### DatePicker禁用日期
 
+> disabled-date: 一个用来判断该日期是否被禁用的函数，接受一个Date对象作为参数，应该返回一个Boolean值
+>
+> disabled-hours：判断该小时是否被禁用的函数，但是和disabled-date略有不同，返回的是一个数组，数据里面包含的是被禁用的小时，如无禁用选项，返回空数组即可
+>
+> disabled-minutes：同上
+>
+> disabled-seconds：同上
+
+###### 日期
+
+```vue
+# 第一种
+<template>
+...
+	<el-date-picker 
+     	type="date" 
+  		format="yyyy 年 MM 月 dd 日" 
+        value-format="yyyy-MM-dd"
+        placeholder="选择日期"
+        :picker-options="pickerOptions" // 或者 :disabled-date='disabledDate'
+    >
+    </el-date-picker>
+...
+</template>
+
+<script>
+export default {
+    data(){
+        return {
+            pickerOptions:{
+                disabledDate(time){
+                    return time.getTime()<new Date().getTime()
+                }
+            }
+        }
+    }
+}
+</script>
+
+# 第二种 (未测试)
+<template>
+...
+	<el-date-picker 
+     	type="date" 
+  		format="yyyy 年 MM 月 dd 日" 
+        value-format="yyyy-MM-dd"
+        placeholder="选择日期"
+        :disabled-date='disabledDate'
+    >
+    </el-date-picker>
+...
+</template>
+
+<script>
+export default {
+    method: {
+        disabledDate(time){
+            return time.getTime()<new Date().getTime()
+        }
+    }
+}
+</script>
+```
+
+**注意：根据props传值判断是否禁用**
+
 ```vue
 <template>
 ...
@@ -211,6 +277,59 @@ export default {
                 }
             }
         }
+    }
+}
+</script>
+```
+
+###### 时间(时分秒)
+
+```vue
+<template>
+...
+	<el-date-picker 
+     	type="date" 
+  		format="yyyy 年 MM 月 dd 日" 
+        value-format="yyyy-MM-dd"
+        placeholder="选择日期"
+        :disabled-hours="disabledHours"
+        :disabled-minutes="disabledMinutes"
+        :disabled-seconds="disabledSeconds"
+    >
+    </el-date-picker>
+...
+</template>
+
+<script>
+export default {
+    method:{
+       disabledHours(){
+           const arr=[]
+           if(new Date(selectTimes.value).getTime()>Date.now()) return arr
+           for(let i=0;i<24;i++){
+               if(new Date().getHours() <= i) continue
+               arr.push(i)
+           }
+           return arr
+       }, 
+       disabledMinutes(){
+           const arr=[]
+           if(new Date(selectTimes.value).getTime()>Date.now()) return arr
+           for(let i=0;i<60;i++){
+               if(new Date().getMinutes() <= i) continue
+               arr.push(i)
+           }
+           return arr
+       }, 
+       disabledSeconds(){
+           const arr=[]
+           if(new Date(selectTimes.value).getTime()>Date.now()) return arr
+           for(let i=0;i<60;i++){
+               if(new Date().getSeconds() <= i) continue
+               arr.push(i)
+           }
+           return arr
+       }, 
     }
 }
 </script>
