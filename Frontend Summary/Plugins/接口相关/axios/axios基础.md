@@ -82,12 +82,18 @@ axios.patch(url[, data[, config]])
     ID: 12345
   },
 
-   // `paramsSerializer` 是一个负责 `params` 序列化的函数
+  // `paramsSerializer` 是一个负责 `params` 序列化的函数
   // (e.g. https://www.npmjs.com/package/qs, http://api.jquery.com/jquery.param/)
   paramsSerializer: function(params) {
-    return Qs.stringify(params, {arrayFormat: 'brackets'})
+    return Qs.stringify(params, {arrayFormat: 'repeat'})
   },
-
+  // 上边适合vue2，下边适合vue3
+  // paramsSerializer: {
+  //    serialize: (params) => {
+  //  		return Qs.stringify(params, {arrayFormat: 'repeat'})
+  //    }
+  // },  
+      
   // `data` 是作为请求主体被发送的数据
   // 只适用于这些请求方法 'PUT', 'POST', 和 'PATCH'
   // 在没有设置 `transformRequest` 时，必须是以下类型之一：

@@ -157,7 +157,14 @@ VScode插件地址 [https://marketplace.visualstudio.com](https://marketplace.vi
 > Vue 团队官方推荐 Volar 插件来代替 Vetur 插件，不仅支持 Vue3 语言高亮、语法检测，还支持 TypeScript 和基于 vue-tsc 的类型检查功能。
 > https://marketplace.visualstudio.com/items?itemName=Vue.volar
 > ![1713700325980](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1713700325980.png)
+#### Vue - Official
+
+![1726293581003](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1726293581003.png)
+
+`Volar` 的替代品。现在属于 Vue 开发的必备插件了！
+
 #### 22. Vue VSCode Snippets（已用）
+
 > 为开发者提供最简单快速的生成 Vue 代码片段的方法，通过各种快捷键就可以在 .vue文件中快速生成各种代码片段。
 > vbase会提示生成的模版内容
 > 输入 vfor快速生成 v-for指令模版
@@ -325,3 +332,17 @@ VScode插件地址 [https://marketplace.visualstudio.com](https://marketplace.vi
 > 注意：在处理兼容IE浏览器时，要注意IE浏览器较低版本本身就不支持的属性，即使进行兼容处理也不能应用。
 
 > 使用方法： 在需要处理的css文件里F1，选择Autoprefixer：Run选项
+
+#### env-cmd-file-syntax
+
+![1726293737509](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1726293737509.png)
+
+在项目中，我们经常会写入很多 **环境变量**。这些文件多以 `.env.xxxxx` 的方式命名。
+
+![1726293779557](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1726293779557.png)
+
+这样格式的文件在写入内容时，是没有代码颜色划分的，就会很不方便。
+
+那么通过这个库就可以让你的代码具有颜色划分和提示
+
+![1726293770080](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1726293770080.png)

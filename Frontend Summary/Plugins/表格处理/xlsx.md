@@ -256,8 +256,14 @@ if('msSaveOrOpenBlob' in navigator) {
 #### 前端获取后端filename
 
 ```js
-// 后端的filename放在响应头的content-disposition中，需要后端配置，让流浪器暴露给前端
+// 后端的filename放在响应头的content-disposition中，需要后端配置，让浏览器暴露给前端
 
+// 前端需要将response整体返回出来
+// 在响应拦截器中，判断responseType是不是blob，不是就只返回页面所需的data即可
+if(response.config.responseType==='blob') return response
+return response.data
+
+// 下载
 function download (response,defaultname) {
     const { data, header } = response
     const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
@@ -280,6 +286,9 @@ function download (response,defaultname) {
 > 因为下载接口使用 responseType: 'blob' 来接收信息，所有，接口报错时，错误信息也会转为blob类型，这样就需要我们读取出来，把message展示出来
 
 ```js
+// 在响应拦截器中处理下载blob出现错误的情况
+if(response.config.responseType==='blob') readBlobMessage(response.data)
+
 function readBlobMessage (data) {
     const reader = new FileReader();
     reader.onload = (e) => {

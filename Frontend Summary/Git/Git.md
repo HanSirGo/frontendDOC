@@ -1,3 +1,5 @@
+![1726305234303](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1726305234303.png)
+
 ##  Git
 
 ### Git 基本概念
@@ -91,7 +93,7 @@ git status
 
 此命令不会更改或更新任何内容。它会打印出哪些文件被修改、暂存或未跟踪。未跟踪的文件是尚未添加到 git 索引的文件，而自上次提交以来已更改的文件将被视为已被 git 修改。
 
-### 全局配置
+### 全局配置 Git config
 
 当安装Git后首先要做的就是配置所有本地存储库中使用的用户信息。每次Git提交都会使用该用户信息。
 
@@ -116,6 +118,9 @@ git config --global user.name "name"
 
 ```js
 git config user.name
+
+#查看用户名是否配置成功
+git config --global user.name
 ```
 
 #### 设置邮箱
@@ -131,6 +136,9 @@ git config --global user.email "email"
 
 ```js
 git config user.email
+
+#查看邮箱是否配置
+git config --global user.email 
 ```
 
 #### 设置命令颜色
@@ -139,6 +147,16 @@ git config user.email
 
 ```js
  git config --global color.ui auto
+```
+
+#### 其他查看配置相关
+
+```
+git config --global --list #查看全局设置相关参数列表
+git config --local --list #查看本地设置相关参数列表
+git config --system --list #查看系统配置参数列表
+git config --list #查看所有Git的配置(全局+本地+系统)
+git config --global color.ui true #显示git相关颜色
 ```
 
 #### 查看所有配置
@@ -353,6 +371,16 @@ git add filename  # 将指定的文件添加到暂存区 
 git add path/     # 将指定的目录添加到暂存区  
 git add .         # 将当前目录所有内容(文件和文件夹)添加到暂存区    
 git add --all     # 将当前目录所有内容(文件和文件夹)添加到暂存区
+
+git add . #将当前工作区的所有文件都加入暂存区
+
+git add 文件名 #将工作区的某个文件添加到暂存区
+
+git add -u #添加所有被tracked文件中被修改或删除的文件信息到暂存区，不处理untracked的文件
+
+git add -A #添加所有被tracked文件中被修改或删除的文件信息到暂存区，包括untracked的文件
+
+git add -i #进入交互界面模式，按需添加文件到缓存区
 ```
 
 ##### Git rm
@@ -361,8 +389,6 @@ git add --all     # 将当前目录所有内容(文件和文件夹)添加到�
 # 将文件移出暂存区
 $ git rm --cached filenamed
 ```
-
-
 
 ##### Git查看提交日志
 
@@ -384,6 +410,33 @@ git reflog
 ```js
 git log // 命令用于显示所有提交的历史记录。它包括提交哈希、作者、日期和提交消息。
 git log --oneline // 将每次commit提交,简化成一行
+
+# 可以输入 q 退出
+
+git log #查看所有commit记录(SHA-A校验和，作者名称，邮箱，提交时间，提交说明)
+
+git log -p -次数#查看最近多少次的提交记录
+
+git log --stat #简略显示每次提交的内容更改
+
+git log --name-only #仅显示已修改的文件清单
+
+git log --name-status #显示新增，修改，删除的文件清单
+
+git log --oneline #让提交记录以精简的一行输出
+
+git log --graph --all --oneline #图形展示分支的合并历史
+
+git log --author=作者#查询作者的提交记录(和grep同时使用要加一个–all–match参数)
+
+git log --grep=过滤信息#列出提交信息中包含过滤信息的提交记录
+
+git log -S查询内容#和–grep类似，S和查询内容间没有空格
+
+git log fileName #查看某文件的修改记录，找背锅专用
+
+# 谁？在什么时间，修改了文件的什么内容
+git blame <file>
 ```
 
 ##### Git diff
@@ -392,6 +445,22 @@ git log --oneline // 将每次commit提交,简化成一行
 git diff // 命令用于检查当前工作目录和上次提交之间的差异。
 # 要查看尚未添加到暂存区的变更，直接输入不加参数的 git diff 命令
 # 将暂存的变更和上一次提交的内容进行比较 git diff --staged 或者 git diff --cached
+
+git diff #工作区与暂存区的差异
+
+git diff 分支名#工作区与某分支的差异，远程分支这样写：remotes/origin/分支名
+
+git diff HEAD #工作区与HEAD指针指向的内容差异
+
+git diff 提交id 文件路径#工作区某文件当前版本与历史版本的差异
+
+git diff --stage #工作区文件与上次提交的差异(1.6 版本前用 --cached)
+
+git diff 版本TAG #查看从某个版本后都改动内容
+
+git diff 分支A 分支B #比较从分支A和分支B的差异(也支持比较两个TAG)
+
+git diff 分支A...分支B #比较两分支在分开后各自的改动
 ```
 
 ##### Git pull
@@ -425,19 +494,6 @@ git restore filename // 将删除的文件恢复
 git reset --hard commitid // commitid之后的提交会消失
 // 想要保留所有提交，切还原
 git revert commitid
-```
-
-##### Git reset
-
-```js
-如果你想要完全重做最新的提交，可以使用 git reset 命令。这将撤销你的提交，但不会影响你的工作目录。
-
-# 软重置（--soft）：重置提交，但保留更改在暂存区。
-# 混成重置（--mixed）：重置提交，保留更改在工作目录。
-# 硬重置（--hard）：重置提交，丢弃所有更改。
-
-# 撤销最后一次提交，更改保留在暂存区
-git reset --soft HEAD~1  
 ```
 
 #### 分支
@@ -774,7 +830,7 @@ HEAD^^ : 当前版本的前两个版本
 HEAD~100 : 当前版本的前100个版本
 ```
 
-##### Git **版本回退**
+##### Git **版本回退**（适合提交到远程的commit）
 
 ```
 git reset HEAD^ : 回退到当前版本的前一个版本
@@ -782,6 +838,21 @@ git reset HEAD^^ : 回退到当前版本的前两个版本
 git reset HEAD~100 : 回退到当前版本的前100个版本
 如果增加 --hard 参数会重置工作区和暂存区,未提交的变更将不可逆的丢弃
 ```
+
+##### Git reset
+
+```js
+如果你想要完全重做最新的提交，可以使用 git reset 命令。这将撤销你的提交，但不会影响你的工作目录。
+
+# 软重置（--soft）：重置提交，但保留更改在暂存区。
+# 混成重置（--mixed）：重置提交，保留更改在工作目录。
+# 硬重置（--hard）：重置提交，丢弃所有更改。
+
+# 撤销最后一次提交，更改保留在暂存区
+git reset --soft HEAD~1  
+```
+
+**具体步骤：**
 
 ```
 1. Git log 查看commit 提交；复制 版本号
@@ -793,7 +864,10 @@ git reset HEAD~100 : 回退到当前版本的前100个版本
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps58.jpg)
 
-// TODO git stash 补存
+##### Git 提交了多个 commit （未提交到远程），想要撤回
+
+![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps51.jpg)
+
 #### 提交
 
 ##### Git 提交暂存区
@@ -832,6 +906,14 @@ git stash drop  // 删除最近的一次stash
 ```
 
 ##### Git提交本地仓库
+
+```js
+git commit -m "提交说明" #将暂存区内容提交到本地仓库
+
+git commit -a "提交说明" #跳过缓存区操作，直接把工作区内容提交到本地仓库
+
+git commit --amend #修正提交信息（请匆修改已发布的提交记录）
+```
 
 ```js
 git commit -m '注释' // 将暂存区的文件修改提交到本地仓库
@@ -1575,6 +1657,59 @@ git diff <分支名1> <分支名2>
 git diff <分支名1> <分支名2> --stat
 ```
 
+#### 更新与发布
+
+```js
+# 列出当前配置的远程端
+git remote -v
+# 显示远程端信息
+git remote show <remote>
+# 添加新的远程端
+git remote add <shortname> <url>
+# 下载远程端的所有改动到本地，不会自动合并到当前
+git fetch <remote>
+# 下载远程端的所有改动到本地，自动合并到当前
+git pull <remote> <branch>
+# 将本地版本发布到远程端
+git push <remote> <branch>
+# 删除远程端分支
+git branch -dr <remote/branch>
+# 生成一个可供发布的压缩包
+git archive --format=tar --output=[file.tar] [commit]
+```
+
+#### 合并与重置
+
+```js
+# 将分支合并到当前
+git merge <branch>
+# 将当前版本重置到分支中（勿重置已发布的提交）
+git rebase <branch>
+# 退出重置
+git rebase --abort
+# 解决冲突后继续重置
+git rebase --continue
+# 使用配置好的合并工具去解决冲突
+git mergetool
+# 在编辑器中手动解决冲突后，标记文件为已解决冲突
+git add <resolved-file>
+
+git rm <resolved-file>
+    
+# 撤销放弃工作目录下的所有修改
+git reset --hard HEAD
+# 放弃某个文件的所有本地修改
+git checkout HEAD <file>
+# 重置一个提交(通过创建一个截然不同的新提交)
+git revert <commit>
+# 将 HEAD 重置到上一次提交的版本，并抛弃该版本之后的所有修改
+git reset --hard <commit>
+# 将 HEAD 重置到上一次提交的版本，并将之后修改标记为未添加到缓存区的修改
+git reset <commit>
+# 将 HEAD 重置到上一次提交的版本，并保留未提交的本地修改
+git reset --keep <commit>
+```
+
 #### 定位问题
 
 git bisect 可以用来查找哪一次代码提交引入了错误。它的原理很简单就是将代码提交的历史使用二分法来缩小出问题的代替提交范围，确定问题出在前半部分还是后半部分，不断执行这个过程，直到找到引入问题的那一次提交。
@@ -1625,6 +1760,21 @@ git bisect reset
 
 - **轻量标签 ：** 只是某个commit 的引用，可以理解为是一个commit的别名；
 - **附注标签 ：** 存储在Git仓库中的一个完整对象，包含打标签者的名字、电子邮件地址、日期时间 以及其他的标签信息。它是可以被校验的，可以使用 GNU Privacy Guard (GPG) 签名并验证。
+
+```js
+# 列出所有标签
+git tag
+# 创建轻量级标签
+git tag [tag]
+# 创建带有注释的标签
+git tag -a [tag] -m "[message]"
+# 删除本地标签
+git tag -d [tag]
+# 删除远程标签
+git push [remote] :refs/tags/[tag]
+# 推送标签到远程仓库
+git push [remote] [tag
+```
 
 ##### Git 展示标签
 
@@ -1792,15 +1942,9 @@ git tag -d
 git checkout -b [branchName] [tagName]
 ```
 
-#### Git遇到的问题
+#### Git遇到的问题 
 
-##### 1. Git 提交了多个 commit 到远程，想要撤回
-
-![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps51.jpg) 
-
-Git log 就可以看到提交到远程的commit 已经撤回了
-
-##### 3. **merge 后Git pull 报错**
+##### 1. **merge 后Git pull 报错**
 
 使用git pull 指令时报错：error: You have not concluded your merge (MERGE_HEAD exists).
 
@@ -1824,7 +1968,7 @@ git pull			// 重新拉取代码
 
 找到 .git 文件中的 index.lock 文件 删除，重新pull
 
-##### 3. 配置git 公钥、秘钥
+##### 2. 配置git 公钥、秘钥
 
 在git终端上输入 以下指令  
 
@@ -1844,7 +1988,7 @@ new SSH key
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps59.jpg)![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps60.jpg) 
 
-##### 4. **报错问题**
+##### 3. **报错问题**
 
 ![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml10700\wps61.jpg) 
 
@@ -1868,7 +2012,7 @@ https://blog.csdn.net/dxy1128/article/details/106363962
 
 
 
-##### 5.git提示fatal: not a git repository (or any of the parent directories): .git
+##### 4. git提示fatal: not a git repository (or any of the parent directories): .git
 
 > 1、创建分支时提示：not a git repository
 >
